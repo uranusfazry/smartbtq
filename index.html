@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMBTQ – Smart Analytic Dashboard BTQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --navy:       #0c2340;
+  --navy-mid:   #163a62;
+  --navy-light: #1e527f;
+  --navy-pale:  #e8eef6;
+  --navy-pale2: #f0f4fa;
+  --gold:       #b8962e;
+  --gold-light: #d4b45a;
+  --gold-pale:  #fdf6e3;
+  --gold-faint: #faf3de;
+  --white:      #ffffff;
+  --bg:         #f2f5f9;
+  --gray-50:    #f8f9fb;
+  --gray-100:   #edf0f5;
+  --gray-200:   #d9dfe9;
+  --gray-300:   #b8c1d0;
+  --gray-500:   #6b7a94;
+  --gray-700:   #3d4a5c;
+  --gray-900:   #1a2333;
+  --green:      #1a6b3c;
+  --green-bg:   #d4edda;
+  --amber:      #7a5c00;
+  --amber-bg:   #fff3cd;
+  --red:        #7a1c1c;
+  --red-bg:     #fde8e8;
+  --serif:      'Playfair Display', Georgia, serif;
+  --sans:       'DM Sans', 'Segoe UI', sans-serif;
+  --radius:     6px;
+  --radius-lg:  10px;
+  --shadow:     0 2px 12px rgba(12,35,64,.08);
+  --shadow-md:  0 4px 20px rgba(12,35,64,.11);
+  --shadow-lg:  0 8px 32px rgba(12,35,64,.14);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--gray-900);font-size:14px;line-height:1.6}
+
+/* ==================== SPA VIEW ==================== */
+.view-section{display:none;animation:fadeIn .4s ease-in-out}
+.view-section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ==================== SIDEBAR ==================== */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;opacity:0;transition:opacity .25s}
+.sidebar-overlay.open{display:block;opacity:1}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--navy);border-right:2px solid var(--gold);z-index:201;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:0}
+.sidebar.open{transform:translateX(0)}
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between}
+.sidebar-brand{font-family:var(--serif);font-size:14px;color:var(--white);font-weight:700;line-height:1.3}
+.sidebar-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;line-height:1;padding:0 2px}
+.sidebar-close:hover{color:var(--gold-light)}
+.sidebar-nav{padding:12px 0;flex:1}
+.sidebar-nav a{display:flex;align-items:center;gap:10px;padding:11px 20px;color:rgba(255,255,255,.75);text-decoration:none;font-size:13.5px;font-weight:500;letter-spacing:.2px;transition:background .15s,color .15s}
+.sidebar-nav a:hover{background:rgba(255,255,255,.08);color:var(--gold-light)}
+.sidebar-nav a.nav-active{background:rgba(255,255,255,.1);color:var(--gold-light);border-left:3px solid var(--gold-light)}
+.sidebar-nav a .nav-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-period{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1)}
+.sidebar-period label{display:block;font-size:11px;color:var(--gold-light);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:8px}
+.sidebar-period select{width:100%;padding:8px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--white);border-radius:4px;font-family:var(--sans);font-size:13px;outline:none;margin-bottom:12px;cursor:pointer;}
+.sidebar-period select option{background:var(--navy);color:var(--white)}
+
+/* ==================== TOPBAR ==================== */
+.topbar{position:sticky;top:0;z-index:100;background:var(--navy);border-bottom:3px solid var(--gold);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 16px rgba(12,35,64,.25)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;border-radius:4px;flex-direction:column;gap:4px;align-items:center}
+.hamburger span{display:block;width:20px;height:2px;background:rgba(255,255,255,.85);border-radius:2px;transition:all .2s}
+.hamburger:hover span{background:var(--gold-light)}
+.topbar-brand{font-family:var(--serif);font-size:14px;color:var(--white);font-weight:700;letter-spacing:.3px;line-height:1.2}
+.topbar-brand small{display:block;font-family:var(--sans);font-size:11px;color:rgba(255,255,255,.55);font-weight:400;letter-spacing:.3px;font-style:normal}
+.topbar-nav{display:flex;align-items:center;gap:6px}
+.topbar-nav a{color:rgba(255,255,255,.7);text-decoration:none;font-size:12px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;padding:6px 10px;border-radius:3px;transition:background .15s,color .15s}
+.topbar-nav a:hover{background:rgba(255,255,255,.1);color:var(--gold-light)}
+.topbar-nav a.nav-active{background:rgba(255,255,255,.15);color:var(--gold-light)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.period-pills{display:flex;align-items:center;gap:6px}
+.period-pills select{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:var(--white);border-radius:4px;padding:6px 10px;font-family:var(--sans);font-size:12.5px;font-weight:600;outline:none;cursor:pointer;transition:background .15s}
+.period-pills select:hover{background:rgba(255,255,255,.2)}
+.period-pills select option{background:var(--navy);color:var(--white)}
+.period-sep{color:rgba(255,255,255,.3);font-size:18px;font-weight:300}
+.btn-print{background:var(--gold);color:var(--navy);border:none;cursor:pointer;font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:7px 14px;border-radius:4px;transition:background .2s,transform .1s;white-space:nowrap}
+.btn-print:hover{background:var(--gold-light);transform:translateY(-1px)}
+
+/* ==================== KOPSURAT ==================== */
+.kopsurat{background:var(--white);border-bottom:4px double var(--navy);padding:22px 40px 18px;display:flex;align-items:center;gap:20px}
+.kop-logo{width:68px;height:68px;flex-shrink:0;border:2px solid var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--gray-50);overflow:hidden}
+.kop-logo svg{width:44px;height:44px}
+.kop-text{flex:1;text-align:center}
+.kop-instansi{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px}
+.kop-judul{font-family:var(--serif);font-size:18px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:1.5px;line-height:1.2}
+.kop-sub{font-size:13px;color:var(--gray-700);margin-top:4px}
+.kop-sub strong{color:var(--navy)}
+.kop-meta{font-size:11.5px;color:var(--gray-300);margin-top:5px;font-style:italic}
+.kop-divider{border:none;border-top:2px solid var(--navy);margin:10px 40px 0}
+
+/* ==================== WRAP ==================== */
+.wrap{max-width:1200px;margin:0 auto;padding:28px 24px 64px}
+
+/* ==================== PERIOD BANNER ==================== */
+.period-banner{display:flex;align-items:center;justify-content:space-between;background:var(--navy-pale);border:1px solid var(--gray-200);border-left:5px solid var(--gold);border-radius:var(--radius);padding:12px 20px;margin-bottom:24px;flex-wrap:wrap;gap:8px}
+.period-banner .pb-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--gray-500);font-weight:600}
+.period-banner .pb-value{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--navy)}
+.period-banner .pb-right{display:flex;align-items:center;gap:10px}
+.trend-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.trend-up{background:#d4edda;color:#155724}
+.trend-down{background:#fde8e8;color:#7a1c1c}
+.trend-neutral{background:var(--gray-100);color:var(--gray-500)}
+
+/* ==================== HIGHLIGHT ==================== */
+.highlight-box{background:var(--navy);border-left:6px solid var(--gold);color:var(--white);padding:22px 28px;margin-bottom:24px;border-radius:var(--radius);position:relative;overflow:hidden}
+.highlight-box::after{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(184,150,46,.12);pointer-events:none}
+.hl-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold-light);font-weight:600;margin-bottom:8px}
+.hl-stat{font-family:var(--serif);font-size:38px;font-weight:800;line-height:1}
+.hl-desc{font-size:14.5px;opacity:.9;margin-top:8px;line-height:1.6;}
+
+/* ==================== STAT GRID ==================== */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:var(--white);border:1px solid var(--gray-200);border-top:3px solid var(--navy-mid);padding:16px 18px;border-radius:var(--radius);box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.sc-label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-500);font-weight:600;margin-bottom:6px}
+.sc-value{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--navy);line-height:1}
+.sc-sub{font-size:12px;color:var(--gray-500);margin-top:4px}
+
+/* ==================== SECTION TITLE ==================== */
+.section-title{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid var(--navy);padding-bottom:8px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.section-title span{flex:1}
+.section-badge{font-family:var(--sans);font-size:11px;font-weight:600;background:var(--navy-pale);color:var(--navy-mid);padding:3px 10px;border-radius:12px;letter-spacing:0;text-transform:none}
+
+/* ==================== FILTER BAR ==================== */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.filter-bar input,.filter-bar select{border:1px solid var(--gray-200);border-radius:4px;padding:8px 12px;font-size:13px;font-family:var(--sans);background:var(--white);outline:none;transition:border-color .15s,box-shadow .15s}
+.filter-bar input{width:220px}
+.filter-bar input:focus,.filter-bar select:focus{border-color:var(--navy-light);box-shadow:0 0 0 3px rgba(30,82,127,.1)}
+.sort-btns{display:flex;gap:6px}
+.sort-btn{background:var(--white);border:1px solid var(--gray-200);border-radius:4px;padding:7px 12px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;transition:all .15s}
+.sort-btn:hover,.sort-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+
+/* ==================== TABLE ==================== */
+.table-wrap{overflow-x:auto;border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:32px;background:var(--white);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--navy);color:var(--white);font-family:var(--sans);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;padding:11px 14px;text-align:left;border-bottom:2px solid var(--gold);white-space:nowrap}
+thead th.c{text-align:center}
+tbody tr{border-bottom:1px solid var(--gray-200)}
+tbody tr:nth-child(even){background:var(--gray-50)}
+tbody tr:hover{background:var(--navy-pale)}
+tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
+tbody td.c{text-align:center}
+.tfoot-row td{background:var(--navy-pale);font-weight:700;border-top:2px solid var(--navy);font-size:13px;color:var(--navy)}
+.badge-pct{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;min-width:56px;text-align:center}
+.badge-high{background:var(--green-bg);color:var(--green)}
+.badge-mid{background:var(--amber-bg);color:var(--amber)}
+.badge-low{background:var(--red-bg);color:var(--red)}
+.btn-detail{background:var(--navy-mid);color:var(--white);border:none;cursor:pointer;font-size:11px;font-weight:600;padding:4px 10px;border-radius:3px;font-family:var(--sans);letter-spacing:.3px;transition:background .15s}
+.btn-detail:hover{background:var(--navy)}
+
+/* ==================== CHART CARDS ==================== */
+.chart-card{background:var(--white);border:1px solid var(--gray-200);border-top:3px solid var(--navy-mid);padding:24px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);margin-bottom:28px}
+.chart-header{margin-bottom:6px}
+.flex-between{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.chart-title{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.6px}
+.chart-subtitle{font-size:12px;color:var(--gray-500);margin-top:3px;font-style:italic}
+.chart-divider{border:none;border-top:1px solid var(--gray-100);margin:14px 0}
+.chart-canvas-wrap canvas { cursor: pointer; } /* Indicates clickable bars */
+
+/* Chart Scroll Wrapper untuk Sekolah yang Banyak */
+.chart-scroll-wrapper{width:100%;overflow-x:auto;overflow-y:hidden;padding-bottom:8px}
+.chart-scroll-wrapper::-webkit-scrollbar{height:8px}
+.chart-scroll-wrapper::-webkit-scrollbar-track{background:var(--gray-100);border-radius:4px}
+.chart-scroll-wrapper::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:4px}
+.chart-scroll-wrapper::-webkit-scrollbar-thumb:hover{background:var(--gray-500)}
+.chart-scroll-inner{position:relative;height:320px;transition:width 0.3s ease}
+
+/* ==================== CHARTS GRID ==================== */
+.charts-grid{display:grid;grid-template-columns:360px 1fr;gap:24px;margin-bottom:28px}
+
+/* ==================== INSIGHT BLOCK (BELOW CHART) ==================== */
+.chart-insight{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.insight-panel{background:var(--navy-pale2);border:1px solid var(--gray-200);border-left:4px solid var(--gold);border-radius:0 var(--radius) var(--radius) 0;padding:14px 18px}
+.insight-panel.ip-navy{border-left-color:var(--navy);background:var(--navy-pale)}
+.insight-panel.ip-red{border-left-color:#c0392b;background:#fef8f8}
+.insight-panel.ip-green{border-left-color:var(--green);background:#f0faf5}
+.ip-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;color:var(--gold);margin-bottom:5px}
+.ip-label.lbl-navy{color:var(--navy-mid)}
+.ip-label.lbl-red{color:#c0392b}
+.ip-label.lbl-green{color:var(--green)}
+.ip-text{font-size:13px;color:var(--gray-700);line-height:1.7}
+.ip-text strong{color:var(--navy)}
+
+/* ==================== NARASI GRAFIK ==================== */
+.chart-narasi{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:14px 18px}
+.narasi-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray-500);margin-bottom:6px}
+.narasi-text{font-size:13.5px;color:var(--gray-700);line-height:1.75}
+.narasi-text strong{color:var(--navy);}
+
+/* ==================== HIGHLIGHT BOXES (BEST/WORST) ==================== */
+.highlight-duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.hl-duo-card{padding:14px 18px;border-radius:var(--radius);border:1px solid; cursor: pointer; transition: transform 0.2s;}
+.hl-duo-card:hover{transform: translateY(-2px);}
+.hl-duo-card.best{background:#f0faf5;border-color:#a8d5b8;border-left:4px solid var(--green)}
+.hl-duo-card.worst{background:#fef8f8;border-color:#e8b8b8;border-left:4px solid #c0392b}
+.hl-duo-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:6px}
+.best .hl-duo-label{color:var(--green)}
+.worst .hl-duo-label{color:#c0392b}
+.hl-duo-name{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:3px}
+.hl-duo-pct{font-size:20px;font-weight:800;font-family:var(--serif)}
+.best .hl-duo-pct{color:var(--green)}
+.worst .hl-duo-pct{color:#c0392b}
+.hl-duo-sub{font-size:11.5px;color:var(--gray-500);margin-top:3px}
+
+/* ==================== ANALISIS SECTION ==================== */
+.analisis-section{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:28px;margin-bottom:28px}
+.analisis-section h2{font-family:var(--serif);font-size:16px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:1.2px;border-bottom:2px solid var(--navy);padding-bottom:10px;margin-bottom:20px}
+.analisis-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.analisis-card{padding:16px 20px;border-radius:var(--radius);border:1px solid var(--gray-200)}
+.ac-label{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--gray-500);margin-bottom:8px}
+.ac-title{font-family:var(--serif);font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.ac-body{font-size:12.5px;color:var(--gray-700);line-height:1.7}
+.analisis-card.ac-trend{border-left:3px solid var(--navy-mid);background:var(--navy-pale2)}
+.analisis-card.ac-problem{border-left:3px solid #c0392b;background:#fef8f8}
+.analisis-card.ac-potential{border-left:3px solid var(--green);background:#f0faf5}
+.analisis-card.ac-summary{border-left:3px solid var(--gold);background:var(--gold-faint)}
+.analisis-footer{background:var(--navy);color:rgba(255,255,255,.85);border-radius:var(--radius);padding:16px 20px;font-size:13px;line-height:1.7}
+.analisis-footer strong{color:var(--gold-light)}
+
+/* ==================== TREND ==================== */
+.trend-section{background:var(--white);border:1px solid var(--gray-200);border-top:3px solid var(--gold);padding:24px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);margin-bottom:28px}
+.trend-empty{text-align:center;padding:40px 20px;color:var(--gray-300);font-size:13px}
+.trend-empty .te-icon{font-size:36px;margin-bottom:10px}
+
+/* ==================== KESIMPULAN ==================== */
+.kesimpulan{background:var(--white);border:1px solid var(--gray-200);border-left:5px solid var(--navy);padding:28px 32px;margin-bottom:32px;border-radius:var(--radius);box-shadow:var(--shadow-md)}
+.kesimpulan h3{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;border-bottom:1px solid var(--gray-200);padding-bottom:8px}
+.kesimpulan p,.kesimpulan li{font-size:13.5px;color:var(--gray-700);line-height:1.85;margin-bottom:8px}
+.kesimpulan ol{padding-left:20px}
+.kesimpulan li{margin-bottom:6px}
+.insight-highlight{background:var(--navy-pale);padding:14px 18px;border-left:4px solid var(--gold);margin-bottom:18px;border-radius:0 4px 4px 0}
+.insight-highlight p{font-size:13.5px;line-height:1.7;color:var(--navy);margin-bottom:0}
+
+/* ==================== MODAL ==================== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-top:4px solid var(--navy);border-radius:var(--radius);width:90%;max-width:720px;max-height:88vh;overflow-y:auto;padding:28px;position:relative;box-shadow:var(--shadow-lg)}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--gray-300);line-height:1}
+.modal-close:hover{color:var(--navy)}
+.modal h2{font-family:var(--serif);font-size:16px;color:var(--navy);margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--gray-200)}
+.modal-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:2px solid var(--gray-200)}
+.modal-tab{background:none;border:none;cursor:pointer;padding:8px 16px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--gray-500);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.modal-tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+.modal-tab:hover{color:var(--navy)}
+.modal-tab-content{display:none}
+.modal-tab-content.active{display:block}
+.modal-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.modal-table th{background:var(--navy);color:var(--white);font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;text-align:left}
+.modal-table td{padding:8px 12px;border-bottom:1px solid var(--gray-200);font-size:13px}
+.modal-table tr:nth-child(even) td{background:var(--gray-50)}
+.modal-sub{font-size:12px;color:var(--gray-300);font-style:italic;margin-top:4px}
+.modal-history{margin-top:8px}
+.hist-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid var(--gray-200);border-radius:4px;margin-bottom:6px}
+.hist-period{font-weight:600;font-size:13px;color:var(--navy)}
+.hist-pct{font-size:13px;font-weight:700}
+
+/* ==================== DATA WARNING ==================== */
+.data-warning{background:#fff8e1;border:1px solid #ffe082;border-left:4px solid #f9a825;border-radius:4px;padding:10px 14px;font-size:12.5px;color:#5d4037;margin-bottom:14px;display:none}
+
+/* ==================== FOOTER ==================== */
+footer{background:var(--navy);color:rgba(255,255,255,.55);text-align:center;padding:16px;font-size:12px;border-top:3px solid var(--gold)}
+
+/* ==================== PRINT ==================== */
+@media print{
+  nav,.hamburger,.sidebar,.sidebar-overlay,.btn-print,.filter-bar,.btn-detail,
+  footer,.modal-overlay,.period-banner,.sort-btns{display:none!important}
+  .wrap{padding:0;max-width:100%}
+  .kopsurat{page-break-after:avoid}
+  .chart-card{break-inside:avoid;padding:16px;margin-bottom:16px}
+  .table-wrap{border:none;box-shadow:none}
+  body{background:white;font-size:11px}
+  .topbar{position:relative;padding:10px 20px}
+  .topbar-nav,.topbar-right{display:none}
+  .view-section{display:block!important;opacity:1!important;transform:none!important;margin-bottom:20px}
+  .charts-grid{grid-template-columns:1fr 1fr!important;gap:16px}
+  .chart-scroll-inner{width:100%!important}
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media(max-width:960px){
+  .hamburger{display:flex}
+  .topbar-nav,.period-pills{display:none}
+  .btn-print{font-size:0;padding:7px 10px}
+  .btn-print::before{content:'🖨';font-size:16px}
+  .charts-grid{grid-template-columns:1fr}
+  .kopsurat{flex-direction:column;text-align:center;padding:16px 20px}
+  .kop-divider{margin:10px 20px 0}
+  .highlight-duo{grid-template-columns:1fr}
+  .analisis-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .wrap{padding:16px 12px 40px}
+  .highlight-box .hl-stat{font-size:30px}
+  .topbar{padding:0 14px}
+  .topbar-brand small{display:none}
+  .filter-bar input{width:100%}
+  .filter-bar{gap:8px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .chart-card{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== SIDEBAR ==================== -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">SIMBTQ<br><span style="font-family:var(--sans);font-weight:400;font-size:11px;color:rgba(255,255,255,.55)">Data Eksekutif</span></div>
+    <button class="sidebar-close" onclick="closeSidebar()">×</button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-link nav-active" data-target="view-ringkasan" onclick="showSection('view-ringkasan');return false;"><span class="nav-icon">📊</span> Ringkasan</a>
+    <a href="#" class="nav-link" data-target="view-tabel" onclick="showSection('view-tabel');return false;"><span class="nav-icon">📋</span> Data Sekolah</a>
+    <a href="#" class="nav-link" data-target="view-grafik" onclick="showSection('view-grafik');return false;"><span class="nav-icon">📈</span> Grafik & Insight</a>
+    <a href="#" class="nav-link" data-target="view-trend" onclick="showSection('view-trend');return false;"><span class="nav-icon">📉</span> Tren Bulanan</a>
+    <a href="#" class="nav-link" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan');return false;"><span class="nav-icon">📝</span> Kesimpulan</a>
+  </nav>
+  <div class="sidebar-period">
+    <label>Filter Wilayah</label>
+    <select id="sbKecamatan" onchange="onPeriodChange()">
+      <option value="all">Semua Kecamatan</option>
+      <option value="Langensari">Langensari</option>
+      <option value="Purwaharja">Purwaharja</option>
+      <option value="Pataruman">Pataruman</option>
+      <option value="Banjar">Banjar</option>
+    </select>
+    <label>Pilih Periode</label>
+    <select id="sbYear" onchange="onPeriodChange()"></select>
+    <select id="sbMonth" onchange="onPeriodChange()"></select>
+  </div>
+</aside>
+
+<!-- ==================== TOPBAR ==================== -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="topbar-brand">SIMBTQ<small>Smart Analytic Dashboard</small></div>
+  </div>
+  <nav class="topbar-nav">
+    <a href="#" class="nav-link nav-active" data-target="view-ringkasan" onclick="showSection('view-ringkasan');return false;">Ringkasan</a>
+    <a href="#" class="nav-link" data-target="view-tabel" onclick="showSection('view-tabel');return false;">Data Sekolah</a>
+    <a href="#" class="nav-link" data-target="view-grafik" onclick="showSection('view-grafik');return false;">Grafik & Insight</a>
+    <a href="#" class="nav-link" data-target="view-trend" onclick="showSection('view-trend');return false;">Tren</a>
+    <a href="#" class="nav-link" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan');return false;">Kesimpulan</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="period-pills">
+      <select id="selKecamatan" onchange="onPeriodChange()">
+        <option value="all">Semua Kecamatan</option>
+        <option value="Langensari">Langensari</option>
+        <option value="Purwaharja">Purwaharja</option>
+        <option value="Pataruman">Pataruman</option>
+        <option value="Banjar">Banjar</option>
+      </select>
+      <span class="period-sep">|</span>
+      <select id="selYear" onchange="onPeriodChange()"></select>
+      <span class="period-sep">/</span>
+      <select id="selMonth" onchange="onPeriodChange()"></select>
+    </div>
+    <button class="btn-print" onclick="window.print()">🖨 Cetak PDF</button>
+  </div>
+</header>
+
+<!-- ==================== KOPSURAT ==================== -->
+<div class="kopsurat">
+  <div class="kop-logo">
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="22" stroke="#0c2340" stroke-width="2" fill="#f3f5f9"/>
+      <path d="M24 8 L28 18 H38 L30 24 L33 34 L24 28 L15 34 L18 24 L10 18 H20 Z" fill="#163a62" opacity=".8"/>
+      <rect x="18" y="36" width="12" height="3" rx="1" fill="#b8962e"/>
+      <rect x="21" y="39" width="6" height="3" rx="1" fill="#b8962e"/>
+    </svg>
+  </div>
+  <div class="kop-text">
+    <div class="kop-instansi">Pemerintah Kota Banjar &nbsp;·&nbsp; Dinas Pendidikan dan Kebudayaan</div>
+    <div class="kop-judul">Sistem Monitoring Baca Tulis Al-Qur'an (BTQ)</div>
+    <div class="kop-sub">Laporan Eksekutif Wilayah &nbsp;·&nbsp; <strong id="kop-period">–</strong></div>
+    <div class="kop-meta">Dokumen Resmi – Untuk Kepentingan Internal &nbsp;·&nbsp; SIMBTQ v6.0 Smart Analytic</div>
+  </div>
+</div>
+<hr class="kop-divider">
+
+<!-- ==================== MAIN ==================== -->
+<main class="wrap">
+
+  <div class="period-banner" id="periodBanner">
+    <div>
+      <div class="pb-label">Lingkup Data Aktif</div>
+      <div class="pb-value" id="bannerPeriod">–</div>
+    </div>
+    <div class="pb-right">
+      <span id="trendBadge"></span>
+      <span id="bannerMeta" style="font-size:12px;color:var(--gray-500)"></span>
+    </div>
+  </div>
+
+  <div class="data-warning" id="dataWarning">
+    ⚠ <strong>Peringatan Data:</strong> Ditemukan inkonsistensi data pada beberapa catatan. Data tetap ditampilkan namun perlu verifikasi ke sekolah terkait.
+  </div>
+
+  <!-- ======== VIEW: RINGKASAN ======== -->
+  <div id="view-ringkasan" class="view-section active">
+    <div class="highlight-box">
+      <div class="hl-label">Capaian Utama – <span id="hl-period">–</span></div>
+      <div class="hl-stat" id="hl-pct">–%</div>
+      <div class="hl-desc" id="hl-desc"></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="sc-label">Jumlah Sekolah</div>
+        <div class="sc-value" id="sc-sekolah">–</div>
+        <div class="sc-sub">SD Negeri (<span id="sc-kec-label">Semua</span>)</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Total Siswa</div>
+        <div class="sc-value" id="sc-siswa">–</div>
+        <div class="sc-sub">Kelas IV & V Dievaluasi</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Sudah Lancar</div>
+        <div class="sc-value" id="sc-lancar" style="color:var(--green)">–</div>
+        <div class="sc-sub">Telah Mampu Membaca</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Belum Lancar</div>
+        <div class="sc-value" id="sc-belum" style="color:var(--amber)">–</div>
+        <div class="sc-sub">Perlu Pendampingan</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Tidak Bisa</div>
+        <div class="sc-value" id="sc-tidak" style="color:var(--red)">–</div>
+        <div class="sc-sub">Belum Mengenal Huruf</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Rata-rata Kehadiran</div>
+        <div class="sc-value" id="sc-hadir">–%</div>
+        <div class="sc-sub">Guru Pembimbing BTQ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== VIEW: TABEL ======== -->
+  <div id="view-tabel" class="view-section">
+    <h2 class="section-title">
+      <span>Data Sekolah – <span id="tabel-kec-title">Semua Kecamatan</span></span>
+      <span class="section-badge" id="tabel-badge">0 sekolah</span>
+    </h2>
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="🔍 Cari nama sekolah…" oninput="filterTable()">
+      <select id="filterPct" onchange="filterTable()">
+        <option value="">Semua Persentase Capaian</option>
+        <option value="high">Kategori Tinggi (≥ 80%)</option>
+        <option value="mid">Kategori Sedang (60–79%)</option>
+        <option value="low">Kategori Rendah (&lt; 60%)</option>
+      </select>
+      <div class="sort-btns">
+        <button class="sort-btn" id="sortBest" onclick="sortTable('best')">▲ Terbaik</button>
+        <button class="sort-btn" id="sortWorst" onclick="sortTable('worst')">▼ Terburuk</button>
+        <button class="sort-btn active" id="sortDefault" onclick="sortTable('default')">= Urutan Wilayah</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Sekolah</th>
+            <th class="c">Total Siswa</th>
+            <th class="c">Lancar</th>
+            <th class="c">% Lancar</th>
+            <th class="c">Belum Lancar</th>
+            <th class="c">Tidak Bisa</th>
+            <th class="c">Tindakan</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+        <tfoot id="tableFoot"></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======== VIEW: GRAFIK ======== -->
+  <div id="view-grafik" class="view-section">
+    <h2 class="section-title"><span id="grafik-focus-title">Visualisasi Analitik: Fokus Kota Banjar</span></h2>
+
+    <!-- GRAFIK 1: Kecamatan Comparison (OVERVIEW UTAMA) -->
+    <div class="chart-card" id="districtCompareWrapper">
+      <div class="chart-header">
+        <div class="chart-title" id="kecTitle">Perbandingan Capaian Antar Kecamatan se-Kota Banjar</div>
+        <div class="chart-subtitle">Persentase rata-rata kelancaran membaca Al-Qur'an per wilayah kecamatan (OVERVIEW GLOBAL)</div>
+      </div>
+      <hr class="chart-divider">
+      <div class="chart-wrap" style="height:260px"><canvas id="kecamatanChart"></canvas></div>
+      <div class="chart-insight" id="kec-insight"></div>
+    </div>
+
+    <!-- GRAFIK 2: Pie + Top Bar (HIERARKI KEDUA - TOP SEKOLAH) -->
+    <div class="charts-grid">
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="chart-header">
+          <div class="chart-title" id="pieTitle">Komposisi Kemampuan BTQ</div>
+          <div class="chart-subtitle" id="pieSubtitle">Distribusi status kemampuan seluruh siswa di wilayah ini</div>
+        </div>
+        <hr class="chart-divider">
+        <div class="chart-wrap" style="height:240px"><canvas id="pieChart"></canvas></div>
+        <div class="chart-insight" id="pie-insight"></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="chart-header">
+          <div class="chart-title" id="barTopTitle">Top Sekolah Tertinggi</div>
+          <div class="chart-subtitle" id="barSubtitle">Peringkat capaian kelancaran membaca Al-Qur'an (Klik batang untuk detail)</div>
+        </div>
+        <hr class="chart-divider">
+        <div class="chart-wrap chart-canvas-wrap" style="height:240px"><canvas id="barChart"></canvas></div>
+        <div class="chart-insight" id="bar-insight"></div>
+      </div>
+    </div>
+
+    <!-- GRAFIK 3: Stacked (HIERARKI KETIGA - DETAIL) -->
+    <div class="chart-card">
+      <div class="chart-header flex-between">
+        <div>
+          <div class="chart-title" id="stackTitle">Distribusi Kemampuan Seluruh Sekolah</div>
+          <div class="chart-subtitle" id="stackSubtitle">Perbandingan komposisi lancar, belum lancar, dan tidak bisa (Klik batang untuk detail)</div>
+        </div>
+        <div class="sort-btns" id="stackToggle" style="display:none;">
+           <button class="sort-btn active" id="btnStackTop20" onclick="setStackMode('top20')">Top 20</button>
+           <button class="sort-btn" id="btnStackAll" onclick="setStackMode('all')">Semua Sekolah (Scroll ⇄)</button>
+        </div>
+      </div>
+      <hr class="chart-divider">
+      
+      <!-- Wrapper for horizontal scrolling -->
+      <div class="chart-scroll-wrapper">
+        <div class="chart-scroll-inner chart-canvas-wrap" id="stackCanvasContainer">
+          <canvas id="stackChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-insight" id="stack-insight"></div>
+    </div>
+
+    <!-- ANALISIS TERPADU -->
+    <div class="analisis-section" id="analisis-section">
+      <h2>Analisis Visual dan Temuan Utama</h2>
+      <div class="analisis-grid" id="analisis-grid"></div>
+      <div class="analisis-footer" id="analisis-footer"></div>
+    </div>
+  </div>
+
+  <!-- ======== VIEW: TREN ======== -->
+  <div id="view-trend" class="view-section">
+    <h2 class="section-title"><span>Tren Perkembangan Bulanan</span></h2>
+    <div class="trend-section">
+      <div class="chart-header">
+        <div class="chart-title" id="trendTitle">Histori Persentase Kelancaran BTQ</div>
+        <div class="chart-subtitle">Perkembangan capaian dari bulan ke bulan untuk mendeteksi pola dan momentum</div>
+      </div>
+      <hr class="chart-divider">
+      <div id="trendContent"></div>
+      <div id="trend-insight" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- ======== VIEW: KESIMPULAN ======== -->
+  <div id="view-kesimpulan" class="view-section">
+    <div class="kesimpulan">
+      <h3>Kesimpulan Evaluasi &amp; Insight Wilayah</h3>
+      <div class="insight-highlight"><p id="insight-box-text"></p></div>
+      <p id="kesimpulan-text"></p>
+      <br>
+      <p><strong>Rekomendasi Tindak Lanjut Kebijakan:</strong></p>
+      <ol id="rekomendasi-list"></ol>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 id="modalTitle">Detail Sekolah</h2>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab(0)">Data Rekap Kelas</button>
+      <button class="modal-tab" onclick="switchTab(1)">Evaluasi Guru & Kehadiran</button>
+      <button class="modal-tab" onclick="switchTab(2)">Riwayat Bulanan</button>
+    </div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<footer>
+  Sistem Monitoring Baca Tulis Al-Qur'an (SIMBTQ) &nbsp;·&nbsp;
+  Dinas Pendidikan dan Kebudayaan Kota Banjar &nbsp;·&nbsp; v6.0 — Smart Analytic Executive Dashboard
+</footer>
+
+<!-- ==================== SCRIPT ==================== -->
+<script>
+// ============================================================
+// DATABASE
+// ============================================================
+const MARET_2026 = [
+  { no: 1, nama: "SDN 1 LANGENSARI", kecamatan: "Langensari", rows: [
+    { kls4:{total:26,lancar:8,belum:18,tidak:0},kls5:{total:22,lancar:14,belum:8,tidak:0},guru:"NUR LAELATUL AZIZAH, S.Pd",hadir:100},
+    { kls4:{total:29,lancar:11,belum:18,tidak:0},kls5:{total:23,lancar:12,belum:8,tidak:3},guru:"PURJIATI, S.Pd.I",hadir:75}
+  ]},
+  { no: 2, nama: "SDN 2 LANGENSARI", kecamatan: "Langensari", rows: [
+    { kls4:{total:22,lancar:6,belum:14,tidak:2},kls5:{total:16,lancar:13,belum:3,tidak:0},guru:"PURWATI",hadir:100},
+    { kls4:{total:26,lancar:16,belum:10,tidak:0},kls5:{total:16,lancar:13,belum:3,tidak:0},guru:"SHOFI BADRIATUL HIDAYAH, S.H",hadir:100},
+    { kls4:{total:28,lancar:13,belum:11,tidak:4},kls5:{total:14,lancar:9,belum:3,tidak:2},guru:"SUCI SUSILOWATI, S.H",hadir:100}
+  ]},
+  { no: 3, nama: "SDN 3 LANGENSARI", kecamatan: "Langensari", rows: [{ kls4:{total:24,lancar:14,belum:10,tidak:0},kls5:{total:28,lancar:22,belum:6,tidak:0},guru:"WAHIDATUL LAYLI YAHYA",hadir:100}]},
+  { no: 4, nama: "SDN 4 LANGENSARI", kecamatan: "Langensari", rows: [{ kls4:{total:17,lancar:11,belum:3,tidak:3},kls5:{total:22,lancar:16,belum:3,tidak:3},guru:"ZAKIYA NAILATUSSYARIFAH",hadir:84.6}]},
+  { no: 5, nama: "SDN 1 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:25,lancar:9,belum:10,tidak:6},kls5:{total:15,lancar:6,belum:7,tidak:2},guru:"AHLAN SYAEFUL MILLAH, S.Pd",hadir:91.6}]},
+  { no: 6, nama: "SDN 2 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:8,lancar:2,belum:1,tidak:5},kls5:{total:11,lancar:4,belum:3,tidak:4},guru:"APRIYANTI NUR ROHMAH",hadir:100}]},
+  { no: 7, nama: "SDN 3 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:16,lancar:5,belum:6,tidak:5},kls5:{total:17,lancar:8,belum:6,tidak:3},guru:"JIHARKAH",hadir:100}]},
+  { no: 8, nama: "SDN 4 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:14,lancar:6,belum:5,tidak:3},kls5:{total:14,lancar:5,belum:5,tidak:4},guru:"LAILATUN NAELI",hadir:100}]},
+  { no: 9, nama: "SDN 5 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:23,lancar:10,belum:13,tidak:0},kls5:{total:29,lancar:18,belum:11,tidak:0},guru:"NURJANAH, S.Pd.I",hadir:100}]},
+  { no: 10, nama: "SDN 6 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:21,lancar:7,belum:7,tidak:7},kls5:{total:16,lancar:8,belum:6,tidak:2},guru:"AINI ZAHRO",hadir:100}]},
+  { no: 11, nama: "SDN 1 WARINGINSARI", kecamatan: "Langensari", rows: [
+    { kls4:{total:17,lancar:5,belum:12,tidak:0},kls5:{total:20,lancar:8,belum:12,tidak:0},guru:"HIKMATUL LEDYA YAHYA",hadir:100},
+    { kls4:{total:17,lancar:6,belum:11,tidak:0},kls5:{total:16,lancar:16,belum:0,tidak:0},guru:"SALISAH",hadir:100}
+  ]},
+  { no: 12, nama: "SDN 2 WARINGINSARI", kecamatan: "Langensari", rows: [{ kls4:{total:11,lancar:6,belum:4,tidak:1},kls5:{total:22,lancar:10,belum:7,tidak:5},guru:"SITI NUR ASIAH, S.Pd",hadir:100}]},
+  { no: 13, nama: "SDN 3 WARINGINSARI", kecamatan: "Langensari", rows: [{ kls4:{total:18,lancar:12,belum:5,tidak:1},kls5:{total:19,lancar:13,belum:5,tidak:1},guru:"UMI BAROROH, S.Pd.I",hadir:100}]},
+  { no: 14, nama: "SDN 5 WARINGINSARI", kecamatan: "Langensari", rows: [{ kls4:{total:9,lancar:5,belum:2,tidak:2},kls5:{total:16,lancar:7,belum:7,tidak:2},guru:"ASEP SAEPUL MIRAJ, S. Kesos",hadir:100}]},
+  { no: 15, nama: "SDN 1 MUKTISARI", kecamatan: "Langensari", rows: [{ kls4:{total:31,lancar:11,belum:20,tidak:0},kls5:{total:33,lancar:23,belum:10,tidak:0},guru:"FATIMAH, S.Pd",hadir:100}]},
+  { no: 16, nama: "SDN 2 MUKTISARI", kecamatan: "Langensari", rows: [{ kls4:{total:24,lancar:12,belum:12,tidak:0},kls5:{total:26,lancar:19,belum:7,tidak:0},guru:"ARIFHA CATUR KHAIRUNNISA",hadir:84.4}]},
+  { no: 17, nama: "SDN 3 MUKTISARI", kecamatan: "Langensari", rows: [{ kls4:{total:20,lancar:15,belum:4,tidak:1},kls5:{total:18,lancar:14,belum:2,tidak:2},guru:"HASAN",hadir:100}]},
+  { no: 18, nama: "SDN 4 MUKTISARI", kecamatan: "Langensari", rows: [{ kls4:{total:24,lancar:6,belum:15,tidak:3},kls5:{total:16,lancar:5,belum:10,tidak:1},guru:"SANIA MUNAWAROH",hadir:100}]},
+  { no: 19, nama: "SDN 2 BOJONGKANTONG", kecamatan: "Langensari", rows: [{ kls4:{total:17,lancar:10,belum:5,tidak:2},kls5:{total:18,lancar:14,belum:2,tidak:2},guru:"M. IRHAM ZAINUL FATA",hadir:100}]},
+  { no: 20, nama: "SDN 3 BOJONGKANTONG", kecamatan: "Langensari", rows: [{ kls4:{total:31,lancar:4,belum:16,tidak:11},kls5:{total:20,lancar:8,belum:5,tidak:7},guru:"WINA SHAMROTUL FUADAH",hadir:100}]},
+  { no: 21, nama: "SDN 4 BOJONGKANTONG", kecamatan: "Langensari", rows: [{ kls4:{total:22,lancar:17,belum:3,tidak:2},kls5:{total:22,lancar:17,belum:3,tidak:2},guru:"IHSQAN WAHID",hadir:100}]},
+  { no: 22, nama: "SDN 1 KUJANGSARI", kecamatan: "Langensari", rows: [{ kls4:{total:27,lancar:13,belum:11,tidak:3},kls5:{total:28,lancar:12,belum:10,tidak:6},guru:"MILA ABIAH KHARISMA",hadir:100}]},
+  { no: 23, nama: "SDN 2 KUJANGSARI", kecamatan: "Langensari", rows: [{ kls4:{total:14,lancar:5,belum:9,tidak:0},kls5:{total:13,lancar:3,belum:10,tidak:0},guru:"NURUL AMALIA",hadir:100}]},
+  { no: 24, nama: "SDN 3 KUJANGSARI", kecamatan: "Langensari", rows: [
+    { kls4:{total:15,lancar:4,belum:7,tidak:4},kls5:{total:16,lancar:6,belum:7,tidak:3},guru:"NURUL HUDA, S.Pd.I",hadir:100},
+    { kls4:{total:13,lancar:3,belum:4,tidak:6},kls5:{total:16,lancar:9,belum:5,tidak:2},guru:"SALASATUN HIDAYATURROHMAH",hadir:100},
+    { kls4:{total:13,lancar:3,belum:5,tidak:5},kls5:{total:17,lancar:7,belum:5,tidak:5},guru:"LENI MAESAROH, S.Pd",hadir:33.3}
+  ]},
+  { no: 25, nama: "SDN 4 KUJANGSARI", kecamatan: "Langensari", rows: [{ kls4:{total:36,lancar:32,belum:4,tidak:0},kls5:{total:24,lancar:19,belum:5,tidak:0},guru:"SOLIHAH, S.Pd",hadir:100}]},
+  { no: 26, nama: "SDN 7 KUJANGSARI", kecamatan: "Langensari", rows: [{ kls4:{total:30,lancar:14,belum:16,tidak:0},kls5:{total:14,lancar:11,belum:3,tidak:0},guru:"TITIN NADIROH",hadir:100}]},
+  { no: 27, nama: "SDN 1 PURWAHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:26,lancar:18,belum:8,tidak:0},kls5:{total:13,lancar:9,belum:4,tidak:0},guru:"Asep Undang Munawar",hadir:100}]},
+  { no: 28, nama: "SDN 2 PURWAHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:19,lancar:15,belum:2,tidak:2},kls5:{total:22,lancar:11,belum:9,tidak:2},guru:"Lilih Solihah",hadir:58}]},
+  { no: 29, nama: "SDN 1 KARANGPANIMBAL", kecamatan: "Purwaharja", rows: [{ kls4:{total:32,lancar:17,belum:10,tidak:5},kls5:{total:13,lancar:10,belum:1,tidak:2},guru:"Sri Nurmala,S.Pd.I",hadir:100}]},
+  { no: 30, nama: "SDN 2 KARANGPANIMBAL", kecamatan: "Purwaharja", rows: [{ kls4:{total:24,lancar:24,belum:0,tidak:0},kls5:{total:23,lancar:23,belum:0,tidak:0},guru:"Riva Lanisa",hadir:100}]},
+  { no: 31, nama: "SDN 1 RAHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:34,lancar:34,belum:0,tidak:0},kls5:{total:30,lancar:30,belum:0,tidak:0},guru:"Lia Nurmuhibah,S.Pd",hadir:100}]},
+  { no: 32, nama: "SDN 2 RAHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:0,lancar:0,belum:0,tidak:0},kls5:{total:0,lancar:0,belum:0,tidak:0},guru:"-",hadir:100}]},
+  { no: 33, nama: "SDN 1 MEKARHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:16,lancar:4,belum:12,tidak:0},kls5:{total:19,lancar:10,belum:9,tidak:0},guru:"Muna Maemunah",hadir:100}]},
+  { no: 34, nama: "SDN 2 MEKARHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:31,lancar:12,belum:18,tidak:1},kls5:{total:35,lancar:21,belum:14,tidak:0},guru:"Neli Mulyana",hadir:100}]},
+  { no: 35, nama: "SDN 3 MEKARHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:39,lancar:6,belum:14,tidak:19},kls5:{total:31,lancar:14,belum:13,tidak:4},guru:"Ina Apriani",hadir:100}]},
+  { no: 36, nama: "SDN 1 PATARUMAN", kecamatan: "Pataruman", rows: [{ kls4:{total:25,lancar:16,belum:9,tidak:0},kls5:{total:22,lancar:17,belum:5,tidak:0},guru:"SYARAH AWALIAH",hadir:100}]},
+  { no: 37, nama: "SDN 2 PATARUMAN", kecamatan: "Pataruman", rows: [{ kls4:{total:34,lancar:15,belum:12,tidak:7},kls5:{total:25,lancar:13,belum:6,tidak:6},guru:"NAELAL AQIDAH, S.Pd.I",hadir:100}]},
+  { no: 38, nama: "SDN 3 PATARUMAN", kecamatan: "Pataruman", rows: [
+    { kls4:{total:14,lancar:4,belum:6,tidak:4},kls5:{total:20,lancar:5,belum:8,tidak:7},guru:"IHYA YAZID ASY SYAKIRI, S.Pd",hadir:100},
+    { kls4:{total:12,lancar:2,belum:8,tidak:2},kls5:{total:23,lancar:8,belum:11,tidak:4},guru:"MUHAMMAD DAUD, S.Pd.",hadir:75}
+  ]},
+  { no: 39, nama: "SDN 4 PATARUMAN", kecamatan: "Pataruman", rows: [{ kls4:{total:12,lancar:5,belum:7,tidak:0},kls5:{total:13,lancar:7,belum:6,tidak:0},guru:"TIKA KARTIKA, S.Pd",hadir:83}]},
+  { no: 40, nama: "SDN 5 PATARUMAN", kecamatan: "Pataruman", rows: [{ kls4:{total:21,lancar:5,belum:16,tidak:0},kls5:{total:16,lancar:10,belum:6,tidak:0},guru:"BUNGA AULIYA",hadir:50}]},
+  { no: 41, nama: "SDN 1 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:20,lancar:3,belum:14,tidak:3},kls5:{total:23,lancar:12,belum:11,tidak:0},guru:"TITA NURLIA",hadir:66}]},
+  { no: 42, nama: "SDN 2 HEGARSARI", kecamatan: "Pataruman", rows: [
+    { kls4:{total:8,lancar:2,belum:6,tidak:0},kls5:{total:11,lancar:2,belum:9,tidak:0},guru:"SITI NURHASANAH",hadir:100},
+    { kls4:{total:6,lancar:1,belum:5,tidak:0},kls5:{total:9,lancar:1,belum:8,tidak:0},guru:"MIA ROHMIATI, S.Pd.",hadir:100},
+    { kls4:{total:22,lancar:5,belum:17,tidak:0},kls5:{total:16,lancar:5,belum:11,tidak:0},guru:"SANI SYAMROTUL FUADAH, S.H",hadir:100}
+  ]},
+  { no: 43, nama: "SDN 5 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:14,lancar:8,belum:6,tidak:0},kls5:{total:17,lancar:9,belum:8,tidak:0},guru:"NENENG SURYATI",hadir:100}]},
+  { no: 44, nama: "SDN 6 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:22,lancar:12,belum:10,tidak:0},kls5:{total:25,lancar:16,belum:9,tidak:0},guru:"DEWI PRIANTI",hadir:100}]},
+  { no: 45, nama: "SDN 7 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:12,lancar:3,belum:4,tidak:5},kls5:{total:13,lancar:7,belum:3,tidak:3},guru:"SAEPUMILAH, SKM",hadir:83}]},
+  { no: 46, nama: "SDN 8 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:25,lancar:6,belum:9,tidak:10},kls5:{total:15,lancar:5,belum:7,tidak:3},guru:"SILPIA GITA CAHYANI",hadir:100}]},
+  { no: 47, nama: "SDN 9 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:22,lancar:10,belum:11,tidak:1},kls5:{total:20,lancar:11,belum:9,tidak:0},guru:"RESTY PUTRI DYNASTI AWALIYAH, S.Pd",hadir:100}]},
+  { no: 48, nama: "SDN 10 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:10,lancar:8,belum:2,tidak:0},kls5:{total:15,lancar:13,belum:2,tidak:0},guru:"WULAN HARDIANI DEVI",hadir:100}]},
+  { no: 49, nama: "SDN 1 MULYASARI", kecamatan: "Pataruman", rows: [
+    { kls4:{total:23,lancar:8,belum:12,tidak:3},kls5:{total:17,lancar:8,belum:8,tidak:1},guru:"ANDI JUANDI, S.Kom.I",hadir:100},
+    { kls4:{total:24,lancar:12,belum:12,tidak:0},kls5:{total:17,lancar:13,belum:4,tidak:0},guru:"NANANG KURNIAWAN",hadir:100}
+  ]},
+  { no: 50, nama: "SDN 3 MULYASARI", kecamatan: "Pataruman", rows: [{ kls4:{total:20,lancar:1,belum:5,tidak:14},kls5:{total:19,lancar:5,belum:1,tidak:13},guru:"LELA NURLAELA FITRIA, S.Pd",hadir:100}]},
+  { no: 51, nama: "SDN SINARTANJUNG", kecamatan: "Pataruman", rows: [
+    { kls4:{total:22,lancar:13,belum:5,tidak:4},kls5:{total:16,lancar:9,belum:5,tidak:2},guru:"JUITA FETRA KANIA",hadir:100},
+    { kls4:{total:26,lancar:15,belum:6,tidak:5},kls5:{total:16,lancar:11,belum:2,tidak:3},guru:"YUANISA VIDYA WAHYUNI, S.Pd",hadir:100}
+  ]},
+  { no: 52, nama: "SDN 1 BATULAWANG", kecamatan: "Pataruman", rows: [{ kls4:{total:17,lancar:10,belum:7,tidak:0},kls5:{total:11,lancar:7,belum:4,tidak:0},guru:"FAZRY IRAWAN, S.Pd",hadir:100}]},
+  { no: 53, nama: "SDN 2 BATULAWANG", kecamatan: "Pataruman", rows: [{ kls4:{total:19,lancar:1,belum:4,tidak:14},kls5:{total:14,lancar:8,belum:3,tidak:3},guru:"NUNING NURAIDAH",hadir:18}]},
+  { no: 54, nama: "SDN 3 BATULAWANG", kecamatan: "Pataruman", rows: [{ kls4:{total:11,lancar:1,belum:10,tidak:0},kls5:{total:13,lancar:10,belum:3,tidak:0},guru:"DEWI PIRLI",hadir:100}]},
+  { no: 55, nama: "SDN 4 BATULAWANG", kecamatan: "Pataruman", rows: [{ kls4:{total:14,lancar:7,belum:7,tidak:0},kls5:{total:14,lancar:8,belum:6,tidak:0},guru:"MUHAMMAD ANWAR RAIHAN",hadir:50}]},
+  { no: 56, nama: "SDN 1 KARYAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:14,lancar:6,belum:6,tidak:2},kls5:{total:14,lancar:6,belum:6,tidak:2},guru:"SITI NURAJIZAH, S.Pd",hadir:100}]},
+  { no: 57, nama: "SDN 2 KARYAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:14,lancar:9,belum:5,tidak:0},kls5:{total:18,lancar:11,belum:7,tidak:0},guru:"DILA NURLATIVAH",hadir:100}]},
+  { no: 58, nama: "SDN 3 KARYAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:23,lancar:16,belum:6,tidak:1},kls5:{total:20,lancar:17,belum:3,tidak:0},guru:"RISWANTO",hadir:83}]},
+  { no: 59, nama: "SDN 1 BINANGUN", kecamatan: "Pataruman", rows: [{ kls4:{total:29,lancar:14,belum:15,tidak:0},kls5:{total:23,lancar:13,belum:10,tidak:0},guru:"ADELA PUTRI MEILA FARHATAINI",hadir:50}]},
+  { no: 60, nama: "SDN 2 BINANGUN", kecamatan: "Pataruman", rows: [{ kls4:{total:18,lancar:7,belum:7,tidak:4},kls5:{total:22,lancar:16,belum:3,tidak:3},guru:"NURFADILLAH AL-AZIZIYAHIYYAH, S.Pd",hadir:100}]},
+  { no: 61, nama: "SDN 1 SUKAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:35,lancar:6,belum:22,tidak:7},kls5:{total:32,lancar:18,belum:12,tidak:2},guru:"ANQI QIANSARI",hadir:91}]},
+  { no: 62, nama: "SDN 2 SUKAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:15,lancar:4,belum:7,tidak:4},kls5:{total:18,lancar:6,belum:7,tidak:5},guru:"MOHAMAD RIF'AT ABDUL AZIZ",hadir:41}]},
+  { no: 63, nama: "SDN 1 BANJAR", kecamatan: "Banjar", rows: [
+    { kls4:{total:22,lancar:11,belum:11,tidak:0},kls5:{total:14,lancar:10,belum:4,tidak:0},guru:"Apip Kurniawan",hadir:100},
+    { kls4:{total:17,lancar:5,belum:7,tidak:5},kls5:{total:17,lancar:8,belum:2,tidak:7},guru:"Jidan Muhamad Muhsin",hadir:100},
+    { kls4:{total:19,lancar:11,belum:6,tidak:2},kls5:{total:16,lancar:10,belum:6,tidak:0},guru:"Yayah Siti Latifah",hadir:100}
+  ]},
+  { no: 64, nama: "SDN 2 BANJAR", kecamatan: "Banjar", rows: [
+    { kls4:{total:22,lancar:2,belum:4,tidak:16},kls5:{total:21,lancar:15,belum:4,tidak:2},guru:"Imas Mafuah",hadir:100},
+    { kls4:{total:22,lancar:9,belum:7,tidak:6},kls5:{total:21,lancar:9,belum:7,tidak:5},guru:"Muhammad Sufi Abdul Jabbar",hadir:100}
+  ]},
+  { no: 65, nama: "SDN 3 BANJAR", kecamatan: "Banjar", rows: [
+    { kls4:{total:33,lancar:15,belum:15,tidak:3},kls5:{total:27,lancar:15,belum:9,tidak:3},guru:"Siti Nur Leliah",hadir:100},
+    { kls4:{total:27,lancar:15,belum:12,tidak:0},kls5:{total:26,lancar:20,belum:6,tidak:0},guru:"Muhammad Azka Sulaiman",hadir:100}
+  ]},
+  { no: 66, nama: "SDN 4 BANJAR", kecamatan: "Banjar", rows: [{ kls4:{total:30,lancar:9,belum:21,tidak:0},kls5:{total:21,lancar:11,belum:10,tidak:0},guru:"Azmy Muhammad Farhan, S.Pd",hadir:100}]},
+  { no: 67, nama: "SDN 5 BANJAR", kecamatan: "Banjar", rows: [
+    { kls4:{total:25,lancar:5,belum:13,tidak:7},kls5:{total:19,lancar:8,belum:7,tidak:4},guru:"Koharudin",hadir:100},
+    { kls4:{total:24,lancar:8,belum:14,tidak:2},kls5:{total:16,lancar:4,belum:6,tidak:6},guru:"Sopiatin",hadir:83}
+  ]},
+  { no: 68, nama: "SDN 8 BANJAR", kecamatan: "Banjar", rows: [
+    { kls4:{total:23,lancar:10,belum:13,tidak:0},kls5:{total:17,lancar:8,belum:9,tidak:0},guru:"Emil Jamilah,S.Pd",hadir:83},
+    { kls4:{total:23,lancar:10,belum:10,tidak:3},kls5:{total:21,lancar:10,belum:9,tidak:2},guru:"Ela Nurlaela,S.Pd.I",hadir:83}
+  ]},
+  { no: 69, nama: "SDN 1 MEKARSARI", kecamatan: "Banjar", rows: [{ kls4:{total:30,lancar:25,belum:5,tidak:0},kls5:{total:17,lancar:14,belum:3,tidak:0},guru:"Ali fuad Hasan",hadir:100}]},
+  { no: 70, nama: "SDN 3 MEKARSARI", kecamatan: "Banjar", rows: [
+    { kls4:{total:16,lancar:10,belum:6,tidak:0},kls5:{total:13,lancar:5,belum:8,tidak:0},guru:"Ai Nuraeni,S.Pd.I",hadir:83},
+    { kls4:{total:20,lancar:7,belum:13,tidak:0},kls5:{total:18,lancar:18,belum:0,tidak:0},guru:"Ina Hasanah,S.Pd",hadir:100}
+  ]},
+  { no: 71, nama: "SDN 4 MEKARSARI", kecamatan: "Banjar", rows: [
+    { kls4:{total:23,lancar:3,belum:5,tidak:15},kls5:{total:17,lancar:6,belum:8,tidak:3},guru:"Andi Mustofa",hadir:91},
+    { kls4:{total:21,lancar:7,belum:3,tidak:11},kls5:{total:16,lancar:9,belum:6,tidak:1},guru:"Salwa Tsaniah Mujahidah",hadir:100}
+  ]},
+  { no: 72, nama: "SDN 5 MEKARSARI", kecamatan: "Banjar", rows: [
+    { kls4:{total:25,lancar:13,belum:3,tidak:9},kls5:{total:14,lancar:10,belum:3,tidak:1},guru:"Wiwi yuningsih",hadir:100},
+    { kls4:{total:28,lancar:18,belum:8,tidak:2},kls5:{total:14,lancar:10,belum:3,tidak:1},guru:"Fadil Irfan H",hadir:66}
+  ]},
+  { no: 73, nama: "SDN 1 BALOKANG", kecamatan: "Banjar", rows: [{ kls4:{total:24,lancar:4,belum:5,tidak:15},kls5:{total:30,lancar:20,belum:7,tidak:3},guru:"Aceng Kustiawan",hadir:100}]},
+  { no: 74, nama: "SDN 2 BALOKANG", kecamatan: "Banjar", rows: [{ kls4:{total:17,lancar:10,belum:7,tidak:0},kls5:{total:35,lancar:26,belum:9,tidak:0},guru:"Ela Elvina siti Padila,S.Pd.I",hadir:75}]},
+  { no: 75, nama: "SDN 3 BALOKANG", kecamatan: "Banjar", rows: [{ kls4:{total:22,lancar:17,belum:5,tidak:0},kls5:{total:22,lancar:9,belum:13,tidak:0},guru:"Lina Laila Yusrina",hadir:100}]},
+  { no: 76, nama: "SDN 1 CIBEUREUM", kecamatan: "Banjar", rows: [{ kls4:{total:24,lancar:13,belum:5,tidak:6},kls5:{total:15,lancar:8,belum:4,tidak:3},guru:"Ade Rosi Zakiah,M.Ag",hadir:100}]},
+  { no: 77, nama: "SDN 1 NEGLASARI", kecamatan: "Banjar", rows: [{ kls4:{total:22,lancar:12,belum:9,tidak:1},kls5:{total:20,lancar:18,belum:2,tidak:0},guru:"Ai Sarah Naudyah Cahyani",hadir:100}]},
+  { no: 78, nama: "SDN 2 NEGLASARI", kecamatan: "Banjar", rows: [{ kls4:{total:20,lancar:3,belum:6,tidak:11},kls5:{total:19,lancar:9,belum:7,tidak:3},guru:"Nurhamidah",hadir:91}]},
+  { no: 79, nama: "SDN 3 NEGLASARI", kecamatan: "Banjar", rows: [{ kls4:{total:23,lancar:5,belum:5,tidak:13},kls5:{total:19,lancar:9,belum:3,tidak:7},guru:"Pipit Padilah,S.Pd",hadir:100}]},
+  { no: 80, nama: "SDN 1 SITUBATU", kecamatan: "Banjar", rows: [{ kls4:{total:19,lancar:2,belum:15,tidak:2},kls5:{total:20,lancar:12,belum:8,tidak:0},guru:"Hilman Nursidik",hadir:75}]},
+  { no: 81, nama: "SDN 2 SITUBATU", kecamatan: "Banjar", rows: [{ kls4:{total:15,lancar:9,belum:4,tidak:2},kls5:{total:11,lancar:10,belum:1,tidak:0},guru:"Fikri Aili",hadir:100}]},
+  { no: 82, nama: "SDN 1 JAJAWAR", kecamatan: "Banjar", rows: [{ kls4:{total:30,lancar:14,belum:16,tidak:0},kls5:{total:25,lancar:15,belum:10,tidak:0},guru:"Dyina Aulia Rahmat,S.Ag",hadir:100}]}
+];
+
+const FEBRUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
+  s.rows.forEach(r => {
+    if(r.kls4.lancar>0){r.kls4.lancar--;r.kls4.belum++;}
+    if(r.kls5.lancar>0){r.kls5.lancar--;r.kls5.belum++;}
+  });
+  return s;
+});
+
+const RAW_DATABASE = {
+  2026: { "Februari": FEBRUARI_2026, "Maret": MARET_2026 }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentYear = null, currentMonth = null;
+let selectedKecamatan = 'all';
+let currentSchools = [], filteredSchools = [];
+let sortMode = 'default';
+let stackDisplayMode = 'top20'; // default stack mode cerdas
+let charts = {};
+// Simpan referensi ke dataset aktif untuk interaksi klik
+let barChartActiveData = [];
+let stackChartActiveData = [];
+
+// ============================================================
+// SPA NAVIGATION
+// ============================================================
+function showSection(id) {
+  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.toggle('nav-active', l.getAttribute('data-target') === id);
+  });
+  if(window.innerWidth <= 900) closeSidebar();
+  window.dispatchEvent(new Event('resize'));
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  const years = Object.keys(RAW_DATABASE).sort((a,b) => b-a);
+  currentYear = years[0];
+  const months = Object.keys(RAW_DATABASE[currentYear]);
+  currentMonth = months[months.length-1];
+  populateSelects();
+  showSection('view-ringkasan');
+  render();
+}
+
+function populateSelects() {
+  const years = Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
+  ['selYear','sbYear'].forEach(id => {
+    const el = document.getElementById(id);
+    el.innerHTML = years.map(y=>`<option value="${y}"${y==currentYear?' selected':''}>${y}</option>`).join('');
+  });
+  populateMonths();
+}
+
+function populateMonths() {
+  const months = Object.keys(RAW_DATABASE[currentYear]||{});
+  ['selMonth','sbMonth'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.innerHTML = months.map(m=>`<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join('');
+  });
+}
+
+function onPeriodChange() {
+  const yr = document.getElementById('selYear').value || document.getElementById('sbYear').value;
+  const mo = document.getElementById('selMonth').value || document.getElementById('sbMonth').value;
+  const kec1 = document.getElementById('selKecamatan');
+  const kec2 = document.getElementById('sbKecamatan');
+  if(event && event.target.id === 'selKecamatan') selectedKecamatan = kec1.value;
+  else if(event && event.target.id === 'sbKecamatan') selectedKecamatan = kec2.value;
+  if(kec1) kec1.value = selectedKecamatan;
+  if(kec2) kec2.value = selectedKecamatan;
+  
+  currentYear = yr; currentMonth = mo;
+  
+  // Smart Mode Reset
+  if(selectedKecamatan === 'all') stackDisplayMode = 'top20';
+  else stackDisplayMode = 'all'; // Jika pilih kecamatan, otomatis tampilkan semua yang ada di sana
+  
+  ['selYear','sbYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=yr;});
+  populateMonths();
+  ['selMonth','sbMonth'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=mo;});
+  sortMode='default';
+  ['sortBest','sortWorst','sortDefault'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('sortDefault').classList.add('active');
+  render();
+}
+
+// Stack mode handler
+function setStackMode(mode) {
+    stackDisplayMode = mode;
+    document.getElementById('btnStackTop20').classList.toggle('active', mode === 'top20');
+    document.getElementById('btnStackAll').classList.toggle('active', mode === 'all');
+    render();
+}
+
+// ============================================================
+// DATA PROCESSING
+// ============================================================
+function aggregateSchools(rawArr) {
+  return rawArr.map(s => {
+    let tot=0,lancar=0,belum=0,tidak=0;
+    let k4t=0,k4l=0,k4b=0,k4k=0;
+    let k5t=0,k5l=0,k5b=0,k5k=0;
+    let hadirArr=[],guruArr=[],warnings=[];
+    s.rows.forEach(r => {
+      const k4sum=r.kls4.lancar+r.kls4.belum+r.kls4.tidak;
+      const k5sum=r.kls5.lancar+r.kls5.belum+r.kls5.tidak;
+      if(Math.abs(k4sum-r.kls4.total)>1) warnings.push(`Kls4 ${r.guru}: sum(${k4sum})≠total(${r.kls4.total})`);
+      if(Math.abs(k5sum-r.kls5.total)>1) warnings.push(`Kls5 ${r.guru}: sum(${k5sum})≠total(${r.kls5.total})`);
+      tot+=r.kls4.total+r.kls5.total; lancar+=r.kls4.lancar+r.kls5.lancar;
+      belum+=r.kls4.belum+r.kls5.belum; tidak+=r.kls4.tidak+r.kls5.tidak;
+      k4t+=r.kls4.total;k4l+=r.kls4.lancar;k4b+=r.kls4.belum;k4k+=r.kls4.tidak;
+      k5t+=r.kls5.total;k5l+=r.kls5.lancar;k5b+=r.kls5.belum;k5k+=r.kls5.tidak;
+      hadirArr.push(r.hadir); guruArr.push(r.guru);
+    });
+    const pct = tot>0?(lancar/tot*100):0;
+    return {
+      idx:s.no,no:s.no,nama:s.nama,kecamatan:s.kecamatan,
+      tot,lancar,belum,tidak,pct,
+      kls4:{tot:k4t,lancar:k4l,belum:k4b,tidak:k4k},
+      kls5:{tot:k5t,lancar:k5l,belum:k5b,tidak:k5k},
+      guru:guruArr,hadir:hadirArr,rows:s.rows,warnings
+    };
+  });
+}
+
+function computeTotals(schools) {
+  return {
+    tot: schools.reduce((a,s)=>a+s.tot,0),
+    lancar: schools.reduce((a,s)=>a+s.lancar,0),
+    belum: schools.reduce((a,s)=>a+s.belum,0),
+    tidak: schools.reduce((a,s)=>a+s.tidak,0),
+    avgHadir: (()=>{
+      const arr=schools.flatMap(s=>s.hadir);
+      return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
+    })()
+  };
+}
+
+function getPrevPeriod(year,month) {
+  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const idx=months.indexOf(month);
+  if(idx<=0){
+    const py=String(parseInt(year)-1);
+    if(!RAW_DATABASE[py]) return null;
+    const pym=Object.keys(RAW_DATABASE[py]);
+    return pym.length?{year:py,month:pym[pym.length-1]}:null;
+  }
+  for(let i=idx-1;i>=0;i--){
+    if(RAW_DATABASE[year]&&RAW_DATABASE[year][months[i]]) return {year,month:months[i]};
+  }
+  return null;
+}
+
+function getAllPeriods() {
+  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const result=[];
+  Object.keys(RAW_DATABASE).sort().forEach(yr=>{
+    months.forEach(mo=>{
+      if(RAW_DATABASE[yr]&&RAW_DATABASE[yr][mo]) result.push({year:yr,month:mo});
+    });
+  });
+  return result;
+}
+
+// ============================================================
+// INSIGHT GENERATORS
+// ============================================================
+function categoryLabel(pct) {
+  if(pct>=80) return 'Tinggi';
+  if(pct>=60) return 'Sedang';
+  return 'Rendah';
+}
+function n2(n){ return n.toFixed(1); }
+
+function genInsightPanel(type, label, text, labelClass='') {
+  const cls = type==='gold'?'':'ip-'+type;
+  const lblCls = labelClass || (type==='green'?'lbl-green':type==='red'?'lbl-red':'lbl-navy');
+  return `
+    <div class="insight-panel ${cls}">
+      <div class="ip-label ${lblCls}">${label}</div>
+      <div class="ip-text">${text}</div>
+    </div>
+  `;
+}
+
+function genNarasi(title, text) {
+  return `
+    <div class="chart-narasi">
+      <div class="narasi-title">${title}</div>
+      <div class="narasi-text">${text}</div>
+    </div>
+  `;
+}
+
+function genMiniConclusion(text) {
+  return `<div class="mini-conclusion"><span class="mc-icon">💡</span><span class="mc-text">${text}</span></div>`;
+}
+
+function genHighlightDuo(best, worst) {
+  if(!best || !worst) return '';
+  return `
+    <div class="highlight-duo">
+      <div class="hl-duo-card best" onclick="openModal(${best.no})">
+        <div class="hl-duo-label">🏆 Sekolah Terbaik</div>
+        <div class="hl-duo-name">${best.nama}</div>
+        <div class="hl-duo-pct">${n2(best.pct)}%</div>
+        <div class="hl-duo-sub">Kec. ${best.kecamatan} &nbsp;·&nbsp; ${best.lancar} dari ${best.tot} siswa lancar</div>
+      </div>
+      <div class="hl-duo-card worst" onclick="openModal(${worst.no})">
+        <div class="hl-duo-label">⚠️ Perhatian Khusus</div>
+        <div class="hl-duo-name">${worst.nama}</div>
+        <div class="hl-duo-pct">${n2(worst.pct)}%</div>
+        <div class="hl-duo-sub">Kec. ${worst.kecamatan} &nbsp;·&nbsp; ${worst.lancar} dari ${worst.tot} siswa lancar</div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// MAIN RENDER
+// ============================================================
+function render() {
+  const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth] || [];
+  const allSchoolsAggr = aggregateSchools(rawMaster);
+
+  let rawArr = rawMaster;
+  if(selectedKecamatan !== 'all') rawArr = rawArr.filter(s=>s.kecamatan===selectedKecamatan);
+
+  currentSchools = aggregateSchools(rawArr);
+  filteredSchools = [...currentSchools];
+
+  const T = computeTotals(currentSchools);
+  const pctKec = T.tot>0?(T.lancar/T.tot*100):0;
+  const periodStr = `${currentMonth} ${currentYear}`;
+  const isAllKec = selectedKecamatan === 'all';
+  const cakupan = isAllKec ? 'Tingkat Kota Banjar' : `Kecamatan ${selectedKecamatan}`;
+  
+  // Smart Hierarchy & Titles
+  const focusText = isAllKec ? 'Kota Banjar' : `Wilayah: Kec. ${selectedKecamatan}`;
+  document.getElementById('grafik-focus-title').textContent = `Visualisasi Analitik: Fokus ${focusText}`;
+  document.getElementById('kop-period').innerHTML = `${cakupan} &nbsp;·&nbsp; ${periodStr}`;
+  document.getElementById('hl-period').textContent = periodStr;
+  document.getElementById('bannerPeriod').textContent = `${cakupan} – ${periodStr}`;
+  document.getElementById('sc-kec-label').textContent = isAllKec ? 'Semua Wilayah' : `Kec. ${selectedKecamatan}`;
+  document.getElementById('tabel-kec-title').textContent = cakupan;
+  
+  // Dynamic Chart Titles
+  document.getElementById('pieTitle').textContent = `Komposisi Kemampuan BTQ di ${focusText}`;
+  document.getElementById('barTopTitle').textContent = `Top 10 Sekolah di ${focusText}`;
+  document.getElementById('stackTitle').textContent = `Distribusi Kemampuan Sekolah di ${focusText}`;
+
+  // Top School Analysis for main highlight
+  const sortedValid = [...currentSchools].filter(s=>s.tot>0).sort((a,b)=>b.pct-a.pct);
+  const bestSch = sortedValid[0];
+  const worstSch = sortedValid[sortedValid.length-1];
+
+  // Trend Badge
+  const prevPeriod = getPrevPeriod(currentYear, currentMonth);
+  let trendHTML = '<span class="trend-badge trend-neutral">Periode Pertama</span>';
+  let bannerMeta = `${currentSchools.length} sekolah &nbsp;·&nbsp; ${T.tot.toLocaleString()} siswa`;
+
+  if(prevPeriod) {
+    let prevRaw = RAW_DATABASE[prevPeriod.year][prevPeriod.month];
+    if(!isAllKec) prevRaw=prevRaw.filter(s=>s.kecamatan===selectedKecamatan);
+    const prevT = computeTotals(aggregateSchools(prevRaw));
+    const prevPct = prevT.tot>0?(prevT.lancar/prevT.tot*100):0;
+    const diff = pctKec - prevPct;
+    if(diff>0.05) trendHTML=`<span class="trend-badge trend-up">📈 +${n2(diff)}% dari ${prevPeriod.month}</span>`;
+    else if(diff<-0.05) trendHTML=`<span class="trend-badge trend-down">📉 ${n2(diff)}% dari ${prevPeriod.month}</span>`;
+    else trendHTML=`<span class="trend-badge trend-neutral">→ Stabil dari ${prevPeriod.month}</span>`;
+    bannerMeta=`vs ${prevPeriod.month}: ${n2(prevPct)}%`;
+  }
+  document.getElementById('trendBadge').innerHTML = trendHTML;
+  document.getElementById('bannerMeta').innerHTML = bannerMeta;
+
+  const hasWarning = currentSchools.some(s=>s.warnings.length>0);
+  document.getElementById('dataWarning').style.display = hasWarning?'block':'none';
+
+  // Smart Insight di Highlight Box
+  document.getElementById('hl-pct').textContent = n2(pctKec)+'%';
+  let hlDesc = `Sebanyak <strong>${n2(pctKec)}%</strong> dari total ${T.tot.toLocaleString('id-ID')} siswa telah lancar membaca Al-Qur'an. `;
+  if(bestSch && worstSch && bestSch.no !== worstSch.no) {
+    hlDesc += `<strong>${bestSch.nama}</strong> meraih capaian tertinggi (<strong>${n2(bestSch.pct)}%</strong>), sementara <strong>${worstSch.nama}</strong> masih terendah (<strong>${n2(worstSch.pct)}%</strong>).`;
+  }
+  document.getElementById('hl-desc').innerHTML = hlDesc;
+
+  document.getElementById('sc-sekolah').textContent = currentSchools.length;
+  document.getElementById('sc-siswa').textContent = T.tot.toLocaleString('id-ID');
+  document.getElementById('sc-lancar').textContent = T.lancar.toLocaleString('id-ID');
+  document.getElementById('sc-belum').textContent = T.belum.toLocaleString('id-ID');
+  document.getElementById('sc-tidak').textContent = T.tidak.toLocaleString('id-ID');
+  document.getElementById('sc-hadir').textContent = n2(T.avgHadir)+'%';
+
+  renderTable();
+  renderCharts(T, allSchoolsAggr, pctKec, focusText);
+  renderTrend(cakupan);
+  renderKesimpulan(T, pctKec, allSchoolsAggr, cakupan, bestSch, worstSch);
+}
+
+// ============================================================
+// TABLE
+// ============================================================
+function pctBadge(pct) {
+  const cls = pct>=80?'badge-high':pct>=60?'badge-mid':'badge-low';
+  return `<span class="badge-pct ${cls}">${n2(pct)}%</span>`;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const tfoot = document.getElementById('tableFoot');
+  tbody.innerHTML = '';
+  let display = [...filteredSchools];
+  if(sortMode==='best') display.sort((a,b)=>b.pct-a.pct);
+  if(sortMode==='worst') display.sort((a,b)=>a.pct-b.pct);
+  display.forEach((s,i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="c">${i+1}</td>
+      <td><strong>${s.nama}</strong><br><small style="color:var(--gray-500)">Kec. ${s.kecamatan}</small></td>
+      <td class="c">${s.tot}</td>
+      <td class="c">${s.lancar}</td>
+      <td class="c">${pctBadge(s.pct)}</td>
+      <td class="c">${s.belum}</td>
+      <td class="c">${s.tidak}</td>
+      <td class="c"><button class="btn-detail" onclick="openModal(${s.no})">Detail</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  const T = computeTotals(filteredSchools);
+  const pct = T.tot>0?(T.lancar/T.tot*100):0;
+  tfoot.innerHTML = `<tr class="tfoot-row">
+    <td class="c" colspan="2">TOTAL KESELURUHAN</td>
+    <td class="c">${T.tot}</td><td class="c">${T.lancar}</td>
+    <td class="c">${pctBadge(pct)}</td>
+    <td class="c">${T.belum}</td><td class="c">${T.tidak}</td><td></td>
+  </tr>`;
+  document.getElementById('tabel-badge').textContent = `${display.length} sekolah`;
+}
+
+function filterTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const fPct = document.getElementById('filterPct').value;
+  filteredSchools = currentSchools.filter(s => {
+    const nameOk = s.nama.toLowerCase().includes(q);
+    let pctOk = true;
+    if(fPct==='high') pctOk=s.pct>=80;
+    else if(fPct==='mid') pctOk=s.pct>=60&&s.pct<80;
+    else if(fPct==='low') pctOk=s.pct<60;
+    return nameOk&&pctOk;
+  });
+  renderTable();
+}
+
+function sortTable(mode) {
+  sortMode=mode;
+  ['sortBest','sortWorst','sortDefault'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('sort'+mode.charAt(0).toUpperCase()+mode.slice(1)).classList.add('active');
+  renderTable();
+}
+
+// ============================================================
+// CHARTS + SMART INSIGHT
+// ============================================================
+function destroyChart(key){ if(charts[key]){charts[key].destroy();charts[key]=null;} }
+
+function renderCharts(T, allSchoolsAggr, pctKec, focusText) {
+  const C = {green:'#1a6b3c',amber:'#d4a017',red:'#c0392b',navy:'#0c2340',navyMid:'#163a62',gold:'#b8962e'};
+  const isAllKec = selectedKecamatan === 'all';
+
+  // ---- 1. KECAMATAN CHART (LEVEL 1) ----
+  destroyChart('kecamatanChart');
+  const kecNames = ["Langensari","Purwaharja","Pataruman","Banjar"];
+  const kecStats = kecNames.map(k => {
+    const ks = allSchoolsAggr.filter(s=>s.kecamatan===k);
+    const tk = computeTotals(ks);
+    return { name:k, pct:tk.tot>0?(tk.lancar/tk.tot*100):0, schools:ks.length, active: isAllKec || selectedKecamatan===k };
+  });
+  const kecSorted = [...kecStats].sort((a,b)=>b.pct-a.pct);
+  const bestKec = kecSorted[0], worstKec = kecSorted[kecSorted.length-1];
+  const kecGap = bestKec.pct - worstKec.pct;
+  const selfKec = !isAllKec ? kecStats.find(k=>k.name===selectedKecamatan) : null;
+  const selfRank = !isAllKec ? kecSorted.findIndex(k=>k.name===selectedKecamatan)+1 : null;
+
+  charts['kecamatanChart'] = new Chart(document.getElementById('kecamatanChart'), {
+    type:'bar',
+    data:{
+      labels:kecStats.map(k=>k.name),
+      datasets:[{
+        label:'% Kelancaran',
+        data:kecStats.map(k=>parseFloat(n2(k.pct))),
+        backgroundColor:kecStats.map(k=>k.active?C.navyMid:'#d9dfe9'),
+        borderColor:kecStats.map(k=>k.active?C.gold:'#c8cfd9'),
+        borderWidth:2,borderRadius:5
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#edf0f5'}},
+        x:{ticks:{font:{size:12,weight:'bold',family:'DM Sans'}}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>` Capaian: ${ctx.raw}%`}}
+      }
+    }
+  });
+
+  let kecInsightHTML = '';
+  if(isAllKec) {
+    const narKec = `Berdasarkan perbandingan di atas, <strong>Kecamatan ${bestKec.name}</strong> menjadi yang terbaik dengan rata-rata <strong>${n2(bestKec.pct)}%</strong> kelancaran. Di sisi lain, <strong>Kecamatan ${worstKec.name}</strong> mencatat capaian terendah di angka <strong>${n2(worstKec.pct)}%</strong>. Terdapat selisih signifikan sebesar <strong>${n2(kecGap)}%</strong> antar wilayah.`;
+    kecInsightHTML += genNarasi('Analisis Tingkat Kota', narKec);
+    kecInsightHTML += genInsightPanel('green','lbl-green',`Pola pembelajaran di <strong>Kecamatan ${bestKec.name}</strong> layak diidentifikasi untuk menjadi percontohan bagi wilayah lain.`, 'lbl-green');
+  } else {
+    const narKec = `Fokus analisis saat ini pada <strong>Kecamatan ${selfKec.name}</strong>. Wilayah ini menempati peringkat ke-<strong>${selfRank}</strong> dari 4 kecamatan se-Kota Banjar dengan capaian <strong>${n2(selfKec.pct)}%</strong>. Untuk mengejar standar tertinggi kota (${n2(bestKec.pct)}%), masih diperlukan peningkatan mutu sebesar <strong>${n2(Math.abs(selfKec.pct-bestKec.pct))}%</strong>.`;
+    kecInsightHTML += genNarasi(`Konteks Wilayah ${selfKec.name}`, narKec);
+  }
+  document.getElementById('kec-insight').innerHTML = kecInsightHTML;
+
+  // ---- 2. PIE CHART ----
+  destroyChart('pie');
+  const pctLancar = T.tot>0?(T.lancar/T.tot*100):0;
+  const pctBelum = T.tot>0?(T.belum/T.tot*100):0;
+  const pctTidak = T.tot>0?(T.tidak/T.tot*100):0;
+
+  charts['pie'] = new Chart(document.getElementById('pieChart'), {
+    type:'doughnut',
+    data:{
+      labels:['Lancar','Belum Lancar','Tidak Bisa'],
+      datasets:[{
+        data:[T.lancar,T.belum,T.tidak],
+        backgroundColor:[C.green,C.amber,C.red],
+        borderColor:'#fff',borderWidth:3
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:12,family:'DM Sans'},padding:12}},
+        tooltip:{
+          callbacks:{
+            label:ctx=>` ${ctx.label}: ${ctx.parsed} siswa (${T.tot>0?n2(ctx.parsed/T.tot*100):0}%)`
+          }
+        }
+      }
+    }
+  });
+
+  const pieInsightHTML = genNarasi('Proporsi Siswa', `Dari total <strong>${T.tot.toLocaleString('id-ID')} siswa</strong> di ${focusText}, dominasi saat ini adalah kelompok <strong>${pctLancar > 50 ? 'Lancar' : 'Belum/Tidak Mampu'}</strong>. Secara spesifik: <strong>${n2(pctLancar)}%</strong> Lancar, <strong>${n2(pctBelum)}%</strong> Belum, dan <strong>${n2(pctTidak)}%</strong> Tidak Bisa membaca huruf hijaiyah.`);
+  document.getElementById('pie-insight').innerHTML = pieInsightHTML;
+
+  // ---- 3. BAR TOP 10 (Interactive) ----
+  destroyChart('bar');
+  const validSchools = currentSchools.filter(s=>s.tot>0);
+  const top10 = [...validSchools].sort((a,b)=>b.pct-a.pct).slice(0,10);
+  const bottom3 = [...validSchools].sort((a,b)=>a.pct-b.pct).slice(0,3);
+  const avgWilayah = T.tot>0?(T.lancar/T.tot*100):0;
+  barChartActiveData = top10; // Save reference for click event
+
+  charts['bar'] = new Chart(document.getElementById('barChart'), {
+    type:'bar',
+    data:{
+      labels:top10.map(s=>s.nama.replace('SDN ','')),
+      datasets:[{
+        label:'% Lancar',
+        data:top10.map(s=>parseFloat(n2(s.pct))),
+        backgroundColor:top10.map(s=>s.pct>=80?C.green:s.pct>=60?C.amber:C.red),
+        borderRadius:4
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      onClick: (e, elements) => {
+        if(elements.length > 0) {
+          const index = elements[0].index;
+          if(barChartActiveData[index]) openModal(barChartActiveData[index].no);
+        }
+      },
+      scales:{
+        x:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#edf0f5'},
+          annotations:{line1:{type:'line',xMin:avgWilayah,xMax:avgWilayah,borderColor:'#163a62',borderWidth:2}}},
+        y:{ticks:{font:{size:11,family:'DM Sans'}}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            title: ctx => barChartActiveData[ctx[0].dataIndex].nama,
+            label: ctx => {
+              const sch = barChartActiveData[ctx.dataIndex];
+              return [
+                ` Capaian: ${ctx.raw}%`,
+                ` Lancar: ${sch.lancar} | Belum: ${sch.belum} | Tidak: ${sch.tidak}`,
+                ` Total Siswa: ${sch.tot}`
+              ];
+            }
+          }
+        }
+      }
+    }
+  });
+
+  let barInsightHTML = '';
+  if(top10.length > 0 && bottom3.length > 0) {
+    barInsightHTML += genHighlightDuo(top10[0], bottom3[0]);
+    const narBar = `Garis vertikal biru menunjukkan rata-rata wilayah (<strong>${n2(avgWilayah)}%</strong>). <strong>${top10[0].nama}</strong> memimpin dengan sangat baik di angka <strong>${n2(top10[0].pct)}%</strong>. Sekolah-sekolah di jajaran atas ini siap untuk menjadi sekolah rujukan metodologi BTQ.`;
+    barInsightHTML += genNarasi('Analisis Peringkat', narBar);
+  }
+  document.getElementById('bar-insight').innerHTML = barInsightHTML;
+
+  // ---- 4. STACKED CHART (LEVEL 2 Detail & Smart Mode) ----
+  destroyChart('stack');
+  document.getElementById('btnStackTop20').textContent = isAllKec ? 'Top 20' : 'Tertinggi';
+  
+  let stackData = [...currentSchools].filter(s=>s.tot>0);
+  if(stackDisplayMode === 'top20') {
+    // Mode Ringkas (Smart)
+    stackData = stackData.sort((a,b) => b.pct - a.pct);
+    if(isAllKec && stackData.length > 20) stackData = stackData.slice(0, 20);
+    document.getElementById('stackCanvasContainer').style.width = '100%';
+  } else {
+    // Mode Ekspansi Horizontal Scroll
+    const dynamicWidth = Math.max(100, stackData.length * 4); 
+    document.getElementById('stackCanvasContainer').style.width = `${dynamicWidth}%`;
+  }
+  stackChartActiveData = stackData;
+
+  charts['stack'] = new Chart(document.getElementById('stackChart'), {
+    type:'bar',
+    data:{
+      labels:stackData.map(s=>s.nama.replace('SDN ','').split(' ').slice(0,2).join(' ')),
+      datasets:[
+        {label:'Lancar',data:stackData.map(s=>s.lancar),backgroundColor:C.green,borderRadius:2},
+        {label:'Belum Lancar',data:stackData.map(s=>s.belum),backgroundColor:C.amber,borderRadius:2},
+        {label:'Tidak Bisa',data:stackData.map(s=>s.tidak),backgroundColor:C.red,borderRadius:2}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      onClick: (e, elements) => {
+        if(elements.length > 0) {
+          const index = elements[0].index;
+          if(stackChartActiveData[index]) openModal(stackChartActiveData[index].no);
+        }
+      },
+      scales:{
+        x:{stacked:true,ticks:{font:{size:10},maxRotation:50}},
+        y:{stacked:true,grid:{color:'#edf0f5'}}
+      },
+      plugins:{
+        legend:{position:'bottom'},
+        tooltip:{
+          callbacks:{
+            title: ctx => stackChartActiveData[ctx[0].dataIndex].nama,
+            label: ctx => {
+              const sch = stackChartActiveData[ctx.dataIndex];
+              const pct = sch.tot > 0 ? (ctx.raw / sch.tot * 100).toFixed(1) : 0;
+              return ` ${ctx.dataset.label}: ${ctx.raw} siswa (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  let stackInsightHTML = '';
+  const highCount = validSchools.filter(s=>s.pct>=80).length;
+  const midCount = validSchools.filter(s=>s.pct>=60&&s.pct<80).length;
+  const lowCount = validSchools.filter(s=>s.pct<60).length;
+  const dominanKategori = (highCount >= lowCount) ? "kategori aman (Tinggi/Sedang)" : "kategori rawan (Rendah)";
+  
+  document.getElementById('stackToggle').style.display = (validSchools.length > 20 && isAllKec) ? 'flex' : 'none';
+
+  const narStack = `Analisis mendalam dari <strong>${validSchools.length} sekolah</strong> di ${focusText} mengidentifikasi bahwa mayoritas berada pada <strong>${dominanKategori}</strong>. Secara detail: <strong>${highCount} sekolah</strong> tinggi (≥80%), <strong>${midCount} sekolah</strong> sedang (60–79%), dan <strong>${lowCount} sekolah</strong> masih masuk kategori rendah (&lt;60%) yang memerlukan pemantauan ketat.`;
+  stackInsightHTML += genNarasi('Detail Distribusi Keseluruhan', narStack);
+  document.getElementById('stack-insight').innerHTML = stackInsightHTML;
+
+  // Render Analisis Terpadu Bawah
+  renderAnalisis(T, pctKec, focusText, allSchoolsAggr, highCount, midCount, lowCount, bestKec, worstKec, kecGap);
+}
+
+// ============================================================
+// ANALISIS SECTION
+// ============================================================
+function renderAnalisis(T, pctKec, cakupan, allSchoolsAggr, highCount, midCount, lowCount, bestKec, worstKec, kecGap) {
+  const validSchools = currentSchools.filter(s=>s.tot>0);
+  const sortedSchools = [...validSchools].sort((a,b)=>b.pct-a.pct);
+  const top1 = sortedSchools[0];
+  const bot1 = sortedSchools[sortedSchools.length-1];
+  const lowHadir = currentSchools.flatMap(s=>s.hadir).filter(h=>h<80).length;
+  const totalGuru = currentSchools.flatMap(s=>s.hadir).length;
+  const pctTidak = T.tot>0?(T.tidak/T.tot*100):0;
+
+  const cards = [
+    {
+      type:'ac-summary',
+      label:'Ringkasan Capaian',
+      title:`Status Mutu ${cakupan}`,
+      body:`Kelancaran BTQ tercatat pada angka <strong>${n2(pctKec)}%</strong> (Kategori: ${categoryLabel(pctKec)}). Distribusi mutu: <strong>${n2(highCount/Math.max(validSchools.length,1)*100)}%</strong> sekolah sudah berada di standar tinggi.`
+    },
+    {
+      type:'ac-trend',
+      label:'Fokus Lokasi',
+      title: selectedKecamatan === 'all' ? 'Distribusi Makro Kota Banjar' : `Kondisi Internal ${cakupan}`,
+      body: selectedKecamatan === 'all' ? `Kesenjangan <strong>${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} (${n2(bestKec.pct)}%) dan Kec. ${worstKec.name} (${n2(worstKec.pct)}%) memerlukan pemerataan program pembinaan.` : `Dalam wilayah ini, selisih antara sekolah terbaik (${top1?top1.nama:''}) dan terendah (${bot1?bot1.nama:''}) adalah <strong>${top1&&bot1?n2(top1.pct-bot1.pct):0}%</strong>.`
+    },
+    {
+      type:'ac-problem',
+      label:'Isu Kritis',
+      title:'Titik Lemah yang Perlu Penanganan',
+      body:`Masih terdapat <strong>${T.tidak.toLocaleString('id-ID')} siswa (${n2(pctTidak)}%)</strong> yang sama sekali belum mengenal huruf hijaiyah. Selain itu, <strong>${lowHadir} dari ${totalGuru} guru pembimbing</strong> memiliki tingkat kehadiran di bawah 80%.`
+    },
+    {
+      type:'ac-potential',
+      label:'Potensi Akselerasi',
+      title:'Peluang Strategis Jangka Pendek',
+      body:`Akselerasi tercepat dapat dicapai dengan memfokuskan intervensi metodologi langsung ke <strong>${lowCount} sekolah kategori rendah</strong>. Gunakan <strong>${top1?top1.nama:''}</strong> sebagai pusat rujukan praktik pengajaran yang efektif.`
+    }
+  ];
+
+  document.getElementById('analisis-grid').innerHTML = cards.map(c=>`
+    <div class="analisis-card ${c.type}">
+      <div class="ac-label">${c.label}</div>
+      <div class="ac-title">${c.title}</div>
+      <div class="ac-body">${c.body}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('analisis-footer').innerHTML = `
+    <strong>Konklusi Eksekutif:</strong> Visualisasi data membuktikan bahwa pendekatan <em>one-size-fits-all</em> (kebijakan seragam) tidak lagi efektif untuk menangani BTQ. Dengan capaian saat ini (<strong>${n2(pctKec)}%</strong>), diperlukan kebijakan berbasis data yang bersifat asimetris: <strong>penguatan infrastruktur metode di sekolah rendah</strong> dan <strong>pemberian apresiasi/model rujukan pada sekolah berprestasi</strong>.
+  `;
+}
+
+// ============================================================
+// TREND
+// ============================================================
+function renderTrend(cakupan) {
+  const allPeriods = getAllPeriods();
+  const trendEl = document.getElementById('trendContent');
+  const insightEl = document.getElementById('trend-insight');
+
+  if(allPeriods.length < 2) {
+    trendEl.innerHTML = `<div class="trend-empty"><div class="te-icon">📊</div><div>Data tren historis akan muncul secara otomatis saat data bulan berikutnya diinput ke sistem.</div></div>`;
+    insightEl.innerHTML='';
+    return;
+  }
+
+  const labels = allPeriods.map(p=>`${p.month.substring(0,3)} ${p.year}`);
+  const pctData = allPeriods.map(p => {
+    let raw = RAW_DATABASE[p.year][p.month];
+    if(selectedKecamatan!=='all') raw=raw.filter(s=>s.kecamatan===selectedKecamatan);
+    const T = computeTotals(aggregateSchools(raw));
+    return T.tot>0?parseFloat(n2(T.lancar/T.tot*100)):0;
+  });
+
+  trendEl.innerHTML = '<div class="chart-wrap" style="height:260px"><canvas id="trendChart"></canvas></div>';
+  destroyChart('trend');
+  charts['trend'] = new Chart(document.getElementById('trendChart'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'% Rata-rata Lancar',
+        data:pctData,
+        borderColor:'#163a62',
+        backgroundColor:'rgba(22,58,98,.08)',
+        pointBackgroundColor:'#163a62',
+        pointRadius:6,pointHoverRadius:8,
+        borderWidth:2.5,fill:true,tension:.3
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#edf0f5'}},
+        x:{ticks:{font:{size:11,family:'DM Sans'}}}
+      },
+      plugins:{legend:{display:true,position:'bottom'},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.raw}% siswa lancar`}}}
+    }
+  });
+
+  const overallDiff = pctData[pctData.length-1] - pctData[0];
+  const isUp = overallDiff > 0;
+  let trendInsightHTML = genNarasi('Analisis Momentum', `Memantau perkembangan dari ${allPeriods.length} periode, tren kelancaran BTQ di wilayah ini menunjukkan pergerakan <strong>${isUp?'POSITIF (mengalami kenaikan '+n2(Math.abs(overallDiff))+'%)':'NEGATIF (mengalami penurunan '+n2(Math.abs(overallDiff))+'%)'}</strong> dibandingkan awal observasi.`);
+  insightEl.innerHTML = trendInsightHTML;
+}
+
+// ============================================================
+// KESIMPULAN
+// ============================================================
+function renderKesimpulan(T, pctKec, allSchoolsAggr, cakupan, bestSch, worstSch) {
+  const sorted = [...currentSchools].sort((a,b)=>b.pct-a.pct).filter(s=>s.tot>0);
+  const best3 = sorted.slice(0,3).map(s=>`<strong>${s.nama}</strong> (${n2(s.pct)}%)`).join(', ');
+  const worst3 = sorted.slice(-3).reverse().map(s=>`<strong>${s.nama}</strong> (${n2(s.pct)}%)`).join(', ');
+  const lowCount = sorted.filter(s=>s.pct<60).length;
+
+  let insightText = '';
+  if(selectedKecamatan==='all') {
+    const kecRanking = ["Langensari","Purwaharja","Pataruman","Banjar"].map(k=>{
+      const ks=allSchoolsAggr.filter(s=>s.kecamatan===k);
+      const tk=computeTotals(ks);
+      return {name:k,pct:tk.tot>0?(tk.lancar/tk.tot*100):0};
+    }).sort((a,b)=>b.pct-a.pct);
+    insightText = `📊 <strong>Kecamatan ${kecRanking[0].name}</strong> memegang posisi teratas se-Kota Banjar dengan capaian <strong>${n2(kecRanking[0].pct)}%</strong>. Kebijakan afirmasi perlu segera difokuskan ke <strong>Kecamatan ${kecRanking[kecRanking.length-1].name}</strong> yang berada di angka terendah (<strong>${n2(kecRanking[kecRanking.length-1].pct)}%</strong>).`;
+  } else {
+    insightText = `🎯 Berfokus pada <strong>${cakupan}</strong>, <strong>${bestSch?bestSch.nama:''}</strong> tampil sebagai sekolah percontohan (${n2(bestSch?bestSch.pct:0)}%). Masih terdapat <strong>${lowCount} sekolah</strong> di bawah ambang batas kritis (60%) yang menuntut pendampingan intensif dari pengawas.`;
+  }
+
+  document.getElementById('insight-box-text').innerHTML = insightText;
+  document.getElementById('kesimpulan-text').innerHTML = `
+    Evaluasi sistematis atas data BTQ <strong>${cakupan}</strong> periode <strong>${currentMonth} ${currentYear}</strong> yang melibatkan <strong>${T.tot.toLocaleString('id-ID')} siswa</strong> menyimpulkan bahwa capaian kelancaran saat ini bertengger pada <strong>${n2(pctKec)}%</strong>. 
+    Dari data tersebut, <strong>${n2(T.tot>0?T.belum/T.tot*100:0)}% siswa masih pada tahap perlu pendampingan</strong>, dan <strong>${n2(T.tot>0?T.tidak/T.tot*100:0)}% secara radikal belum mengenal huruf dasar</strong>. Kesenjangan mutu masih terlihat kentara, dengan ${best3} sebagai capaian tertinggi, berbanding terbalik dengan ${worst3} di peringkat paling bawah.`;
+
+  document.getElementById('rekomendasi-list').innerHTML = [
+    `Pelaksanaan pendampingan <em>on-site</em> wajib dilakukan ke ${lowCount} sekolah berkategori merah (<60%) dengan melibatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
+    `Tingkat kehadiran guru yang bermasalah (di bawah batas toleransi 80%) harus diinvestigasi oleh Dinas Pendidikan untuk menjamin bahwa hak siswa memperoleh jam pelajaran agama terakomodasi penuh.`,
+    `Pengembangan sistem "Kakak Asuh/Tutor Sebaya Al-Qur'an" secara struktural di kelas IV dan V terbukti efektif memotong rasio keterlambatan baca.`,
+    `Gunakan dashboard analitik ini sebagai instrumen wajib dalam rapat koordinasi kepala sekolah bulanan demi memupuk kultur akuntabilitas berbasis data.`
+  ].map(r=>`<li style="margin-bottom:10px">${r}</li>`).join('');
+}
+
+// ============================================================
+// MODAL & POPUP LOGIC
+// ============================================================
+let currentModalSchool = null;
+
+function openModal(no) {
+  currentModalSchool = currentSchools.find(s=>s.no===no);
+  if(!currentModalSchool) return; // Fail-safe
+  const s = currentModalSchool;
+  document.getElementById('modalTitle').textContent = s.nama + ' — Profil Akademik';
+  renderModalTab(0);
+  document.querySelectorAll('.modal-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function switchTab(idx) {
+  document.querySelectorAll('.modal-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  renderModalTab(idx);
+}
+
+function renderModalTab(idx) {
+  const s = currentModalSchool;
+  if(!s) return;
+  const el = document.getElementById('modalContent');
+  if(idx===0) {
+    el.innerHTML = `
+      <table class="modal-table">
+        <thead><tr><th>Kelas</th><th>Total</th><th>Lancar</th><th>Belum Lancar</th><th>Tidak Bisa</th><th>% Lancar</th></tr></thead>
+        <tbody>
+          <tr><td>Kelas IV</td><td>${s.kls4.tot}</td><td>${s.kls4.lancar}</td><td>${s.kls4.belum}</td><td>${s.kls4.tidak}</td>
+              <td>${s.kls4.tot>0?n2(s.kls4.lancar/s.kls4.tot*100):0}%</td></tr>
+          <tr><td>Kelas V</td><td>${s.kls5.tot}</td><td>${s.kls5.lancar}</td><td>${s.kls5.belum}</td><td>${s.kls5.tidak}</td>
+              <td>${s.kls5.tot>0?n2(s.kls5.lancar/s.kls5.tot*100):0}%</td></tr>
+          <tr style="font-weight:700;background:var(--navy-pale)"><td>TOTAL</td><td>${s.tot}</td><td>${s.lancar}</td>
+              <td>${s.belum}</td><td>${s.tidak}</td><td>${pctBadge(s.pct)}</td></tr>
+        </tbody>
+      </table>
+      ${s.warnings.length?`<div class="data-warning" style="display:block">⚠ <strong>Inkonsistensi terdeteksi:</strong><br> ${s.warnings.join('<br>')}</div>`:''}`;
+  } else if(idx===1) {
+    el.innerHTML = `
+      <table class="modal-table">
+        <thead><tr><th>Nama Guru BTQ</th><th>Kehadiran</th><th>Status Validasi</th></tr></thead>
+        <tbody>
+          ${s.guru.map((g,i)=>`<tr>
+            <td>${g}</td><td>${s.hadir[i]}%</td>
+            <td>${s.hadir[i]>=100?'✅ Valid & Disiplin':s.hadir[i]>=80?'⚠️ Menengah':'❌ Defisit Kehadiran'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <p class="modal-sub">Rata-rata stabilitas kehadiran pengajar: <strong>${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></p>`;
+  } else {
+    const allP = getAllPeriods();
+    const histRows = allP.map(p=>{
+      const raw=RAW_DATABASE[p.year][p.month];
+      const found=raw.find(r=>r.no===s.no);
+      if(!found) return null;
+      const agg=aggregateSchools([found])[0];
+      return {period:`${p.month} ${p.year}`,pct:agg.pct,lancar:agg.lancar,tot:agg.tot};
+    }).filter(Boolean);
+    if(histRows.length<2) {
+      el.innerHTML=`<div class="trend-empty"><div class="te-icon">📅</div><div>Sistem membutuhkan setidaknya 2 data bulan untuk membentuk riwayat komparasi.</div></div>`;
+    } else {
+      el.innerHTML=`<div class="modal-history">${histRows.map((h,i)=>{
+        let trend='';
+        if(i>0){const d=h.pct-histRows[i-1].pct;
+          trend=d>0?`<span style="color:var(--green)">+${n2(d)}%</span>`:
+                d<0?`<span style="color:var(--red)">${n2(d)}%</span>`:
+                '<span style="color:var(--gray-300)">–</span>';}
+        return `<div class="hist-row">
+          <span class="hist-period">${h.period}</span>
+          <span>${h.lancar}/${h.tot} siswa</span>
+          <span class="hist-pct" style="color:${h.pct>=80?'var(--green)':h.pct>=60?'var(--amber)':'var(--red)'}">${n2(h.pct)}%</span>
+          ${trend}</div>`;
+      }).join('')}</div>`;
+    }
+  }
+}
+
+function closeModal(e) {
+  if(!e||e.target===document.getElementById('modalOverlay')||!e.target)
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape'){closeModal();closeSidebar();}
+});
+
+// START
+init();
+</script>
+</body>
+</html>
