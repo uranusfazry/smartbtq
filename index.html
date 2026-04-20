@@ -3,620 +3,1147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIMBTQ – Smart Analytic Dashboard BTQ</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<title>SIMBTQ — Dashboard Eksekutif BTQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
+/* ────────────────────────────────────────────
+   DESIGN TOKENS
+──────────────────────────────────────────── */
 :root {
-  --navy:       #0c2340;
-  --navy-mid:   #163a62;
-  --navy-light: #1e527f;
-  --navy-pale:  #e8eef6;
-  --navy-pale2: #f0f4fa;
-  --gold:       #b8962e;
-  --gold-light: #d4b45a;
-  --gold-pale:  #fdf6e3;
-  --gold-faint: #faf3de;
-  --white:      #ffffff;
-  --bg:         #f2f5f9;
-  --gray-50:    #f8f9fb;
-  --gray-100:   #edf0f5;
-  --gray-200:   #d9dfe9;
-  --gray-300:   #b8c1d0;
-  --gray-500:   #6b7a94;
-  --gray-700:   #3d4a5c;
-  --gray-900:   #1a2333;
-  --green:      #1a6b3c;
-  --green-bg:   #d4edda;
-  --amber:      #7a5c00;
-  --amber-bg:   #fff3cd;
-  --red:        #7a1c1c;
-  --red-bg:     #fde8e8;
-  --serif:      'Playfair Display', Georgia, serif;
-  --sans:       'DM Sans', 'Segoe UI', sans-serif;
-  --radius:     6px;
-  --radius-lg:  10px;
-  --shadow:     0 2px 12px rgba(12,35,64,.08);
-  --shadow-md:  0 4px 20px rgba(12,35,64,.11);
-  --shadow-lg:  0 8px 32px rgba(12,35,64,.14);
+  --bg:       #f6f7f9;
+  --surface:  #ffffff;
+  --border:   #e8eaee;
+  --border-2: #f0f1f4;
+
+  --ink-1:    #0f172a;
+  --ink-2:    #475569;
+  --ink-3:    #94a3b8;
+  --ink-4:    #cbd5e1;
+
+  --blue:     #2563eb;
+  --blue-dim: #eff4ff;
+  --blue-mid: #3b82f6;
+
+  --green:    #16a34a;
+  --green-dim:#f0fdf4;
+  --amber:    #d97706;
+  --amber-dim:#fffbeb;
+  --red:      #dc2626;
+  --red-dim:  #fff5f5;
+
+  --font:     'Sora', system-ui, sans-serif;
+  --mono:     'JetBrains Mono', monospace;
+
+  --r-sm:     6px;
+  --r-md:     10px;
+  --r-lg:     14px;
+  --r-xl:     20px;
+
+  --shadow-xs: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+  --shadow-sm: 0 2px 8px rgba(15,23,42,.07), 0 1px 3px rgba(15,23,42,.05);
+  --shadow-md: 0 4px 16px rgba(15,23,42,.08), 0 2px 6px rgba(15,23,42,.05);
+  --shadow-focus: 0 0 0 3px rgba(37,99,235,.18);
+
+  --sidebar-w: 220px;
+  --header-h:  60px;
 }
 
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--gray-900);font-size:14px;line-height:1.6}
-
-/* ==================== SPA VIEW ==================== */
-.view-section{display:none;animation:fadeIn .4s ease-in-out}
-.view-section.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-/* ==================== SIDEBAR ==================== */
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;opacity:0;transition:opacity .25s}
-.sidebar-overlay.open{display:block;opacity:1}
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--navy);border-right:2px solid var(--gold);z-index:201;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:0}
-.sidebar.open{transform:translateX(0)}
-.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between}
-.sidebar-brand{font-family:var(--serif);font-size:14px;color:var(--white);font-weight:700;line-height:1.3}
-.sidebar-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;line-height:1;padding:0 2px}
-.sidebar-close:hover{color:var(--gold-light)}
-.sidebar-nav{padding:12px 0;flex:1}
-.sidebar-nav a{display:flex;align-items:center;gap:10px;padding:11px 20px;color:rgba(255,255,255,.75);text-decoration:none;font-size:13.5px;font-weight:500;letter-spacing:.2px;transition:background .15s,color .15s}
-.sidebar-nav a:hover{background:rgba(255,255,255,.08);color:var(--gold-light)}
-.sidebar-nav a.nav-active{background:rgba(255,255,255,.1);color:var(--gold-light);border-left:3px solid var(--gold-light)}
-.sidebar-nav a .nav-icon{font-size:16px;width:20px;text-align:center}
-.sidebar-period{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1)}
-.sidebar-period label{display:block;font-size:11px;color:var(--gold-light);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:8px}
-.sidebar-period select{width:100%;padding:8px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--white);border-radius:4px;font-family:var(--sans);font-size:13px;outline:none;margin-bottom:12px;cursor:pointer;}
-.sidebar-period select option{background:var(--navy);color:var(--white)}
-
-/* ==================== TOPBAR ==================== */
-.topbar{position:sticky;top:0;z-index:100;background:var(--navy);border-bottom:3px solid var(--gold);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 16px rgba(12,35,64,.25)}
-.topbar-left{display:flex;align-items:center;gap:12px}
-.hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;border-radius:4px;flex-direction:column;gap:4px;align-items:center}
-.hamburger span{display:block;width:20px;height:2px;background:rgba(255,255,255,.85);border-radius:2px;transition:all .2s}
-.hamburger:hover span{background:var(--gold-light)}
-.topbar-brand{font-family:var(--serif);font-size:14px;color:var(--white);font-weight:700;letter-spacing:.3px;line-height:1.2}
-.topbar-brand small{display:block;font-family:var(--sans);font-size:11px;color:rgba(255,255,255,.55);font-weight:400;letter-spacing:.3px;font-style:normal}
-.topbar-nav{display:flex;align-items:center;gap:6px}
-.topbar-nav a{color:rgba(255,255,255,.7);text-decoration:none;font-size:12px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;padding:6px 10px;border-radius:3px;transition:background .15s,color .15s}
-.topbar-nav a:hover{background:rgba(255,255,255,.1);color:var(--gold-light)}
-.topbar-nav a.nav-active{background:rgba(255,255,255,.15);color:var(--gold-light)}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.period-pills{display:flex;align-items:center;gap:6px}
-.period-pills select{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:var(--white);border-radius:4px;padding:6px 10px;font-family:var(--sans);font-size:12.5px;font-weight:600;outline:none;cursor:pointer;transition:background .15s}
-.period-pills select:hover{background:rgba(255,255,255,.2)}
-.period-pills select option{background:var(--navy);color:var(--white)}
-.period-sep{color:rgba(255,255,255,.3);font-size:18px;font-weight:300}
-.btn-print{background:var(--gold);color:var(--navy);border:none;cursor:pointer;font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:7px 14px;border-radius:4px;transition:background .2s,transform .1s;white-space:nowrap}
-.btn-print:hover{background:var(--gold-light);transform:translateY(-1px)}
-
-/* ==================== KOPSURAT ==================== */
-.kopsurat{background:var(--white);border-bottom:4px double var(--navy);padding:22px 40px 18px;display:flex;align-items:center;gap:20px}
-.kop-logo{width:68px;height:68px;flex-shrink:0;border:2px solid var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--gray-50);overflow:hidden}
-.kop-logo svg{width:44px;height:44px}
-.kop-text{flex:1;text-align:center}
-.kop-instansi{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px}
-.kop-judul{font-family:var(--serif);font-size:18px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:1.5px;line-height:1.2}
-.kop-sub{font-size:13px;color:var(--gray-700);margin-top:4px}
-.kop-sub strong{color:var(--navy)}
-.kop-meta{font-size:11.5px;color:var(--gray-300);margin-top:5px;font-style:italic}
-.kop-divider{border:none;border-top:2px solid var(--navy);margin:10px 40px 0}
-
-/* ==================== WRAP ==================== */
-.wrap{max-width:1200px;margin:0 auto;padding:28px 24px 64px}
-
-/* ==================== PERIOD BANNER ==================== */
-.period-banner{display:flex;align-items:center;justify-content:space-between;background:var(--navy-pale);border:1px solid var(--gray-200);border-left:5px solid var(--gold);border-radius:var(--radius);padding:12px 20px;margin-bottom:24px;flex-wrap:wrap;gap:8px}
-.period-banner .pb-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--gray-500);font-weight:600}
-.period-banner .pb-value{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--navy)}
-.period-banner .pb-right{display:flex;align-items:center;gap:10px}
-.trend-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
-.trend-up{background:#d4edda;color:#155724}
-.trend-down{background:#fde8e8;color:#7a1c1c}
-.trend-neutral{background:var(--gray-100);color:var(--gray-500)}
-
-/* ==================== HIGHLIGHT ==================== */
-.highlight-box{background:var(--navy);border-left:6px solid var(--gold);color:var(--white);padding:22px 28px;margin-bottom:24px;border-radius:var(--radius);position:relative;overflow:hidden}
-.highlight-box::after{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(184,150,46,.12);pointer-events:none}
-.hl-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold-light);font-weight:600;margin-bottom:8px}
-.hl-stat{font-family:var(--serif);font-size:38px;font-weight:800;line-height:1}
-.hl-desc{font-size:14.5px;opacity:.9;margin-top:8px;line-height:1.6;}
-
-/* ==================== STAT GRID ==================== */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
-.stat-card{background:var(--white);border:1px solid var(--gray-200);border-top:3px solid var(--navy-mid);padding:16px 18px;border-radius:var(--radius);box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
-.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.sc-label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-500);font-weight:600;margin-bottom:6px}
-.sc-value{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--navy);line-height:1}
-.sc-sub{font-size:12px;color:var(--gray-500);margin-top:4px}
-
-/* ==================== SECTION TITLE ==================== */
-.section-title{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid var(--navy);padding-bottom:8px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
-.section-title span{flex:1}
-.section-badge{font-family:var(--sans);font-size:11px;font-weight:600;background:var(--navy-pale);color:var(--navy-mid);padding:3px 10px;border-radius:12px;letter-spacing:0;text-transform:none}
-
-/* ==================== FILTER BAR ==================== */
-.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.filter-bar input,.filter-bar select{border:1px solid var(--gray-200);border-radius:4px;padding:8px 12px;font-size:13px;font-family:var(--sans);background:var(--white);outline:none;transition:border-color .15s,box-shadow .15s}
-.filter-bar input{width:220px}
-.filter-bar input:focus,.filter-bar select:focus{border-color:var(--navy-light);box-shadow:0 0 0 3px rgba(30,82,127,.1)}
-.sort-btns{display:flex;gap:6px}
-.sort-btn{background:var(--white);border:1px solid var(--gray-200);border-radius:4px;padding:7px 12px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;transition:all .15s}
-.sort-btn:hover,.sort-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
-
-/* ==================== TABLE ==================== */
-.table-wrap{overflow-x:auto;border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:32px;background:var(--white);box-shadow:var(--shadow)}
-table{width:100%;border-collapse:collapse}
-thead th{background:var(--navy);color:var(--white);font-family:var(--sans);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;padding:11px 14px;text-align:left;border-bottom:2px solid var(--gold);white-space:nowrap}
-thead th.c{text-align:center}
-tbody tr{border-bottom:1px solid var(--gray-200)}
-tbody tr:nth-child(even){background:var(--gray-50)}
-tbody tr:hover{background:var(--navy-pale)}
-tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
-tbody td.c{text-align:center}
-.tfoot-row td{background:var(--navy-pale);font-weight:700;border-top:2px solid var(--navy);font-size:13px;color:var(--navy)}
-.badge-pct{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;min-width:56px;text-align:center}
-.badge-high{background:var(--green-bg);color:var(--green)}
-.badge-mid{background:var(--amber-bg);color:var(--amber)}
-.badge-low{background:var(--red-bg);color:var(--red)}
-.btn-detail{background:var(--navy-mid);color:var(--white);border:none;cursor:pointer;font-size:11px;font-weight:600;padding:4px 10px;border-radius:3px;font-family:var(--sans);letter-spacing:.3px;transition:background .15s}
-.btn-detail:hover{background:var(--navy)}
-
-/* ==================== CHART CARDS ==================== */
-.chart-card{background:var(--white);border:1px solid var(--gray-200);border-top:3px solid var(--navy-mid);padding:24px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);margin-bottom:28px}
-.chart-header{margin-bottom:6px}
-.flex-between{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
-.chart-title{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.6px}
-.chart-subtitle{font-size:12px;color:var(--gray-500);margin-top:3px;font-style:italic}
-.chart-divider{border:none;border-top:1px solid var(--gray-100);margin:14px 0}
-.chart-canvas-wrap canvas { cursor: pointer; } /* Indicates clickable bars */
-
-/* Chart Scroll Wrapper untuk Sekolah yang Banyak */
-.chart-scroll-wrapper{width:100%;overflow-x:auto;overflow-y:hidden;padding-bottom:8px}
-.chart-scroll-wrapper::-webkit-scrollbar{height:8px}
-.chart-scroll-wrapper::-webkit-scrollbar-track{background:var(--gray-100);border-radius:4px}
-.chart-scroll-wrapper::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:4px}
-.chart-scroll-wrapper::-webkit-scrollbar-thumb:hover{background:var(--gray-500)}
-.chart-scroll-inner{position:relative;height:320px;transition:width 0.3s ease}
-
-/* ==================== CHARTS GRID ==================== */
-.charts-grid{display:grid;grid-template-columns:360px 1fr;gap:24px;margin-bottom:28px}
-
-/* ==================== INSIGHT BLOCK (BELOW CHART) ==================== */
-.chart-insight{margin-top:16px;display:flex;flex-direction:column;gap:10px}
-.insight-panel{background:var(--navy-pale2);border:1px solid var(--gray-200);border-left:4px solid var(--gold);border-radius:0 var(--radius) var(--radius) 0;padding:14px 18px}
-.insight-panel.ip-navy{border-left-color:var(--navy);background:var(--navy-pale)}
-.insight-panel.ip-red{border-left-color:#c0392b;background:#fef8f8}
-.insight-panel.ip-green{border-left-color:var(--green);background:#f0faf5}
-.ip-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;color:var(--gold);margin-bottom:5px}
-.ip-label.lbl-navy{color:var(--navy-mid)}
-.ip-label.lbl-red{color:#c0392b}
-.ip-label.lbl-green{color:var(--green)}
-.ip-text{font-size:13px;color:var(--gray-700);line-height:1.7}
-.ip-text strong{color:var(--navy)}
-
-/* ==================== NARASI GRAFIK ==================== */
-.chart-narasi{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:14px 18px}
-.narasi-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray-500);margin-bottom:6px}
-.narasi-text{font-size:13.5px;color:var(--gray-700);line-height:1.75}
-.narasi-text strong{color:var(--navy);}
-
-/* ==================== HIGHLIGHT BOXES (BEST/WORST) ==================== */
-.highlight-duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.hl-duo-card{padding:14px 18px;border-radius:var(--radius);border:1px solid; cursor: pointer; transition: transform 0.2s;}
-.hl-duo-card:hover{transform: translateY(-2px);}
-.hl-duo-card.best{background:#f0faf5;border-color:#a8d5b8;border-left:4px solid var(--green)}
-.hl-duo-card.worst{background:#fef8f8;border-color:#e8b8b8;border-left:4px solid #c0392b}
-.hl-duo-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:6px}
-.best .hl-duo-label{color:var(--green)}
-.worst .hl-duo-label{color:#c0392b}
-.hl-duo-name{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:3px}
-.hl-duo-pct{font-size:20px;font-weight:800;font-family:var(--serif)}
-.best .hl-duo-pct{color:var(--green)}
-.worst .hl-duo-pct{color:#c0392b}
-.hl-duo-sub{font-size:11.5px;color:var(--gray-500);margin-top:3px}
-
-/* ==================== ANALISIS SECTION ==================== */
-.analisis-section{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:28px;margin-bottom:28px}
-.analisis-section h2{font-family:var(--serif);font-size:16px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:1.2px;border-bottom:2px solid var(--navy);padding-bottom:10px;margin-bottom:20px}
-.analisis-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.analisis-card{padding:16px 20px;border-radius:var(--radius);border:1px solid var(--gray-200)}
-.ac-label{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--gray-500);margin-bottom:8px}
-.ac-title{font-family:var(--serif);font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px}
-.ac-body{font-size:12.5px;color:var(--gray-700);line-height:1.7}
-.analisis-card.ac-trend{border-left:3px solid var(--navy-mid);background:var(--navy-pale2)}
-.analisis-card.ac-problem{border-left:3px solid #c0392b;background:#fef8f8}
-.analisis-card.ac-potential{border-left:3px solid var(--green);background:#f0faf5}
-.analisis-card.ac-summary{border-left:3px solid var(--gold);background:var(--gold-faint)}
-.analisis-footer{background:var(--navy);color:rgba(255,255,255,.85);border-radius:var(--radius);padding:16px 20px;font-size:13px;line-height:1.7}
-.analisis-footer strong{color:var(--gold-light)}
-
-/* ==================== TREND ==================== */
-.trend-section{background:var(--white);border:1px solid var(--gray-200);border-top:3px solid var(--gold);padding:24px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);margin-bottom:28px}
-.trend-empty{text-align:center;padding:40px 20px;color:var(--gray-300);font-size:13px}
-.trend-empty .te-icon{font-size:36px;margin-bottom:10px}
-
-/* ==================== KESIMPULAN ==================== */
-.kesimpulan{background:var(--white);border:1px solid var(--gray-200);border-left:5px solid var(--navy);padding:28px 32px;margin-bottom:32px;border-radius:var(--radius);box-shadow:var(--shadow-md)}
-.kesimpulan h3{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;border-bottom:1px solid var(--gray-200);padding-bottom:8px}
-.kesimpulan p,.kesimpulan li{font-size:13.5px;color:var(--gray-700);line-height:1.85;margin-bottom:8px}
-.kesimpulan ol{padding-left:20px}
-.kesimpulan li{margin-bottom:6px}
-.insight-highlight{background:var(--navy-pale);padding:14px 18px;border-left:4px solid var(--gold);margin-bottom:18px;border-radius:0 4px 4px 0}
-.insight-highlight p{font-size:13.5px;line-height:1.7;color:var(--navy);margin-bottom:0}
-
-/* ==================== MODAL ==================== */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--white);border-top:4px solid var(--navy);border-radius:var(--radius);width:90%;max-width:720px;max-height:88vh;overflow-y:auto;padding:28px;position:relative;box-shadow:var(--shadow-lg)}
-.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--gray-300);line-height:1}
-.modal-close:hover{color:var(--navy)}
-.modal h2{font-family:var(--serif);font-size:16px;color:var(--navy);margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--gray-200)}
-.modal-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:2px solid var(--gray-200)}
-.modal-tab{background:none;border:none;cursor:pointer;padding:8px 16px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--gray-500);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
-.modal-tab.active{color:var(--navy);border-bottom-color:var(--navy)}
-.modal-tab:hover{color:var(--navy)}
-.modal-tab-content{display:none}
-.modal-tab-content.active{display:block}
-.modal-table{width:100%;border-collapse:collapse;margin-bottom:16px}
-.modal-table th{background:var(--navy);color:var(--white);font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;text-align:left}
-.modal-table td{padding:8px 12px;border-bottom:1px solid var(--gray-200);font-size:13px}
-.modal-table tr:nth-child(even) td{background:var(--gray-50)}
-.modal-sub{font-size:12px;color:var(--gray-300);font-style:italic;margin-top:4px}
-.modal-history{margin-top:8px}
-.hist-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid var(--gray-200);border-radius:4px;margin-bottom:6px}
-.hist-period{font-weight:600;font-size:13px;color:var(--navy)}
-.hist-pct{font-size:13px;font-weight:700}
-
-/* ==================== DATA WARNING ==================== */
-.data-warning{background:#fff8e1;border:1px solid #ffe082;border-left:4px solid #f9a825;border-radius:4px;padding:10px 14px;font-size:12.5px;color:#5d4037;margin-bottom:14px;display:none}
-
-/* ==================== FOOTER ==================== */
-footer{background:var(--navy);color:rgba(255,255,255,.55);text-align:center;padding:16px;font-size:12px;border-top:3px solid var(--gold)}
-
-/* ==================== PRINT ==================== */
-@media print{
-  nav,.hamburger,.sidebar,.sidebar-overlay,.btn-print,.filter-bar,.btn-detail,
-  footer,.modal-overlay,.period-banner,.sort-btns{display:none!important}
-  .wrap{padding:0;max-width:100%}
-  .kopsurat{page-break-after:avoid}
-  .chart-card{break-inside:avoid;padding:16px;margin-bottom:16px}
-  .table-wrap{border:none;box-shadow:none}
-  body{background:white;font-size:11px}
-  .topbar{position:relative;padding:10px 20px}
-  .topbar-nav,.topbar-right{display:none}
-  .view-section{display:block!important;opacity:1!important;transform:none!important;margin-bottom:20px}
-  .charts-grid{grid-template-columns:1fr 1fr!important;gap:16px}
-  .chart-scroll-inner{width:100%!important}
+/* ────────────────────────────────────────────
+   RESET & BASE
+──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 14px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink-1);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ==================== RESPONSIVE ==================== */
-@media(max-width:960px){
-  .hamburger{display:flex}
-  .topbar-nav,.period-pills{display:none}
-  .btn-print{font-size:0;padding:7px 10px}
-  .btn-print::before{content:'🖨';font-size:16px}
-  .charts-grid{grid-template-columns:1fr}
-  .kopsurat{flex-direction:column;text-align:center;padding:16px 20px}
-  .kop-divider{margin:10px 20px 0}
-  .highlight-duo{grid-template-columns:1fr}
-  .analisis-grid{grid-template-columns:1fr}
+/* ────────────────────────────────────────────
+   LAYOUT SHELL
+──────────────────────────────────────────── */
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: var(--header-h) 1fr;
+  min-height: 100vh;
 }
-@media(max-width:600px){
-  .wrap{padding:16px 12px 40px}
-  .highlight-box .hl-stat{font-size:30px}
-  .topbar{padding:0 14px}
-  .topbar-brand small{display:none}
-  .filter-bar input{width:100%}
-  .filter-bar{gap:8px}
-  .stat-grid{grid-template-columns:repeat(2,1fr)}
-  .chart-card{padding:16px}
+
+/* ────────────────────────────────────────────
+   HEADER
+──────────────────────────────────────────── */
+.header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-xs);
+}
+.header-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.header-brand-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-1);
+  letter-spacing: -.3px;
+}
+.header-brand-dot { color: var(--blue); font-weight: 700; }
+.header-brand-sub {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 400;
+  letter-spacing: .3px;
+}
+.header-sep { width: 1px; height: 24px; background: var(--border); }
+.header-period-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.period-label {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-weight: 500;
+  letter-spacing: .2px;
+}
+.sel {
+  appearance: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 5px 28px 5px 10px;
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-1);
+  cursor: pointer;
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  transition: border-color .15s, box-shadow .15s;
+}
+.sel:focus { border-color: var(--blue); box-shadow: var(--shadow-focus); }
+.sel option { background: var(--surface); }
+
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.btn-print {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--blue); color: #fff;
+  border: none; border-radius: var(--r-sm);
+  padding: 6px 14px;
+  font-family: var(--font); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: background .15s, transform .1s;
+  white-space: nowrap;
+}
+.btn-print:hover { background: #1d4ed8; transform: translateY(-1px); }
+.btn-print svg { width: 14px; height: 14px; }
+
+/* Hamburger */
+.ham { display: none; background: none; border: none; cursor: pointer; padding: 6px; border-radius: var(--r-sm); }
+.ham span { display: block; width: 18px; height: 2px; background: var(--ink-2); border-radius: 2px; margin: 3.5px 0; transition: all .2s; }
+
+/* ────────────────────────────────────────────
+   SIDEBAR
+──────────────────────────────────────────── */
+.sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+}
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 12px 10px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--bg); color: var(--ink-1); }
+.nav-item.active { background: var(--blue-dim); color: var(--blue); font-weight: 600; }
+.nav-icon {
+  width: 30px; height: 30px;
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  background: var(--bg);
+  flex-shrink: 0;
+  transition: background .12s;
+}
+.nav-item.active .nav-icon { background: var(--blue-dim); }
+
+.sidebar-filter {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-2);
+}
+.sidebar-filter-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 8px;
+  display: block;
+}
+.sidebar-filter select { width: 100%; margin-bottom: 8px; }
+
+/* ────────────────────────────────────────────
+   MAIN CONTENT
+──────────────────────────────────────────── */
+.main {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 28px 32px 60px;
+  min-width: 0;
+}
+
+/* SPA Views */
+.view { display: none; animation: fadeUp .3s ease-out; }
+.view.active { display: block; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Skeleton Loading */
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--border-2) 25%, var(--border) 50%, var(--border-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: var(--r-sm);
+}
+
+/* ────────────────────────────────────────────
+   PAGE HEADER ROW
+──────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink-1);
+  letter-spacing: -.4px;
+  line-height: 1.3;
+}
+.page-subtitle { font-size: 13px; color: var(--ink-3); margin-top: 3px; font-weight: 400; }
+.trend-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+}
+.chip-up   { background: var(--green-dim); color: var(--green); }
+.chip-down { background: var(--red-dim);   color: var(--red); }
+.chip-flat { background: var(--bg);        color: var(--ink-3); }
+
+/* ────────────────────────────────────────────
+   KPI CARDS
+──────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.kpi-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-2);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow .15s, transform .15s;
+  cursor: default;
+}
+.kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.kpi-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--border-2);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+.kpi-card.accent-blue::after  { background: var(--blue); }
+.kpi-card.accent-green::after { background: var(--green); }
+.kpi-card.accent-amber::after { background: var(--amber); }
+.kpi-card.accent-red::after   { background: var(--red); }
+
+.kpi-label {
+  font-size: 11px; font-weight: 600; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px;
+}
+.kpi-value {
+  font-size: 30px; font-weight: 700; color: var(--ink-1);
+  line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums;
+}
+.kpi-card.accent-green .kpi-value { color: var(--green); }
+.kpi-card.accent-amber .kpi-value { color: var(--amber); }
+.kpi-card.accent-red   .kpi-value { color: var(--red); }
+.kpi-sub {
+  font-size: 11.5px; color: var(--ink-3); margin-top: 6px; line-height: 1.4;
+}
+.kpi-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px; font-weight: 500;
+  padding: 2px 7px; border-radius: 4px;
+  background: var(--bg); color: var(--ink-3);
+  margin-top: 6px;
+}
+.kpi-badge.valid   { background: var(--green-dim); color: var(--green); }
+.kpi-badge.partial { background: var(--amber-dim); color: var(--amber); }
+.kpi-badge.check   { background: var(--red-dim);   color: var(--red); }
+
+/* ────────────────────────────────────────────
+   BIG HERO METRIC
+──────────────────────────────────────────── */
+.hero-metric {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  padding: 28px 32px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-2);
+  display: flex; align-items: center; gap: 32px;
+  flex-wrap: wrap;
+}
+.hero-main { flex: 1; min-width: 180px; }
+.hero-label { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.hero-pct {
+  font-size: 56px; font-weight: 700; letter-spacing: -3px;
+  line-height: 1; color: var(--ink-1); font-variant-numeric: tabular-nums;
+}
+.hero-pct sup { font-size: 22px; letter-spacing: -1px; vertical-align: super; color: var(--ink-3); }
+.hero-desc { font-size: 13px; color: var(--ink-2); margin-top: 10px; line-height: 1.6; }
+.hero-desc strong { color: var(--blue); }
+
+.hero-right { display: flex; gap: 20px; flex-wrap: wrap; }
+.hero-stat {
+  text-align: center;
+  padding: 14px 18px;
+  background: var(--bg);
+  border-radius: var(--r-md);
+  min-width: 90px;
+}
+.hs-num { font-size: 20px; font-weight: 700; color: var(--ink-1); letter-spacing: -.5px; }
+.hs-num.green { color: var(--green); }
+.hs-num.amber { color: var(--amber); }
+.hs-num.red   { color: var(--red); }
+.hs-lbl { font-size: 10.5px; color: var(--ink-3); font-weight: 500; margin-top: 3px; }
+
+/* Progress bar on hero */
+.hero-progress { margin-top: 14px; }
+.prog-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); margin-bottom: 5px; }
+.prog-bar { height: 6px; border-radius: 6px; background: var(--border); overflow: hidden; display: flex; }
+.prog-segment { height: 100%; transition: width .6s cubic-bezier(.4,0,.2,1); }
+
+/* ────────────────────────────────────────────
+   SECTION HEADINGS
+──────────────────────────────────────────── */
+.section-heading {
+  font-size: 13px; font-weight: 600; color: var(--ink-2);
+  text-transform: uppercase; letter-spacing: .8px;
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-heading-badge {
+  font-size: 11px; font-weight: 500; color: var(--ink-3);
+  background: var(--bg); padding: 3px 10px;
+  border-radius: 20px; text-transform: none; letter-spacing: 0;
+}
+
+/* ────────────────────────────────────────────
+   CHART CARDS
+──────────────────────────────────────────── */
+.chart-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-2);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.chart-card-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border-2);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.chart-card-title { font-size: 13.5px; font-weight: 600; color: var(--ink-1); }
+.chart-card-sub   { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.chart-card-body  { padding: 20px 22px; }
+
+.chart-wrap { position: relative; }
+
+/* Charts grid */
+.charts-2col { display: grid; grid-template-columns: 340px 1fr; gap: 20px; margin-bottom: 20px; }
+
+/* Scroll wrapper for stacked bar */
+.chart-scroll { overflow-x: auto; padding-bottom: 4px; }
+.chart-scroll::-webkit-scrollbar { height: 4px; }
+.chart-scroll::-webkit-scrollbar-track { background: var(--bg); border-radius: 2px; }
+.chart-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.chart-scroll-inner { position: relative; height: 300px; }
+
+/* ────────────────────────────────────────────
+   INSIGHT PANELS
+──────────────────────────────────────────── */
+.insight-strip {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px; margin-top: 16px;
+}
+.insight-item {
+  background: var(--bg);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  border-left: 3px solid transparent;
+}
+.insight-item.blue  { border-left-color: var(--blue); }
+.insight-item.green { border-left-color: var(--green); }
+.insight-item.amber { border-left-color: var(--amber); }
+.insight-item.red   { border-left-color: var(--red); }
+.ii-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px; color: var(--ink-3); margin-bottom: 5px; }
+.ii-text  { font-size: 12.5px; color: var(--ink-2); line-height: 1.6; }
+.ii-text strong { color: var(--ink-1); }
+
+/* Best / Worst Duo */
+.duo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.duo-card {
+  padding: 14px 16px; border-radius: var(--r-md);
+  border: 1px solid var(--border-2);
+  cursor: pointer; transition: box-shadow .15s, transform .12s;
+}
+.duo-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.duo-card.best  { background: var(--green-dim); border-color: rgba(22,163,74,.15); }
+.duo-card.worst { background: var(--red-dim);   border-color: rgba(220,38,38,.15); }
+.duo-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px; margin-bottom: 6px; }
+.duo-card.best  .duo-lbl { color: var(--green); }
+.duo-card.worst .duo-lbl { color: var(--red); }
+.duo-name { font-size: 12.5px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px; line-height: 1.3; }
+.duo-pct  { font-size: 22px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+.duo-card.best  .duo-pct { color: var(--green); }
+.duo-card.worst .duo-pct { color: var(--red); }
+.duo-meta { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+
+/* ────────────────────────────────────────────
+   TABLE
+──────────────────────────────────────────── */
+.table-surface {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-2);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.table-toolbar {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-2);
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+}
+.search-input {
+  flex: 1; min-width: 180px;
+  padding: 7px 12px 7px 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  font-family: var(--font); font-size: 12.5px; color: var(--ink-1);
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.search-input:focus { border-color: var(--blue); box-shadow: var(--shadow-focus); }
+.table-filter-sel { max-width: 200px; }
+.sort-group { display: flex; gap: 4px; margin-left: auto; }
+.sort-btn {
+  padding: 6px 12px; border: 1px solid var(--border);
+  border-radius: var(--r-sm); background: var(--surface);
+  font-family: var(--font); font-size: 11.5px; font-weight: 500;
+  color: var(--ink-2); cursor: pointer; transition: all .12s;
+}
+.sort-btn:hover { border-color: var(--blue-mid); color: var(--blue); }
+.sort-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 10px 16px;
+  font-size: 10.5px; font-weight: 600; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .7px;
+  text-align: left; background: var(--bg);
+  border-bottom: 1px solid var(--border-2);
+  white-space: nowrap;
+}
+thead th.c { text-align: center; }
+tbody tr { border-bottom: 1px solid var(--border-2); transition: background .1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fafbfc; }
+tbody td { padding: 11px 16px; font-size: 13px; color: var(--ink-1); }
+tbody td.c { text-align: center; }
+.td-name { font-weight: 500; }
+.td-school-meta { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+tfoot td {
+  padding: 11px 16px;
+  font-size: 12.5px; font-weight: 600; color: var(--ink-2);
+  background: var(--bg); border-top: 1px solid var(--border);
+}
+tfoot td.c { text-align: center; }
+
+/* Pct Pill */
+.pct-pill {
+  display: inline-flex; align-items: center;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.pill-high { background: var(--green-dim); color: var(--green); }
+.pill-mid  { background: var(--amber-dim); color: var(--amber); }
+.pill-low  { background: var(--red-dim);   color: var(--red); }
+
+/* Quality dot */
+.q-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.q-green { background: var(--green); }
+.q-amber { background: var(--amber); }
+.q-red   { background: var(--red); }
+
+/* Detail button */
+.btn-detail {
+  padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: var(--r-sm); background: var(--surface);
+  font-family: var(--font); font-size: 11px; font-weight: 500;
+  color: var(--ink-2); cursor: pointer; transition: all .12s;
+}
+.btn-detail:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ────────────────────────────────────────────
+   ANALYSIS PANELS (BOTTOM)
+──────────────────────────────────────────── */
+.analysis-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.analysis-card {
+  background: var(--surface);
+  border-radius: var(--r-lg); border: 1px solid var(--border-2);
+  box-shadow: var(--shadow-xs);
+  padding: 18px 20px;
+  border-top: 3px solid var(--border);
+}
+.analysis-card.ac-blue   { border-top-color: var(--blue); }
+.analysis-card.ac-green  { border-top-color: var(--green); }
+.analysis-card.ac-amber  { border-top-color: var(--amber); }
+.analysis-card.ac-red    { border-top-color: var(--red); }
+.ac-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .9px; color: var(--ink-3); margin-bottom: 7px; }
+.ac-title   { font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 7px; line-height: 1.3; }
+.ac-body    { font-size: 12.5px; color: var(--ink-2); line-height: 1.65; }
+.ac-body strong { color: var(--ink-1); }
+
+.exec-banner {
+  background: var(--ink-1);
+  border-radius: var(--r-lg);
+  padding: 18px 22px;
+  color: rgba(255,255,255,.8);
+  font-size: 13px; line-height: 1.7;
+}
+.exec-banner strong { color: #fff; }
+
+/* ────────────────────────────────────────────
+   KESIMPULAN
+──────────────────────────────────────────── */
+.conclusion-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-2);
+  box-shadow: var(--shadow-sm);
+  padding: 28px 32px;
+  margin-bottom: 20px;
+}
+.conclusion-card h3 { font-size: 15px; font-weight: 700; color: var(--ink-1); margin-bottom: 16px; letter-spacing: -.2px; }
+.highlight-callout {
+  background: var(--blue-dim);
+  border-left: 3px solid var(--blue);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  padding: 14px 18px;
+  font-size: 13px; color: var(--ink-1); line-height: 1.65;
+  margin-bottom: 18px;
+}
+.conclusion-body { font-size: 13.5px; color: var(--ink-2); line-height: 1.8; }
+.conclusion-body strong { color: var(--ink-1); }
+.reco-list { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.reco-list li {
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 13px; color: var(--ink-2); line-height: 1.6;
+}
+.reco-num {
+  width: 22px; height: 22px; flex-shrink: 0;
+  background: var(--blue); color: #fff;
+  border-radius: 50%;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+
+/* ────────────────────────────────────────────
+   TREND
+──────────────────────────────────────────── */
+.trend-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.trend-empty-icon { font-size: 32px; margin-bottom: 10px; }
+
+/* ────────────────────────────────────────────
+   MODAL
+──────────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15,23,42,.5); backdrop-filter: blur(4px);
+  z-index: 500; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  width: 90%; max-width: 680px; max-height: 86vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(15,23,42,.2);
+  position: relative;
+  animation: fadeUp .25s ease-out;
+}
+.modal-header {
+  padding: 22px 26px 16px;
+  border-bottom: 1px solid var(--border-2);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  position: sticky; top: 0; background: var(--surface); z-index: 2;
+}
+.modal-title { font-size: 15px; font-weight: 700; color: var(--ink-1); letter-spacing: -.2px; }
+.modal-close {
+  background: var(--bg); border: none; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--ink-3); flex-shrink: 0;
+  transition: background .12s, color .12s;
+}
+.modal-close:hover { background: var(--border); color: var(--ink-1); }
+
+.modal-tabs {
+  display: flex; gap: 0;
+  padding: 0 26px;
+  border-bottom: 1px solid var(--border-2);
+}
+.m-tab {
+  background: none; border: none; cursor: pointer;
+  padding: 10px 14px;
+  font-family: var(--font); font-size: 12.5px; font-weight: 500;
+  color: var(--ink-3); border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all .12s;
+}
+.m-tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+.m-tab:hover { color: var(--ink-1); }
+
+.modal-body { padding: 22px 26px; }
+.m-tab-content { display: none; }
+.m-tab-content.active { display: block; }
+
+.modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.modal-table th {
+  background: var(--bg);
+  padding: 8px 12px;
+  font-size: 10.5px; font-weight: 600; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .6px; text-align: left;
+  border-bottom: 1px solid var(--border-2);
+}
+.modal-table td { padding: 9px 12px; border-bottom: 1px solid var(--border-2); color: var(--ink-1); }
+.modal-table tr:last-child td { border-bottom: none; }
+.modal-table tr:nth-child(even) td { background: var(--bg); }
+
+.hist-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px; border-radius: var(--r-sm); margin-bottom: 6px;
+  background: var(--bg); border: 1px solid var(--border-2);
+}
+.hist-period { font-weight: 500; font-size: 13px; color: var(--ink-1); }
+.hist-pct { font-size: 13px; font-weight: 700; }
+.hist-diff { font-size: 11.5px; font-weight: 500; }
+
+/* ────────────────────────────────────────────
+   DATA QUALITY BANNER
+──────────────────────────────────────────── */
+.dq-banner {
+  display: none;
+  background: var(--amber-dim);
+  border: 1px solid rgba(217,119,6,.2);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 12.5px; color: var(--amber);
+  display: flex; align-items: center; gap: 8px;
+}
+.dq-banner.hidden { display: none !important; }
+
+/* ────────────────────────────────────────────
+   SIDEBAR OVERLAY (Mobile)
+──────────────────────────────────────────── */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,.4);
+  z-index: 90;
+}
+.sidebar-overlay.open { display: block; }
+
+/* ────────────────────────────────────────────
+   RESPONSIVE
+──────────────────────────────────────────── */
+@media(max-width:1024px) {
+  .charts-2col { grid-template-columns: 1fr; }
+}
+@media(max-width:900px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    z-index: 91; width: var(--sidebar-w);
+    transform: translateX(-100%); transition: transform .25s ease;
+    height: 100vh;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .ham { display: flex; flex-direction: column; }
+  .main { grid-column: 1; padding: 20px 16px 48px; }
+  .header { padding: 0 16px; }
+  .header-brand-sub { display: none; }
+  .hero-right { gap: 10px; }
+  .duo-grid { grid-template-columns: 1fr; }
+  .analysis-grid { grid-template-columns: 1fr; }
+}
+@media(max-width:600px) {
+  .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  .hero-metric { flex-direction: column; }
+  .hero-pct { font-size: 44px; }
+  .header-period-group .period-label,
+  .header-period-group .sel + .sel { display: none; }
+}
+
+/* ────────────────────────────────────────────
+   PRINT
+──────────────────────────────────────────── */
+@media print {
+  .shell { display: block; }
+  .header { position: relative; }
+  .sidebar, .sidebar-overlay, .ham, .table-toolbar .sort-group,
+  .btn-print, .modal-overlay { display: none !important; }
+  .view { display: block !important; margin-bottom: 24px; }
+  .chart-card, .kpi-card, .table-surface { break-inside: avoid; }
+  body { background: white; }
 }
 </style>
 </head>
 <body>
 
-<!-- ==================== SIDEBAR ==================== -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">SIMBTQ<br><span style="font-family:var(--sans);font-weight:400;font-size:11px;color:rgba(255,255,255,.55)">Data Eksekutif</span></div>
-    <button class="sidebar-close" onclick="closeSidebar()">×</button>
-  </div>
-  <nav class="sidebar-nav">
-    <a href="#" class="nav-link nav-active" data-target="view-ringkasan" onclick="showSection('view-ringkasan');return false;"><span class="nav-icon">📊</span> Ringkasan</a>
-    <a href="#" class="nav-link" data-target="view-tabel" onclick="showSection('view-tabel');return false;"><span class="nav-icon">📋</span> Data Sekolah</a>
-    <a href="#" class="nav-link" data-target="view-grafik" onclick="showSection('view-grafik');return false;"><span class="nav-icon">📈</span> Grafik & Insight</a>
-    <a href="#" class="nav-link" data-target="view-trend" onclick="showSection('view-trend');return false;"><span class="nav-icon">📉</span> Tren Bulanan</a>
-    <a href="#" class="nav-link" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan');return false;"><span class="nav-icon">📝</span> Kesimpulan</a>
-  </nav>
-  <div class="sidebar-period">
-    <label>Filter Wilayah</label>
-    <select id="sbKecamatan" onchange="onPeriodChange()">
-      <option value="all">Semua Kecamatan</option>
-      <option value="Langensari">Langensari</option>
-      <option value="Purwaharja">Purwaharja</option>
-      <option value="Pataruman">Pataruman</option>
-      <option value="Banjar">Banjar</option>
-    </select>
-    <label>Pilih Periode</label>
-    <select id="sbYear" onchange="onPeriodChange()"></select>
-    <select id="sbMonth" onchange="onPeriodChange()"></select>
-  </div>
-</aside>
 
-<!-- ==================== TOPBAR ==================== -->
-<header class="topbar">
-  <div class="topbar-left">
-    <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Menu">
+<div class="shell">
+
+  <!-- ═══════════════ HEADER ═══════════════ -->
+  <header class="header">
+    <button class="ham" id="hamBtn" onclick="openSidebar()">
       <span></span><span></span><span></span>
     </button>
-    <div class="topbar-brand">SIMBTQ<small>Smart Analytic Dashboard</small></div>
-  </div>
-  <nav class="topbar-nav">
-    <a href="#" class="nav-link nav-active" data-target="view-ringkasan" onclick="showSection('view-ringkasan');return false;">Ringkasan</a>
-    <a href="#" class="nav-link" data-target="view-tabel" onclick="showSection('view-tabel');return false;">Data Sekolah</a>
-    <a href="#" class="nav-link" data-target="view-grafik" onclick="showSection('view-grafik');return false;">Grafik & Insight</a>
-    <a href="#" class="nav-link" data-target="view-trend" onclick="showSection('view-trend');return false;">Tren</a>
-    <a href="#" class="nav-link" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan');return false;">Kesimpulan</a>
-  </nav>
-  <div class="topbar-right">
-    <div class="period-pills">
-      <select id="selKecamatan" onchange="onPeriodChange()">
+
+    <div class="header-brand">
+      <span class="header-brand-name">SIM<span class="header-brand-dot">BTQ</span></span>
+      <span class="header-brand-sub">Dashboard Baca Tulis Al-Qur'an · Kota Banjar</span>
+    </div>
+
+    <div class="header-sep"></div>
+
+    <div class="header-period-group">
+      <span class="period-label">Wilayah</span>
+      <select class="sel" id="selKecamatan" onchange="onPeriodChange()">
         <option value="all">Semua Kecamatan</option>
         <option value="Langensari">Langensari</option>
         <option value="Purwaharja">Purwaharja</option>
         <option value="Pataruman">Pataruman</option>
         <option value="Banjar">Banjar</option>
       </select>
-      <span class="period-sep">|</span>
-      <select id="selYear" onchange="onPeriodChange()"></select>
-      <span class="period-sep">/</span>
-      <select id="selMonth" onchange="onPeriodChange()"></select>
+      <span class="period-label">Tahun</span>
+      <select class="sel" id="selYear" onchange="onPeriodChange()"></select>
+      <span class="period-label">Bulan</span>
+      <select class="sel" id="selMonth" onchange="onPeriodChange()"></select>
     </div>
-    <button class="btn-print" onclick="window.print()">🖨 Cetak PDF</button>
-  </div>
-</header>
 
-<!-- ==================== KOPSURAT ==================== -->
-<div class="kopsurat">
-  <div class="kop-logo">
-    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="24" cy="24" r="22" stroke="#0c2340" stroke-width="2" fill="#f3f5f9"/>
-      <path d="M24 8 L28 18 H38 L30 24 L33 34 L24 28 L15 34 L18 24 L10 18 H20 Z" fill="#163a62" opacity=".8"/>
-      <rect x="18" y="36" width="12" height="3" rx="1" fill="#b8962e"/>
-      <rect x="21" y="39" width="6" height="3" rx="1" fill="#b8962e"/>
-    </svg>
-  </div>
-  <div class="kop-text">
-    <div class="kop-instansi">Pemerintah Kota Banjar &nbsp;·&nbsp; Dinas Pendidikan dan Kebudayaan</div>
-    <div class="kop-judul">Sistem Monitoring Baca Tulis Al-Qur'an (BTQ)</div>
-    <div class="kop-sub">Laporan Eksekutif Wilayah &nbsp;·&nbsp; <strong id="kop-period">–</strong></div>
-    <div class="kop-meta">Dokumen Resmi – Untuk Kepentingan Internal &nbsp;·&nbsp; SIMBTQ v6.0 Smart Analytic</div>
-  </div>
-</div>
-<hr class="kop-divider">
-
-<!-- ==================== MAIN ==================== -->
-<main class="wrap">
-
-  <div class="period-banner" id="periodBanner">
-    <div>
-      <div class="pb-label">Lingkup Data Aktif</div>
-      <div class="pb-value" id="bannerPeriod">–</div>
+    <div class="header-right">
+      <button class="btn-print" onclick="window.print()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Cetak PDF
+      </button>
     </div>
-    <div class="pb-right">
-      <span id="trendBadge"></span>
-      <span id="bannerMeta" style="font-size:12px;color:var(--gray-500)"></span>
-    </div>
-  </div>
+  </header>
 
-  <div class="data-warning" id="dataWarning">
-    ⚠ <strong>Peringatan Data:</strong> Ditemukan inkonsistensi data pada beberapa catatan. Data tetap ditampilkan namun perlu verifikasi ke sekolah terkait.
-  </div>
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <span class="nav-section-label">Navigasi</span>
+    <button class="nav-item active" data-target="view-ringkasan" onclick="showSection('view-ringkasan')">
+      <span class="nav-icon">◫</span> Ringkasan
+    </button>
+    <button class="nav-item" data-target="view-tabel" onclick="showSection('view-tabel')">
+      <span class="nav-icon">≡</span> Data Sekolah
+    </button>
+    <button class="nav-item" data-target="view-grafik" onclick="showSection('view-grafik')">
+      <span class="nav-icon">↗</span> Grafik & Insight
+    </button>
+    <button class="nav-item" data-target="view-trend" onclick="showSection('view-trend')">
+      <span class="nav-icon">∿</span> Tren Bulanan
+    </button>
+    <button class="nav-item" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan')">
+      <span class="nav-icon">◎</span> Kesimpulan
+    </button>
 
-  <!-- ======== VIEW: RINGKASAN ======== -->
-  <div id="view-ringkasan" class="view-section active">
-    <div class="highlight-box">
-      <div class="hl-label">Capaian Utama – <span id="hl-period">–</span></div>
-      <div class="hl-stat" id="hl-pct">–%</div>
-      <div class="hl-desc" id="hl-desc"></div>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="sc-label">Jumlah Sekolah</div>
-        <div class="sc-value" id="sc-sekolah">–</div>
-        <div class="sc-sub">SD Negeri (<span id="sc-kec-label">Semua</span>)</div>
-      </div>
-      <div class="stat-card">
-        <div class="sc-label">Total Siswa</div>
-        <div class="sc-value" id="sc-siswa">–</div>
-        <div class="sc-sub">Kelas IV & V Dievaluasi</div>
-      </div>
-      <div class="stat-card">
-        <div class="sc-label">Sudah Lancar</div>
-        <div class="sc-value" id="sc-lancar" style="color:var(--green)">–</div>
-        <div class="sc-sub">Telah Mampu Membaca</div>
-      </div>
-      <div class="stat-card">
-        <div class="sc-label">Belum Lancar</div>
-        <div class="sc-value" id="sc-belum" style="color:var(--amber)">–</div>
-        <div class="sc-sub">Perlu Pendampingan</div>
-      </div>
-      <div class="stat-card">
-        <div class="sc-label">Tidak Bisa</div>
-        <div class="sc-value" id="sc-tidak" style="color:var(--red)">–</div>
-        <div class="sc-sub">Belum Mengenal Huruf</div>
-      </div>
-      <div class="stat-card">
-        <div class="sc-label">Rata-rata Kehadiran</div>
-        <div class="sc-value" id="sc-hadir">–%</div>
-        <div class="sc-sub">Guru Pembimbing BTQ</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======== VIEW: TABEL ======== -->
-  <div id="view-tabel" class="view-section">
-    <h2 class="section-title">
-      <span>Data Sekolah – <span id="tabel-kec-title">Semua Kecamatan</span></span>
-      <span class="section-badge" id="tabel-badge">0 sekolah</span>
-    </h2>
-    <div class="filter-bar">
-      <input type="text" id="searchInput" placeholder="🔍 Cari nama sekolah…" oninput="filterTable()">
-      <select id="filterPct" onchange="filterTable()">
-        <option value="">Semua Persentase Capaian</option>
-        <option value="high">Kategori Tinggi (≥ 80%)</option>
-        <option value="mid">Kategori Sedang (60–79%)</option>
-        <option value="low">Kategori Rendah (&lt; 60%)</option>
+    <div class="sidebar-filter">
+      <span class="sidebar-filter-label">Filter Wilayah</span>
+      <select class="sel sidebar-filter select" id="sbKecamatan" onchange="onSidebarKec()">
+        <option value="all">Semua Kecamatan</option>
+        <option value="Langensari">Langensari</option>
+        <option value="Purwaharja">Purwaharja</option>
+        <option value="Pataruman">Pataruman</option>
+        <option value="Banjar">Banjar</option>
       </select>
-      <div class="sort-btns">
-        <button class="sort-btn" id="sortBest" onclick="sortTable('best')">▲ Terbaik</button>
-        <button class="sort-btn" id="sortWorst" onclick="sortTable('worst')">▼ Terburuk</button>
-        <button class="sort-btn active" id="sortDefault" onclick="sortTable('default')">= Urutan Wilayah</button>
-      </div>
+      <span class="sidebar-filter-label">Periode</span>
+      <select class="sel" id="sbYear" onchange="onSidebarPeriod()"></select>
+      <select class="sel" id="sbMonth" onchange="onSidebarPeriod()" style="margin-top:6px"></select>
     </div>
-    <div class="table-wrap">
-      <table id="mainTable">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama Sekolah</th>
-            <th class="c">Total Siswa</th>
-            <th class="c">Lancar</th>
-            <th class="c">% Lancar</th>
-            <th class="c">Belum Lancar</th>
-            <th class="c">Tidak Bisa</th>
-            <th class="c">Tindakan</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-        <tfoot id="tableFoot"></tfoot>
-      </table>
-    </div>
-  </div>
+  </aside>
 
-  <!-- ======== VIEW: GRAFIK ======== -->
-  <div id="view-grafik" class="view-section">
-    <h2 class="section-title"><span id="grafik-focus-title">Visualisasi Analitik: Fokus Kota Banjar</span></h2>
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
 
-    <!-- GRAFIK 1: Kecamatan Comparison (OVERVIEW UTAMA) -->
-    <div class="chart-card" id="districtCompareWrapper">
-      <div class="chart-header">
-        <div class="chart-title" id="kecTitle">Perbandingan Capaian Antar Kecamatan se-Kota Banjar</div>
-        <div class="chart-subtitle">Persentase rata-rata kelancaran membaca Al-Qur'an per wilayah kecamatan (OVERVIEW GLOBAL)</div>
-      </div>
-      <hr class="chart-divider">
-      <div class="chart-wrap" style="height:260px"><canvas id="kecamatanChart"></canvas></div>
-      <div class="chart-insight" id="kec-insight"></div>
+    <!-- DQ Banner -->
+    <div class="dq-banner hidden" id="dqBanner">
+      ⚠ Ditemukan inkonsistensi data pada beberapa catatan. Verifikasi ke sekolah terkait disarankan.
     </div>
 
-    <!-- GRAFIK 2: Pie + Top Bar (HIERARKI KEDUA - TOP SEKOLAH) -->
-    <div class="charts-grid">
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-header">
-          <div class="chart-title" id="pieTitle">Komposisi Kemampuan BTQ</div>
-          <div class="chart-subtitle" id="pieSubtitle">Distribusi status kemampuan seluruh siswa di wilayah ini</div>
-        </div>
-        <hr class="chart-divider">
-        <div class="chart-wrap" style="height:240px"><canvas id="pieChart"></canvas></div>
-        <div class="chart-insight" id="pie-insight"></div>
-      </div>
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-header">
-          <div class="chart-title" id="barTopTitle">Top Sekolah Tertinggi</div>
-          <div class="chart-subtitle" id="barSubtitle">Peringkat capaian kelancaran membaca Al-Qur'an (Klik batang untuk detail)</div>
-        </div>
-        <hr class="chart-divider">
-        <div class="chart-wrap chart-canvas-wrap" style="height:240px"><canvas id="barChart"></canvas></div>
-        <div class="chart-insight" id="bar-insight"></div>
-      </div>
-    </div>
-
-    <!-- GRAFIK 3: Stacked (HIERARKI KETIGA - DETAIL) -->
-    <div class="chart-card">
-      <div class="chart-header flex-between">
+    <!-- ══ VIEW: RINGKASAN ══ -->
+    <div id="view-ringkasan" class="view active">
+      <div class="page-header">
         <div>
-          <div class="chart-title" id="stackTitle">Distribusi Kemampuan Seluruh Sekolah</div>
-          <div class="chart-subtitle" id="stackSubtitle">Perbandingan komposisi lancar, belum lancar, dan tidak bisa (Klik batang untuk detail)</div>
+          <div class="page-title" id="r-title">Ringkasan Eksekutif</div>
+          <div class="page-subtitle" id="r-subtitle">–</div>
         </div>
-        <div class="sort-btns" id="stackToggle" style="display:none;">
-           <button class="sort-btn active" id="btnStackTop20" onclick="setStackMode('top20')">Top 20</button>
-           <button class="sort-btn" id="btnStackAll" onclick="setStackMode('all')">Semua Sekolah (Scroll ⇄)</button>
+        <span id="r-trend-chip"></span>
+      </div>
+
+      <!-- Hero Metric -->
+      <div class="hero-metric">
+        <div class="hero-main">
+          <div class="hero-label">Tingkat Kelancaran BTQ</div>
+          <div class="hero-pct" id="hero-pct">–<sup>%</sup></div>
+          <div class="hero-progress">
+            <div class="prog-row">
+              <span>Lancar</span>
+              <span>Belum</span>
+              <span>Tidak Bisa</span>
+            </div>
+            <div class="prog-bar" id="hero-prog"></div>
+          </div>
+          <div class="hero-desc" id="hero-desc"></div>
+        </div>
+        <div class="hero-right">
+          <div class="hero-stat">
+            <div class="hs-num" id="hs-sekolah">–</div>
+            <div class="hs-lbl">Sekolah</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hs-num" id="hs-siswa">–</div>
+            <div class="hs-lbl">Total Siswa</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hs-num green" id="hs-lancar">–</div>
+            <div class="hs-lbl">Lancar</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hs-num amber" id="hs-belum">–</div>
+            <div class="hs-lbl">Belum Lancar</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hs-num red" id="hs-tidak">–</div>
+            <div class="hs-lbl">Tidak Bisa</div>
+          </div>
         </div>
       </div>
-      <hr class="chart-divider">
-      
-      <!-- Wrapper for horizontal scrolling -->
-      <div class="chart-scroll-wrapper">
-        <div class="chart-scroll-inner chart-canvas-wrap" id="stackCanvasContainer">
-          <canvas id="stackChart"></canvas>
+
+      <!-- KPI Grid -->
+      <div class="kpi-grid">
+        <div class="kpi-card accent-blue">
+          <div class="kpi-label">Cakupan Wilayah</div>
+          <div class="kpi-value" id="kpi-sekolah">–</div>
+          <div class="kpi-sub" id="kpi-sekolah-sub">Sekolah Dasar Negeri</div>
+          <span class="kpi-badge valid" id="kpi-q1">● Valid</span>
+        </div>
+        <div class="kpi-card accent-green">
+          <div class="kpi-label">Sudah Lancar</div>
+          <div class="kpi-value" id="kpi-lancar">–</div>
+          <div class="kpi-sub">siswa mampu baca Al-Qur'an</div>
+          <span class="kpi-badge" id="kpi-pct-lancar"></span>
+        </div>
+        <div class="kpi-card accent-amber">
+          <div class="kpi-label">Perlu Pendampingan</div>
+          <div class="kpi-value" id="kpi-belum">–</div>
+          <div class="kpi-sub">siswa belum lancar membaca</div>
+          <span class="kpi-badge" id="kpi-pct-belum"></span>
+        </div>
+        <div class="kpi-card accent-red">
+          <div class="kpi-label">Intervensi Darurat</div>
+          <div class="kpi-value" id="kpi-tidak">–</div>
+          <div class="kpi-sub">siswa belum kenal huruf hijaiyah</div>
+          <span class="kpi-badge check" id="kpi-pct-tidak"></span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Rata-rata Kehadiran Guru</div>
+          <div class="kpi-value" id="kpi-hadir">–</div>
+          <div class="kpi-sub">Guru pembimbing BTQ aktif</div>
+          <span class="kpi-badge" id="kpi-q-hadir"></span>
         </div>
       </div>
-      
-      <div class="chart-insight" id="stack-insight"></div>
     </div>
 
-    <!-- ANALISIS TERPADU -->
-    <div class="analisis-section" id="analisis-section">
-      <h2>Analisis Visual dan Temuan Utama</h2>
-      <div class="analisis-grid" id="analisis-grid"></div>
-      <div class="analisis-footer" id="analisis-footer"></div>
-    </div>
-  </div>
-
-  <!-- ======== VIEW: TREN ======== -->
-  <div id="view-trend" class="view-section">
-    <h2 class="section-title"><span>Tren Perkembangan Bulanan</span></h2>
-    <div class="trend-section">
-      <div class="chart-header">
-        <div class="chart-title" id="trendTitle">Histori Persentase Kelancaran BTQ</div>
-        <div class="chart-subtitle">Perkembangan capaian dari bulan ke bulan untuk mendeteksi pola dan momentum</div>
+    <!-- ══ VIEW: TABEL ══ -->
+    <div id="view-tabel" class="view">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Data Per Sekolah</div>
+          <div class="page-subtitle" id="tabel-sub">–</div>
+        </div>
+        <span class="section-heading-badge" id="tabel-count-badge">–</span>
       </div>
-      <hr class="chart-divider">
-      <div id="trendContent"></div>
-      <div id="trend-insight" style="margin-top:16px"></div>
+
+      <div class="table-surface">
+        <div class="table-toolbar">
+          <input type="text" class="search-input" id="searchInput" placeholder="Cari nama sekolah…" oninput="filterTable()">
+          <select class="sel table-filter-sel" id="filterPct" onchange="filterTable()">
+            <option value="">Semua Kategori</option>
+            <option value="high">Tinggi ≥ 80%</option>
+            <option value="mid">Sedang 60–79%</option>
+            <option value="low">Rendah &lt; 60%</option>
+          </select>
+          <div class="sort-group">
+            <button class="sort-btn" id="sortBest"    onclick="sortTable('best')">↑ Terbaik</button>
+            <button class="sort-btn" id="sortWorst"   onclick="sortTable('worst')">↓ Terburuk</button>
+            <button class="sort-btn active" id="sortDefault" onclick="sortTable('default')">≡ Default</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table id="mainTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sekolah</th>
+                <th class="c">Siswa</th>
+                <th class="c">Lancar</th>
+                <th class="c">% Lancar</th>
+                <th class="c">Belum</th>
+                <th class="c">Tidak</th>
+                <th class="c">Kualitas</th>
+                <th class="c">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+            <tfoot id="tableFoot"></tfoot>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- ======== VIEW: KESIMPULAN ======== -->
-  <div id="view-kesimpulan" class="view-section">
-    <div class="kesimpulan">
-      <h3>Kesimpulan Evaluasi &amp; Insight Wilayah</h3>
-      <div class="insight-highlight"><p id="insight-box-text"></p></div>
-      <p id="kesimpulan-text"></p>
-      <br>
-      <p><strong>Rekomendasi Tindak Lanjut Kebijakan:</strong></p>
-      <ol id="rekomendasi-list"></ol>
+    <!-- ══ VIEW: GRAFIK ══ -->
+    <div id="view-grafik" class="view">
+      <div class="page-header">
+        <div>
+          <div class="page-title" id="g-title">Grafik & Analisis Visual</div>
+          <div class="page-subtitle" id="g-sub">–</div>
+        </div>
+      </div>
+
+      <!-- Kecamatan Comparison -->
+      <div class="chart-card" id="kec-chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title" id="kecTitle">Perbandingan Antar Kecamatan</div>
+            <div class="chart-card-sub">Rata-rata kelancaran BTQ per wilayah (overview kota)</div>
+          </div>
+        </div>
+        <div class="chart-card-body">
+          <div class="chart-wrap" style="height:220px"><canvas id="kecamatanChart"></canvas></div>
+          <div class="insight-strip" id="kec-insight"></div>
+        </div>
+      </div>
+
+      <!-- Pie + Bar Top -->
+      <div class="charts-2col">
+        <div class="chart-card" style="margin-bottom:0">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-card-title" id="pieTitle">Komposisi Siswa</div>
+              <div class="chart-card-sub">Distribusi status kemampuan BTQ</div>
+            </div>
+          </div>
+          <div class="chart-card-body">
+            <div class="chart-wrap" style="height:220px"><canvas id="pieChart"></canvas></div>
+            <div id="pie-insight" style="margin-top:14px"></div>
+          </div>
+        </div>
+        <div class="chart-card" style="margin-bottom:0">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-card-title">Top 10 Sekolah</div>
+              <div class="chart-card-sub">Klik batang untuk detail sekolah</div>
+            </div>
+          </div>
+          <div class="chart-card-body">
+            <div class="chart-wrap" style="height:220px"><canvas id="barChart"></canvas></div>
+            <div id="bar-insight" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stacked -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title" id="stackTitle">Distribusi Lengkap Per Sekolah</div>
+            <div class="chart-card-sub">Klik batang untuk detail · Geser untuk lihat semua →</div>
+          </div>
+          <div class="sort-group" id="stackToggle" style="display:none">
+            <button class="sort-btn active" id="btnStackTop20" onclick="setStackMode('top20')">Top 20</button>
+            <button class="sort-btn" id="btnStackAll" onclick="setStackMode('all')">Semua</button>
+          </div>
+        </div>
+        <div class="chart-card-body" style="padding-top:0">
+          <div class="chart-scroll">
+            <div class="chart-scroll-inner" id="stackCanvasContainer">
+              <canvas id="stackChart"></canvas>
+            </div>
+          </div>
+          <div id="stack-insight" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <!-- Analysis Cards -->
+      <div class="section-heading">
+        Temuan Analitis Utama
+        <span class="section-heading-badge" id="analysis-period-badge">–</span>
+      </div>
+      <div class="analysis-grid" id="analysis-grid"></div>
+      <div class="exec-banner" id="exec-banner"></div>
     </div>
-  </div>
 
-</main>
+    <!-- ══ VIEW: TREND ══ -->
+    <div id="view-trend" class="view">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Tren Perkembangan Bulanan</div>
+          <div class="page-subtitle" id="trend-sub">Pola perubahan kelancaran BTQ dari bulan ke bulan</div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">Histori Persentase Kelancaran</div>
+            <div class="chart-card-sub">Perkembangan capaian multiwaktu</div>
+          </div>
+        </div>
+        <div class="chart-card-body">
+          <div id="trendContent"></div>
+          <div id="trend-insight" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
 
-<!-- MODAL -->
+    <!-- ══ VIEW: KESIMPULAN ══ -->
+    <div id="view-kesimpulan" class="view">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Kesimpulan & Rekomendasi</div>
+          <div class="page-subtitle" id="k-subtitle">Evaluasi sistematis data BTQ</div>
+        </div>
+      </div>
+      <div class="conclusion-card">
+        <div class="highlight-callout" id="k-callout"></div>
+        <div class="conclusion-body" id="k-body"></div>
+        <ul class="reco-list" id="k-reco"></ul>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════ MODAL ═══════════════ -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <h2 id="modalTitle">Detail Sekolah</h2>
-    <div class="modal-tabs">
-      <button class="modal-tab active" onclick="switchTab(0)">Data Rekap Kelas</button>
-      <button class="modal-tab" onclick="switchTab(1)">Evaluasi Guru & Kehadiran</button>
-      <button class="modal-tab" onclick="switchTab(2)">Riwayat Bulanan</button>
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Detail Sekolah</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div id="modalContent"></div>
+    <div class="modal-tabs">
+      <button class="m-tab active" onclick="switchTab(0)">Rekap Kelas</button>
+      <button class="m-tab" onclick="switchTab(1)">Guru & Kehadiran</button>
+      <button class="m-tab" onclick="switchTab(2)">Riwayat Bulanan</button>
+    </div>
+    <div class="modal-body" id="modalContent"></div>
   </div>
 </div>
 
-<footer>
-  Sistem Monitoring Baca Tulis Al-Qur'an (SIMBTQ) &nbsp;·&nbsp;
-  Dinas Pendidikan dan Kebudayaan Kota Banjar &nbsp;·&nbsp; v6.0 — Smart Analytic Executive Dashboard
-</footer>
-
-<!-- ==================== SCRIPT ==================== -->
+<!-- ═══════════════ SCRIPT ═══════════════ -->
 <script>
-// ============================================================
-// DATABASE
-// ============================================================
+// ────────────────────────────────────────────
+// DATABASE (sama persis, tidak diubah)
+// ────────────────────────────────────────────
 const MARET_2026 = [
   { no: 1, nama: "SDN 1 LANGENSARI", kecamatan: "Langensari", rows: [
     { kls4:{total:26,lancar:8,belum:18,tidak:0},kls5:{total:22,lancar:14,belum:8,tidak:0},guru:"NUR LAELATUL AZIZAH, S.Pd",hadir:100},
@@ -762,124 +1289,45 @@ const FEBRUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
   return s;
 });
 
-const RAW_DATABASE = {
-  2026: { "Februari": FEBRUARI_2026, "Maret": MARET_2026 }
-};
+const RAW_DATABASE = { 2026: { "Februari": FEBRUARI_2026, "Maret": MARET_2026 } };
 
-// ============================================================
+// ────────────────────────────────────────────
 // STATE
-// ============================================================
+// ────────────────────────────────────────────
 let currentYear = null, currentMonth = null;
 let selectedKecamatan = 'all';
 let currentSchools = [], filteredSchools = [];
 let sortMode = 'default';
-let stackDisplayMode = 'top20'; // default stack mode cerdas
+let stackDisplayMode = 'top20';
 let charts = {};
-// Simpan referensi ke dataset aktif untuk interaksi klik
-let barChartActiveData = [];
-let stackChartActiveData = [];
+let barChartActiveData = [], stackChartActiveData = [];
+let currentModalSchool = null;
 
-// ============================================================
-// SPA NAVIGATION
-// ============================================================
-function showSection(id) {
-  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-link').forEach(l => {
-    l.classList.toggle('nav-active', l.getAttribute('data-target') === id);
-  });
-  if(window.innerWidth <= 900) closeSidebar();
-  window.dispatchEvent(new Event('resize'));
-}
+// ────────────────────────────────────────────
+// HELPERS
+// ────────────────────────────────────────────
+const n2 = n => parseFloat(n).toFixed(1);
+const fmt = n => n.toLocaleString('id-ID');
 
-// ============================================================
-// INIT
-// ============================================================
-function init() {
-  const years = Object.keys(RAW_DATABASE).sort((a,b) => b-a);
-  currentYear = years[0];
-  const months = Object.keys(RAW_DATABASE[currentYear]);
-  currentMonth = months[months.length-1];
-  populateSelects();
-  showSection('view-ringkasan');
-  render();
-}
-
-function populateSelects() {
-  const years = Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
-  ['selYear','sbYear'].forEach(id => {
-    const el = document.getElementById(id);
-    el.innerHTML = years.map(y=>`<option value="${y}"${y==currentYear?' selected':''}>${y}</option>`).join('');
-  });
-  populateMonths();
-}
-
-function populateMonths() {
-  const months = Object.keys(RAW_DATABASE[currentYear]||{});
-  ['selMonth','sbMonth'].forEach(id => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.innerHTML = months.map(m=>`<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join('');
-  });
-}
-
-function onPeriodChange() {
-  const yr = document.getElementById('selYear').value || document.getElementById('sbYear').value;
-  const mo = document.getElementById('selMonth').value || document.getElementById('sbMonth').value;
-  const kec1 = document.getElementById('selKecamatan');
-  const kec2 = document.getElementById('sbKecamatan');
-  if(event && event.target.id === 'selKecamatan') selectedKecamatan = kec1.value;
-  else if(event && event.target.id === 'sbKecamatan') selectedKecamatan = kec2.value;
-  if(kec1) kec1.value = selectedKecamatan;
-  if(kec2) kec2.value = selectedKecamatan;
-  
-  currentYear = yr; currentMonth = mo;
-  
-  // Smart Mode Reset
-  if(selectedKecamatan === 'all') stackDisplayMode = 'top20';
-  else stackDisplayMode = 'all'; // Jika pilih kecamatan, otomatis tampilkan semua yang ada di sana
-  
-  ['selYear','sbYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=yr;});
-  populateMonths();
-  ['selMonth','sbMonth'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=mo;});
-  sortMode='default';
-  ['sortBest','sortWorst','sortDefault'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById('sortDefault').classList.add('active');
-  render();
-}
-
-// Stack mode handler
-function setStackMode(mode) {
-    stackDisplayMode = mode;
-    document.getElementById('btnStackTop20').classList.toggle('active', mode === 'top20');
-    document.getElementById('btnStackAll').classList.toggle('active', mode === 'all');
-    render();
-}
-
-// ============================================================
-// DATA PROCESSING
-// ============================================================
 function aggregateSchools(rawArr) {
   return rawArr.map(s => {
     let tot=0,lancar=0,belum=0,tidak=0;
-    let k4t=0,k4l=0,k4b=0,k4k=0;
-    let k5t=0,k5l=0,k5b=0,k5k=0;
+    let k4t=0,k4l=0,k4b=0,k4k=0,k5t=0,k5l=0,k5b=0,k5k=0;
     let hadirArr=[],guruArr=[],warnings=[];
     s.rows.forEach(r => {
-      const k4sum=r.kls4.lancar+r.kls4.belum+r.kls4.tidak;
-      const k5sum=r.kls5.lancar+r.kls5.belum+r.kls5.tidak;
-      if(Math.abs(k4sum-r.kls4.total)>1) warnings.push(`Kls4 ${r.guru}: sum(${k4sum})≠total(${r.kls4.total})`);
-      if(Math.abs(k5sum-r.kls5.total)>1) warnings.push(`Kls5 ${r.guru}: sum(${k5sum})≠total(${r.kls5.total})`);
+      const k4s=r.kls4.lancar+r.kls4.belum+r.kls4.tidak;
+      const k5s=r.kls5.lancar+r.kls5.belum+r.kls5.tidak;
+      if(Math.abs(k4s-r.kls4.total)>1) warnings.push(`Kls4 ${r.guru}`);
+      if(Math.abs(k5s-r.kls5.total)>1) warnings.push(`Kls5 ${r.guru}`);
       tot+=r.kls4.total+r.kls5.total; lancar+=r.kls4.lancar+r.kls5.lancar;
       belum+=r.kls4.belum+r.kls5.belum; tidak+=r.kls4.tidak+r.kls5.tidak;
       k4t+=r.kls4.total;k4l+=r.kls4.lancar;k4b+=r.kls4.belum;k4k+=r.kls4.tidak;
       k5t+=r.kls5.total;k5l+=r.kls5.lancar;k5b+=r.kls5.belum;k5k+=r.kls5.tidak;
       hadirArr.push(r.hadir); guruArr.push(r.guru);
     });
-    const pct = tot>0?(lancar/tot*100):0;
     return {
       idx:s.no,no:s.no,nama:s.nama,kecamatan:s.kecamatan,
-      tot,lancar,belum,tidak,pct,
+      tot,lancar,belum,tidak,pct:tot>0?(lancar/tot*100):0,
       kls4:{tot:k4t,lancar:k4l,belum:k4b,tidak:k4k},
       kls5:{tot:k5t,lancar:k5l,belum:k5b,tidak:k5k},
       guru:guruArr,hadir:hadirArr,rows:s.rows,warnings
@@ -888,28 +1336,26 @@ function aggregateSchools(rawArr) {
 }
 
 function computeTotals(schools) {
+  const hadirAll = schools.flatMap(s=>s.hadir);
   return {
-    tot: schools.reduce((a,s)=>a+s.tot,0),
-    lancar: schools.reduce((a,s)=>a+s.lancar,0),
+    tot:  schools.reduce((a,s)=>a+s.tot,0),
+    lancar:schools.reduce((a,s)=>a+s.lancar,0),
     belum: schools.reduce((a,s)=>a+s.belum,0),
     tidak: schools.reduce((a,s)=>a+s.tidak,0),
-    avgHadir: (()=>{
-      const arr=schools.flatMap(s=>s.hadir);
-      return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
-    })()
+    avgHadir: hadirAll.length ? hadirAll.reduce((a,b)=>a+b,0)/hadirAll.length : 0
   };
 }
 
 function getPrevPeriod(year,month) {
   const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const idx=months.indexOf(month);
-  if(idx<=0){
+  if(idx<=0) {
     const py=String(parseInt(year)-1);
     if(!RAW_DATABASE[py]) return null;
     const pym=Object.keys(RAW_DATABASE[py]);
     return pym.length?{year:py,month:pym[pym.length-1]}:null;
   }
-  for(let i=idx-1;i>=0;i--){
+  for(let i=idx-1;i>=0;i--) {
     if(RAW_DATABASE[year]&&RAW_DATABASE[year][months[i]]) return {year,month:months[i]};
   }
   return null;
@@ -918,199 +1364,262 @@ function getPrevPeriod(year,month) {
 function getAllPeriods() {
   const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const result=[];
-  Object.keys(RAW_DATABASE).sort().forEach(yr=>{
-    months.forEach(mo=>{
+  Object.keys(RAW_DATABASE).sort().forEach(yr => {
+    months.forEach(mo => {
       if(RAW_DATABASE[yr]&&RAW_DATABASE[yr][mo]) result.push({year:yr,month:mo});
     });
   });
   return result;
 }
 
-// ============================================================
-// INSIGHT GENERATORS
-// ============================================================
-function categoryLabel(pct) {
-  if(pct>=80) return 'Tinggi';
-  if(pct>=60) return 'Sedang';
-  return 'Rendah';
-}
-function n2(n){ return n.toFixed(1); }
-
-function genInsightPanel(type, label, text, labelClass='') {
-  const cls = type==='gold'?'':'ip-'+type;
-  const lblCls = labelClass || (type==='green'?'lbl-green':type==='red'?'lbl-red':'lbl-navy');
-  return `
-    <div class="insight-panel ${cls}">
-      <div class="ip-label ${lblCls}">${label}</div>
-      <div class="ip-text">${text}</div>
-    </div>
-  `;
+function dataQuality(school) {
+  if (school.warnings.length > 0) return 'check';
+  const avgH = school.hadir.reduce((a,b)=>a+b,0)/school.hadir.length;
+  if (avgH < 70) return 'partial';
+  return 'valid';
 }
 
-function genNarasi(title, text) {
-  return `
-    <div class="chart-narasi">
-      <div class="narasi-title">${title}</div>
-      <div class="narasi-text">${text}</div>
-    </div>
-  `;
+// ────────────────────────────────────────────
+// SPA NAVIGATION
+// ────────────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(l=>{
+    l.classList.toggle('active', l.getAttribute('data-target')===id);
+  });
+  if(window.innerWidth<=900) closeSidebar();
+  window.dispatchEvent(new Event('resize'));
 }
 
-function genMiniConclusion(text) {
-  return `<div class="mini-conclusion"><span class="mc-icon">💡</span><span class="mc-text">${text}</span></div>`;
+// ────────────────────────────────────────────
+// INIT
+// ────────────────────────────────────────────
+function init() {
+  const years=Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
+  currentYear=years[0];
+  const months=Object.keys(RAW_DATABASE[currentYear]);
+  currentMonth=months[months.length-1];
+  populateSelects();
+  showSection('view-ringkasan');
+  render();
 }
 
-function genHighlightDuo(best, worst) {
-  if(!best || !worst) return '';
-  return `
-    <div class="highlight-duo">
-      <div class="hl-duo-card best" onclick="openModal(${best.no})">
-        <div class="hl-duo-label">🏆 Sekolah Terbaik</div>
-        <div class="hl-duo-name">${best.nama}</div>
-        <div class="hl-duo-pct">${n2(best.pct)}%</div>
-        <div class="hl-duo-sub">Kec. ${best.kecamatan} &nbsp;·&nbsp; ${best.lancar} dari ${best.tot} siswa lancar</div>
-      </div>
-      <div class="hl-duo-card worst" onclick="openModal(${worst.no})">
-        <div class="hl-duo-label">⚠️ Perhatian Khusus</div>
-        <div class="hl-duo-name">${worst.nama}</div>
-        <div class="hl-duo-pct">${n2(worst.pct)}%</div>
-        <div class="hl-duo-sub">Kec. ${worst.kecamatan} &nbsp;·&nbsp; ${worst.lancar} dari ${worst.tot} siswa lancar</div>
-      </div>
-    </div>
-  `;
+function populateSelects() {
+  const years=Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
+  ['selYear','sbYear'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.innerHTML=years.map(y=>`<option value="${y}"${y==currentYear?' selected':''}>${y}</option>`).join('');
+  });
+  populateMonths();
 }
 
-// ============================================================
-// MAIN RENDER
-// ============================================================
+function populateMonths() {
+  const months=Object.keys(RAW_DATABASE[currentYear]||{});
+  ['selMonth','sbMonth'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.innerHTML=months.map(m=>`<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join('');
+  });
+}
+
+function syncSelects(kec, yr, mo) {
+  ['selKecamatan','sbKecamatan'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=kec;});
+  ['selYear','sbYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=yr;});
+  ['selMonth','sbMonth'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=mo;});
+}
+
+function onPeriodChange() {
+  const kec=(document.getElementById('selKecamatan')||{}).value||selectedKecamatan;
+  const yr=(document.getElementById('selYear')||{}).value||currentYear;
+  const mo=(document.getElementById('selMonth')||{}).value||currentMonth;
+  selectedKecamatan=kec; currentYear=yr; currentMonth=mo;
+  if(selectedKecamatan==='all') stackDisplayMode='top20';
+  else stackDisplayMode='all';
+  syncSelects(kec,yr,mo);
+  populateMonths();
+  sortMode='default';
+  refreshSortButtons();
+  render();
+}
+
+function onSidebarKec() {
+  selectedKecamatan=document.getElementById('sbKecamatan').value;
+  syncSelects(selectedKecamatan,currentYear,currentMonth);
+  if(selectedKecamatan==='all') stackDisplayMode='top20'; else stackDisplayMode='all';
+  sortMode='default'; refreshSortButtons(); render();
+}
+function onSidebarPeriod() {
+  currentYear=document.getElementById('sbYear').value;
+  currentMonth=document.getElementById('sbMonth').value;
+  syncSelects(selectedKecamatan,currentYear,currentMonth);
+  sortMode='default'; refreshSortButtons(); render();
+}
+
+function refreshSortButtons() {
+  ['sortBest','sortWorst','sortDefault'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('sortDefault').classList.add('active');
+}
+
+function setStackMode(mode) {
+  stackDisplayMode=mode;
+  document.getElementById('btnStackTop20').classList.toggle('active',mode==='top20');
+  document.getElementById('btnStackAll').classList.toggle('active',mode==='all');
+  render();
+}
+
+// ────────────────────────────────────────────
+// RENDER
+// ────────────────────────────────────────────
 function render() {
-  const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth] || [];
+  const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth]||[];
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
   let rawArr = rawMaster;
-  if(selectedKecamatan !== 'all') rawArr = rawArr.filter(s=>s.kecamatan===selectedKecamatan);
-
+  if(selectedKecamatan!=='all') rawArr=rawArr.filter(s=>s.kecamatan===selectedKecamatan);
   currentSchools = aggregateSchools(rawArr);
   filteredSchools = [...currentSchools];
 
   const T = computeTotals(currentSchools);
-  const pctKec = T.tot>0?(T.lancar/T.tot*100):0;
+  const pct = T.tot>0?(T.lancar/T.tot*100):0;
   const periodStr = `${currentMonth} ${currentYear}`;
-  const isAllKec = selectedKecamatan === 'all';
-  const cakupan = isAllKec ? 'Tingkat Kota Banjar' : `Kecamatan ${selectedKecamatan}`;
-  
-  // Smart Hierarchy & Titles
-  const focusText = isAllKec ? 'Kota Banjar' : `Wilayah: Kec. ${selectedKecamatan}`;
-  document.getElementById('grafik-focus-title').textContent = `Visualisasi Analitik: Fokus ${focusText}`;
-  document.getElementById('kop-period').innerHTML = `${cakupan} &nbsp;·&nbsp; ${periodStr}`;
-  document.getElementById('hl-period').textContent = periodStr;
-  document.getElementById('bannerPeriod').textContent = `${cakupan} – ${periodStr}`;
-  document.getElementById('sc-kec-label').textContent = isAllKec ? 'Semua Wilayah' : `Kec. ${selectedKecamatan}`;
-  document.getElementById('tabel-kec-title').textContent = cakupan;
-  
-  // Dynamic Chart Titles
-  document.getElementById('pieTitle').textContent = `Komposisi Kemampuan BTQ di ${focusText}`;
-  document.getElementById('barTopTitle').textContent = `Top 10 Sekolah di ${focusText}`;
-  document.getElementById('stackTitle').textContent = `Distribusi Kemampuan Sekolah di ${focusText}`;
+  const isAll = selectedKecamatan==='all';
+  const cakupan = isAll?'Kota Banjar':`Kec. ${selectedKecamatan}`;
 
-  // Top School Analysis for main highlight
-  const sortedValid = [...currentSchools].filter(s=>s.tot>0).sort((a,b)=>b.pct-a.pct);
-  const bestSch = sortedValid[0];
-  const worstSch = sortedValid[sortedValid.length-1];
+  // Page titles
+  document.getElementById('r-title').textContent = `Ringkasan — ${cakupan}`;
+  document.getElementById('r-subtitle').textContent = `Periode ${periodStr} · ${currentSchools.length} Sekolah Dasar Negeri`;
+  document.getElementById('g-title').textContent = `Grafik & Analisis — ${cakupan}`;
+  document.getElementById('g-sub').textContent = `Periode ${periodStr}`;
+  document.getElementById('k-subtitle').textContent = `${cakupan} · ${periodStr}`;
+  document.getElementById('tabel-sub').textContent = `${cakupan} · ${periodStr}`;
+  document.getElementById('tabel-count-badge').textContent = `${currentSchools.length} sekolah`;
+  document.getElementById('analysis-period-badge').textContent = periodStr;
 
-  // Trend Badge
-  const prevPeriod = getPrevPeriod(currentYear, currentMonth);
-  let trendHTML = '<span class="trend-badge trend-neutral">Periode Pertama</span>';
-  let bannerMeta = `${currentSchools.length} sekolah &nbsp;·&nbsp; ${T.tot.toLocaleString()} siswa`;
-
-  if(prevPeriod) {
-    let prevRaw = RAW_DATABASE[prevPeriod.year][prevPeriod.month];
-    if(!isAllKec) prevRaw=prevRaw.filter(s=>s.kecamatan===selectedKecamatan);
-    const prevT = computeTotals(aggregateSchools(prevRaw));
-    const prevPct = prevT.tot>0?(prevT.lancar/prevT.tot*100):0;
-    const diff = pctKec - prevPct;
-    if(diff>0.05) trendHTML=`<span class="trend-badge trend-up">📈 +${n2(diff)}% dari ${prevPeriod.month}</span>`;
-    else if(diff<-0.05) trendHTML=`<span class="trend-badge trend-down">📉 ${n2(diff)}% dari ${prevPeriod.month}</span>`;
-    else trendHTML=`<span class="trend-badge trend-neutral">→ Stabil dari ${prevPeriod.month}</span>`;
-    bannerMeta=`vs ${prevPeriod.month}: ${n2(prevPct)}%`;
+  // Trend chip
+  const prev=getPrevPeriod(currentYear,currentMonth);
+  let chipHTML='';
+  if(prev) {
+    let pRaw=RAW_DATABASE[prev.year][prev.month];
+    if(!isAll) pRaw=pRaw.filter(s=>s.kecamatan===selectedKecamatan);
+    const pT=computeTotals(aggregateSchools(pRaw));
+    const pPct=pT.tot>0?(pT.lancar/pT.tot*100):0;
+    const diff=pct-pPct;
+    if(diff>0.05) chipHTML=`<span class="trend-chip chip-up">▲ +${n2(diff)}% dari ${prev.month}</span>`;
+    else if(diff<-0.05) chipHTML=`<span class="trend-chip chip-down">▼ ${n2(diff)}% dari ${prev.month}</span>`;
+    else chipHTML=`<span class="trend-chip chip-flat">→ Stabil</span>`;
   }
-  document.getElementById('trendBadge').innerHTML = trendHTML;
-  document.getElementById('bannerMeta').innerHTML = bannerMeta;
+  document.getElementById('r-trend-chip').innerHTML=chipHTML;
 
-  const hasWarning = currentSchools.some(s=>s.warnings.length>0);
-  document.getElementById('dataWarning').style.display = hasWarning?'block':'none';
+  // DQ banner
+  const hasWarn=currentSchools.some(s=>s.warnings.length>0);
+  const dqBanner=document.getElementById('dqBanner');
+  dqBanner.classList.toggle('hidden',!hasWarn);
 
-  // Smart Insight di Highlight Box
-  document.getElementById('hl-pct').textContent = n2(pctKec)+'%';
-  let hlDesc = `Sebanyak <strong>${n2(pctKec)}%</strong> dari total ${T.tot.toLocaleString('id-ID')} siswa telah lancar membaca Al-Qur'an. `;
-  if(bestSch && worstSch && bestSch.no !== worstSch.no) {
-    hlDesc += `<strong>${bestSch.nama}</strong> meraih capaian tertinggi (<strong>${n2(bestSch.pct)}%</strong>), sementara <strong>${worstSch.nama}</strong> masih terendah (<strong>${n2(worstSch.pct)}%</strong>).`;
+  // Hero metric
+  document.getElementById('hero-pct').innerHTML=`${n2(pct)}<sup>%</sup>`;
+  const pctL=T.tot>0?(T.lancar/T.tot*100):0;
+  const pctB=T.tot>0?(T.belum/T.tot*100):0;
+  const pctK=T.tot>0?(T.tidak/T.tot*100):0;
+  document.getElementById('hero-prog').innerHTML=`
+    <div class="prog-segment" style="width:${pctL}%;background:#16a34a"></div>
+    <div class="prog-segment" style="width:${pctB}%;background:#d97706"></div>
+    <div class="prog-segment" style="width:${pctK}%;background:#dc2626"></div>
+  `;
+  const sorted=currentSchools.filter(s=>s.tot>0).sort((a,b)=>b.pct-a.pct);
+  const best=sorted[0], worst=sorted[sorted.length-1];
+  let desc='';
+  if(best&&worst&&best.no!==worst.no) {
+    desc=`<strong>${best.nama}</strong> terbaik (${n2(best.pct)}%) · <strong>${worst.nama}</strong> butuh perhatian (${n2(worst.pct)}%)`;
   }
-  document.getElementById('hl-desc').innerHTML = hlDesc;
+  document.getElementById('hero-desc').innerHTML=desc;
 
-  document.getElementById('sc-sekolah').textContent = currentSchools.length;
-  document.getElementById('sc-siswa').textContent = T.tot.toLocaleString('id-ID');
-  document.getElementById('sc-lancar').textContent = T.lancar.toLocaleString('id-ID');
-  document.getElementById('sc-belum').textContent = T.belum.toLocaleString('id-ID');
-  document.getElementById('sc-tidak').textContent = T.tidak.toLocaleString('id-ID');
-  document.getElementById('sc-hadir').textContent = n2(T.avgHadir)+'%';
+  document.getElementById('hs-sekolah').textContent=currentSchools.length;
+  document.getElementById('hs-siswa').textContent=fmt(T.tot);
+  document.getElementById('hs-lancar').textContent=fmt(T.lancar);
+  document.getElementById('hs-belum').textContent=fmt(T.belum);
+  document.getElementById('hs-tidak').textContent=fmt(T.tidak);
+
+  // KPIs
+  document.getElementById('kpi-sekolah').textContent=currentSchools.length;
+  document.getElementById('kpi-sekolah-sub').textContent=`SD Negeri di ${cakupan}`;
+  document.getElementById('kpi-lancar').textContent=fmt(T.lancar);
+  document.getElementById('kpi-pct-lancar').textContent=n2(pctL)+'% dari total';
+  document.getElementById('kpi-pct-lancar').className='kpi-badge '+(pctL>=60?'valid':'check');
+  document.getElementById('kpi-belum').textContent=fmt(T.belum);
+  document.getElementById('kpi-pct-belum').textContent=n2(pctB)+'% dari total';
+  document.getElementById('kpi-pct-belum').className='kpi-badge partial';
+  document.getElementById('kpi-tidak').textContent=fmt(T.tidak);
+  document.getElementById('kpi-pct-tidak').textContent=n2(pctK)+'% dari total';
+  document.getElementById('kpi-hadir').textContent=n2(T.avgHadir)+'%';
+  const qH = T.avgHadir>=90?'valid':T.avgHadir>=75?'partial':'check';
+  document.getElementById('kpi-q-hadir').textContent=T.avgHadir>=90?'● Baik':T.avgHadir>=75?'● Menengah':'● Perlu Perhatian';
+  document.getElementById('kpi-q-hadir').className='kpi-badge '+qH;
 
   renderTable();
-  renderCharts(T, allSchoolsAggr, pctKec, focusText);
+  renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
   renderTrend(cakupan);
-  renderKesimpulan(T, pctKec, allSchoolsAggr, cakupan, bestSch, worstSch);
+  renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll);
 }
 
-// ============================================================
+// ────────────────────────────────────────────
 // TABLE
-// ============================================================
-function pctBadge(pct) {
-  const cls = pct>=80?'badge-high':pct>=60?'badge-mid':'badge-low';
-  return `<span class="badge-pct ${cls}">${n2(pct)}%</span>`;
+// ────────────────────────────────────────────
+function pctPill(pct) {
+  const cls=pct>=80?'pill-high':pct>=60?'pill-mid':'pill-low';
+  return `<span class="pct-pill ${cls}">${n2(pct)}%</span>`;
 }
 
 function renderTable() {
-  const tbody = document.getElementById('tableBody');
-  const tfoot = document.getElementById('tableFoot');
-  tbody.innerHTML = '';
-  let display = [...filteredSchools];
-  if(sortMode==='best') display.sort((a,b)=>b.pct-a.pct);
+  const tbody=document.getElementById('tableBody');
+  const tfoot=document.getElementById('tableFoot');
+  tbody.innerHTML='';
+  let display=[...filteredSchools];
+  if(sortMode==='best')  display.sort((a,b)=>b.pct-a.pct);
   if(sortMode==='worst') display.sort((a,b)=>a.pct-b.pct);
-  display.forEach((s,i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="c">${i+1}</td>
-      <td><strong>${s.nama}</strong><br><small style="color:var(--gray-500)">Kec. ${s.kecamatan}</small></td>
-      <td class="c">${s.tot}</td>
-      <td class="c">${s.lancar}</td>
-      <td class="c">${pctBadge(s.pct)}</td>
-      <td class="c">${s.belum}</td>
-      <td class="c">${s.tidak}</td>
-      <td class="c"><button class="btn-detail" onclick="openModal(${s.no})">Detail</button></td>
+  display.forEach((s,i)=>{
+    const q=dataQuality(s);
+    const qLabel=q==='valid'?'<span class="q-dot q-green" title="Data Valid"></span> Valid':
+                 q==='partial'?'<span class="q-dot q-amber" title="Perlu Periksa"></span> Partial':
+                 '<span class="q-dot q-red" title="Inkonsistensi"></span> Cek';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="color:var(--ink-3);font-size:12px">${i+1}</td>
+      <td><div class="td-name">${s.nama}</div><div class="td-school-meta">Kec. ${s.kecamatan}</div></td>
+      <td class="c" style="font-variant-numeric:tabular-nums">${s.tot>0?fmt(s.tot):'<span style="color:var(--ink-4)">–</span>'}</td>
+      <td class="c" style="font-variant-numeric:tabular-nums;color:var(--green);font-weight:600">${fmt(s.lancar)}</td>
+      <td class="c">${s.tot>0?pctPill(s.pct):'<span style="color:var(--ink-4)">–</span>'}</td>
+      <td class="c" style="color:var(--amber)">${fmt(s.belum)}</td>
+      <td class="c" style="color:var(--red)">${fmt(s.tidak)}</td>
+      <td class="c" style="font-size:12px;white-space:nowrap">${qLabel}</td>
+      <td class="c"><button class="btn-detail" onclick="openModal(${s.no})">Detail →</button></td>
     `;
     tbody.appendChild(tr);
   });
-  const T = computeTotals(filteredSchools);
-  const pct = T.tot>0?(T.lancar/T.tot*100):0;
-  tfoot.innerHTML = `<tr class="tfoot-row">
-    <td class="c" colspan="2">TOTAL KESELURUHAN</td>
-    <td class="c">${T.tot}</td><td class="c">${T.lancar}</td>
-    <td class="c">${pctBadge(pct)}</td>
-    <td class="c">${T.belum}</td><td class="c">${T.tidak}</td><td></td>
+  const T=computeTotals(filteredSchools);
+  const p=T.tot>0?(T.lancar/T.tot*100):0;
+  tfoot.innerHTML=`<tr>
+    <td colspan="2" class="c" style="font-weight:600;color:var(--ink-1)">Total (${display.length} sekolah)</td>
+    <td class="c">${fmt(T.tot)}</td>
+    <td class="c" style="color:var(--green);font-weight:600">${fmt(T.lancar)}</td>
+    <td class="c">${pctPill(p)}</td>
+    <td class="c">${fmt(T.belum)}</td>
+    <td class="c">${fmt(T.tidak)}</td>
+    <td></td><td></td>
   </tr>`;
-  document.getElementById('tabel-badge').textContent = `${display.length} sekolah`;
 }
 
 function filterTable() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  const fPct = document.getElementById('filterPct').value;
-  filteredSchools = currentSchools.filter(s => {
-    const nameOk = s.nama.toLowerCase().includes(q);
-    let pctOk = true;
-    if(fPct==='high') pctOk=s.pct>=80;
-    else if(fPct==='mid') pctOk=s.pct>=60&&s.pct<80;
-    else if(fPct==='low') pctOk=s.pct<60;
-    return nameOk&&pctOk;
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const fPct=document.getElementById('filterPct').value;
+  filteredSchools=currentSchools.filter(s=>{
+    const nameOk=s.nama.toLowerCase().includes(q);
+    let pOk=true;
+    if(fPct==='high') pOk=s.pct>=80;
+    else if(fPct==='mid') pOk=s.pct>=60&&s.pct<80;
+    else if(fPct==='low') pOk=s.pct<60;
+    return nameOk&&pOk;
   });
   renderTable();
 }
@@ -1118,208 +1627,247 @@ function filterTable() {
 function sortTable(mode) {
   sortMode=mode;
   ['sortBest','sortWorst','sortDefault'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById('sort'+mode.charAt(0).toUpperCase()+mode.slice(1)).classList.add('active');
+  const map={best:'sortBest',worst:'sortWorst',default:'sortDefault'};
+  document.getElementById(map[mode]).classList.add('active');
   renderTable();
 }
 
-// ============================================================
-// CHARTS + SMART INSIGHT
-// ============================================================
-function destroyChart(key){ if(charts[key]){charts[key].destroy();charts[key]=null;} }
+// ────────────────────────────────────────────
+// CHARTS
+// ────────────────────────────────────────────
+const C = {
+  green:'rgba(22,163,74,1)', greenA:'rgba(22,163,74,.15)',
+  amber:'rgba(217,119,6,1)', amberA:'rgba(217,119,6,.15)',
+  red:'rgba(220,38,38,1)',   redA:'rgba(220,38,38,.12)',
+  blue:'rgba(37,99,235,1)',  blueA:'rgba(37,99,235,.12)',
+  navy:'rgba(15,23,42,1)',   navyA:'rgba(15,23,42,.06)',
+  ink2:'#475569', ink3:'#94a3b8', border:'#e8eaee',
+};
+const chartDefaults = {
+  font: { family: 'Sora, system-ui, sans-serif' },
+  plugins: { legend: { display: false } },
+};
 
-function renderCharts(T, allSchoolsAggr, pctKec, focusText) {
-  const C = {green:'#1a6b3c',amber:'#d4a017',red:'#c0392b',navy:'#0c2340',navyMid:'#163a62',gold:'#b8962e'};
-  const isAllKec = selectedKecamatan === 'all';
+function destroyChart(k){if(charts[k]){charts[k].destroy();charts[k]=null;}}
 
-  // ---- 1. KECAMATAN CHART (LEVEL 1) ----
-  destroyChart('kecamatanChart');
-  const kecNames = ["Langensari","Purwaharja","Pataruman","Banjar"];
-  const kecStats = kecNames.map(k => {
-    const ks = allSchoolsAggr.filter(s=>s.kecamatan===k);
-    const tk = computeTotals(ks);
-    return { name:k, pct:tk.tot>0?(tk.lancar/tk.tot*100):0, schools:ks.length, active: isAllKec || selectedKecamatan===k };
+function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
+  Chart.defaults.font.family = 'Sora, system-ui, sans-serif';
+  Chart.defaults.color = C.ink3;
+
+  // ── 1. KECAMATAN OVERVIEW ──
+  destroyChart('kec');
+  const kecNames=["Langensari","Purwaharja","Pataruman","Banjar"];
+  const kecStats=kecNames.map(k=>{
+    const ks=allSchoolsAggr.filter(s=>s.kecamatan===k);
+    const t=computeTotals(ks);
+    return {name:k,pct:t.tot>0?(t.lancar/t.tot*100):0};
   });
-  const kecSorted = [...kecStats].sort((a,b)=>b.pct-a.pct);
-  const bestKec = kecSorted[0], worstKec = kecSorted[kecSorted.length-1];
-  const kecGap = bestKec.pct - worstKec.pct;
-  const selfKec = !isAllKec ? kecStats.find(k=>k.name===selectedKecamatan) : null;
-  const selfRank = !isAllKec ? kecSorted.findIndex(k=>k.name===selectedKecamatan)+1 : null;
+  const kecSorted=[...kecStats].sort((a,b)=>b.pct-a.pct);
+  const bestKec=kecSorted[0], worstKec=kecSorted[kecSorted.length-1];
+  const kecGap=bestKec.pct-worstKec.pct;
 
-  charts['kecamatanChart'] = new Chart(document.getElementById('kecamatanChart'), {
+  charts['kec']=new Chart(document.getElementById('kecamatanChart'),{
     type:'bar',
     data:{
       labels:kecStats.map(k=>k.name),
       datasets:[{
-        label:'% Kelancaran',
         data:kecStats.map(k=>parseFloat(n2(k.pct))),
-        backgroundColor:kecStats.map(k=>k.active?C.navyMid:'#d9dfe9'),
-        borderColor:kecStats.map(k=>k.active?C.gold:'#c8cfd9'),
-        borderWidth:2,borderRadius:5
+        backgroundColor:kecStats.map(k=>{
+          if(!isAll&&k.name===selectedKecamatan) return C.blue;
+          return k.pct>=80?C.green:k.pct>=60?C.amber:C.red;
+        }),
+        borderRadius:6,
+        borderSkipped:false,
       }]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
       scales:{
-        y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#edf0f5'}},
-        x:{ticks:{font:{size:12,weight:'bold',family:'DM Sans'}}}
+        y:{min:0,max:100,grid:{color:C.border},
+           ticks:{callback:v=>v+'%',font:{size:11}},border:{display:false}},
+        x:{grid:{display:false},ticks:{font:{size:12,weight:'600'}},border:{display:false}}
       },
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>` Capaian: ${ctx.raw}%`}}
+        tooltip:{
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
+          callbacks:{label:ctx=>` Capaian: ${ctx.raw}%`}
+        }
       }
     }
   });
 
-  let kecInsightHTML = '';
-  if(isAllKec) {
-    const narKec = `Berdasarkan perbandingan di atas, <strong>Kecamatan ${bestKec.name}</strong> menjadi yang terbaik dengan rata-rata <strong>${n2(bestKec.pct)}%</strong> kelancaran. Di sisi lain, <strong>Kecamatan ${worstKec.name}</strong> mencatat capaian terendah di angka <strong>${n2(worstKec.pct)}%</strong>. Terdapat selisih signifikan sebesar <strong>${n2(kecGap)}%</strong> antar wilayah.`;
-    kecInsightHTML += genNarasi('Analisis Tingkat Kota', narKec);
-    kecInsightHTML += genInsightPanel('green','lbl-green',`Pola pembelajaran di <strong>Kecamatan ${bestKec.name}</strong> layak diidentifikasi untuk menjadi percontohan bagi wilayah lain.`, 'lbl-green');
+  let kecInsightHTML='';
+  if(isAll){
+    kecInsightHTML=`
+      <div class="insight-item green">
+        <div class="ii-label">Terbaik</div>
+        <div class="ii-text"><strong>Kec. ${bestKec.name}</strong> unggul dengan rata-rata <strong>${n2(bestKec.pct)}%</strong>. Jadikan sebagai referensi praktik terbaik.</div>
+      </div>
+      <div class="insight-item red">
+        <div class="ii-label">Perhatian</div>
+        <div class="ii-text"><strong>Kec. ${worstKec.name}</strong> paling rendah di angka <strong>${n2(worstKec.pct)}%</strong>. Diperlukan program khusus.</div>
+      </div>
+      <div class="insight-item amber">
+        <div class="ii-label">Kesenjangan</div>
+        <div class="ii-text">Gap antar kecamatan mencapai <strong>${n2(kecGap)}%</strong>. Menunjukkan ketidakmerataan mutu BTQ di kota.</div>
+      </div>
+    `;
   } else {
-    const narKec = `Fokus analisis saat ini pada <strong>Kecamatan ${selfKec.name}</strong>. Wilayah ini menempati peringkat ke-<strong>${selfRank}</strong> dari 4 kecamatan se-Kota Banjar dengan capaian <strong>${n2(selfKec.pct)}%</strong>. Untuk mengejar standar tertinggi kota (${n2(bestKec.pct)}%), masih diperlukan peningkatan mutu sebesar <strong>${n2(Math.abs(selfKec.pct-bestKec.pct))}%</strong>.`;
-    kecInsightHTML += genNarasi(`Konteks Wilayah ${selfKec.name}`, narKec);
+    const self=kecStats.find(k=>k.name===selectedKecamatan);
+    const rank=kecSorted.findIndex(k=>k.name===selectedKecamatan)+1;
+    kecInsightHTML=`
+      <div class="insight-item blue">
+        <div class="ii-label">Peringkat Kota</div>
+        <div class="ii-text"><strong>Kec. ${selectedKecamatan}</strong> berada di posisi ke-<strong>${rank}</strong> dari 4 kecamatan dengan capaian <strong>${n2(self.pct)}%</strong>.</div>
+      </div>
+      <div class="insight-item amber">
+        <div class="ii-label">Gap ke Terbaik</div>
+        <div class="ii-text">Diperlukan peningkatan <strong>${n2(Math.abs(self.pct-bestKec.pct))}%</strong> untuk menyamai Kec. ${bestKec.name} (${n2(bestKec.pct)}%).</div>
+      </div>
+    `;
   }
-  document.getElementById('kec-insight').innerHTML = kecInsightHTML;
+  document.getElementById('kec-insight').innerHTML=kecInsightHTML;
 
-  // ---- 2. PIE CHART ----
+  // ── 2. PIE ──
   destroyChart('pie');
-  const pctLancar = T.tot>0?(T.lancar/T.tot*100):0;
-  const pctBelum = T.tot>0?(T.belum/T.tot*100):0;
-  const pctTidak = T.tot>0?(T.tidak/T.tot*100):0;
-
-  charts['pie'] = new Chart(document.getElementById('pieChart'), {
+  const pL=T.tot>0?(T.lancar/T.tot*100):0;
+  const pB=T.tot>0?(T.belum/T.tot*100):0;
+  const pK=T.tot>0?(T.tidak/T.tot*100):0;
+  charts['pie']=new Chart(document.getElementById('pieChart'),{
     type:'doughnut',
     data:{
       labels:['Lancar','Belum Lancar','Tidak Bisa'],
       datasets:[{
         data:[T.lancar,T.belum,T.tidak],
         backgroundColor:[C.green,C.amber,C.red],
-        borderColor:'#fff',borderWidth:3
+        borderWidth:0,
+        hoverOffset:6,
       }]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
+      cutout:'68%',
       plugins:{
-        legend:{position:'bottom',labels:{font:{size:12,family:'DM Sans'},padding:12}},
+        legend:{display:true,position:'bottom',labels:{
+          font:{size:11},padding:14,
+          usePointStyle:true,pointStyle:'circle',
+        }},
         tooltip:{
-          callbacks:{
-            label:ctx=>` ${ctx.label}: ${ctx.parsed} siswa (${T.tot>0?n2(ctx.parsed/T.tot*100):0}%)`
-          }
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
+          callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.parsed)} (${T.tot>0?n2(ctx.parsed/T.tot*100):0}%)`}
         }
       }
     }
   });
+  document.getElementById('pie-insight').innerHTML=`
+    <div class="insight-strip" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="insight-item green"><div class="ii-label">Lancar</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--green)">${n2(pL)}%</div><div class="ii-text">${fmt(T.lancar)} siswa</div></div>
+      <div class="insight-item amber"><div class="ii-label">Belum</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--amber)">${n2(pB)}%</div><div class="ii-text">${fmt(T.belum)} siswa</div></div>
+      <div class="insight-item red"><div class="ii-label">Tidak Bisa</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--red)">${n2(pK)}%</div><div class="ii-text">${fmt(T.tidak)} siswa</div></div>
+    </div>
+  `;
 
-  const pieInsightHTML = genNarasi('Proporsi Siswa', `Dari total <strong>${T.tot.toLocaleString('id-ID')} siswa</strong> di ${focusText}, dominasi saat ini adalah kelompok <strong>${pctLancar > 50 ? 'Lancar' : 'Belum/Tidak Mampu'}</strong>. Secara spesifik: <strong>${n2(pctLancar)}%</strong> Lancar, <strong>${n2(pctBelum)}%</strong> Belum, dan <strong>${n2(pctTidak)}%</strong> Tidak Bisa membaca huruf hijaiyah.`);
-  document.getElementById('pie-insight').innerHTML = pieInsightHTML;
-
-  // ---- 3. BAR TOP 10 (Interactive) ----
+  // ── 3. BAR TOP 10 ──
   destroyChart('bar');
-  const validSchools = currentSchools.filter(s=>s.tot>0);
-  const top10 = [...validSchools].sort((a,b)=>b.pct-a.pct).slice(0,10);
-  const bottom3 = [...validSchools].sort((a,b)=>a.pct-b.pct).slice(0,3);
-  const avgWilayah = T.tot>0?(T.lancar/T.tot*100):0;
-  barChartActiveData = top10; // Save reference for click event
-
-  charts['bar'] = new Chart(document.getElementById('barChart'), {
+  const valid=currentSchools.filter(s=>s.tot>0);
+  const top10=[...valid].sort((a,b)=>b.pct-a.pct).slice(0,10);
+  const bot1=[...valid].sort((a,b)=>a.pct-b.pct)[0];
+  barChartActiveData=top10;
+  charts['bar']=new Chart(document.getElementById('barChart'),{
     type:'bar',
     data:{
       labels:top10.map(s=>s.nama.replace('SDN ','')),
       datasets:[{
-        label:'% Lancar',
         data:top10.map(s=>parseFloat(n2(s.pct))),
         backgroundColor:top10.map(s=>s.pct>=80?C.green:s.pct>=60?C.amber:C.red),
-        borderRadius:4
+        borderRadius:4,borderSkipped:false,
       }]
     },
     options:{
       indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      onClick: (e, elements) => {
-        if(elements.length > 0) {
-          const index = elements[0].index;
-          if(barChartActiveData[index]) openModal(barChartActiveData[index].no);
-        }
-      },
+      onClick:(e,els)=>{if(els.length>0&&barChartActiveData[els[0].index])openModal(barChartActiveData[els[0].index].no);},
       scales:{
-        x:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#edf0f5'},
-          annotations:{line1:{type:'line',xMin:avgWilayah,xMax:avgWilayah,borderColor:'#163a62',borderWidth:2}}},
-        y:{ticks:{font:{size:11,family:'DM Sans'}}}
+        x:{min:0,max:100,grid:{color:C.border},ticks:{callback:v=>v+'%',font:{size:10}},border:{display:false}},
+        y:{grid:{display:false},ticks:{font:{size:10.5}},border:{display:false}}
       },
       plugins:{
         legend:{display:false},
         tooltip:{
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
           callbacks:{
-            title: ctx => barChartActiveData[ctx[0].dataIndex].nama,
-            label: ctx => {
-              const sch = barChartActiveData[ctx.dataIndex];
-              return [
-                ` Capaian: ${ctx.raw}%`,
-                ` Lancar: ${sch.lancar} | Belum: ${sch.belum} | Tidak: ${sch.tidak}`,
-                ` Total Siswa: ${sch.tot}`
-              ];
+            title:ctx=>barChartActiveData[ctx[0].dataIndex].nama,
+            label:ctx=>{
+              const s=barChartActiveData[ctx.dataIndex];
+              return [` ${n2(s.pct)}% lancar`,` ${fmt(s.lancar)} dari ${fmt(s.tot)} siswa`];
             }
           }
         }
       }
     }
   });
-
-  let barInsightHTML = '';
-  if(top10.length > 0 && bottom3.length > 0) {
-    barInsightHTML += genHighlightDuo(top10[0], bottom3[0]);
-    const narBar = `Garis vertikal biru menunjukkan rata-rata wilayah (<strong>${n2(avgWilayah)}%</strong>). <strong>${top10[0].nama}</strong> memimpin dengan sangat baik di angka <strong>${n2(top10[0].pct)}%</strong>. Sekolah-sekolah di jajaran atas ini siap untuk menjadi sekolah rujukan metodologi BTQ.`;
-    barInsightHTML += genNarasi('Analisis Peringkat', narBar);
+  if(top10.length>0&&bot1) {
+    document.getElementById('bar-insight').innerHTML=`
+      <div class="duo-grid">
+        <div class="duo-card best" onclick="openModal(${top10[0].no})">
+          <div class="duo-lbl">🏆 Terbaik</div>
+          <div class="duo-name">${top10[0].nama}</div>
+          <div class="duo-pct">${n2(top10[0].pct)}%</div>
+          <div class="duo-meta">Kec. ${top10[0].kecamatan} · ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)} siswa</div>
+        </div>
+        <div class="duo-card worst" onclick="openModal(${bot1.no})">
+          <div class="duo-lbl">⚠ Perhatian</div>
+          <div class="duo-name">${bot1.nama}</div>
+          <div class="duo-pct">${n2(bot1.pct)}%</div>
+          <div class="duo-meta">Kec. ${bot1.kecamatan} · ${fmt(bot1.lancar)}/${fmt(bot1.tot)} siswa</div>
+        </div>
+      </div>
+    `;
   }
-  document.getElementById('bar-insight').innerHTML = barInsightHTML;
 
-  // ---- 4. STACKED CHART (LEVEL 2 Detail & Smart Mode) ----
+  // ── 4. STACKED ──
   destroyChart('stack');
-  document.getElementById('btnStackTop20').textContent = isAllKec ? 'Top 20' : 'Tertinggi';
-  
-  let stackData = [...currentSchools].filter(s=>s.tot>0);
-  if(stackDisplayMode === 'top20') {
-    // Mode Ringkas (Smart)
-    stackData = stackData.sort((a,b) => b.pct - a.pct);
-    if(isAllKec && stackData.length > 20) stackData = stackData.slice(0, 20);
-    document.getElementById('stackCanvasContainer').style.width = '100%';
+  let stackData=[...valid];
+  if(stackDisplayMode==='top20') {
+    stackData=stackData.sort((a,b)=>b.pct-a.pct);
+    if(isAll&&stackData.length>20) stackData=stackData.slice(0,20);
+    document.getElementById('stackCanvasContainer').style.width='100%';
   } else {
-    // Mode Ekspansi Horizontal Scroll
-    const dynamicWidth = Math.max(100, stackData.length * 4); 
-    document.getElementById('stackCanvasContainer').style.width = `${dynamicWidth}%`;
+    const dw=Math.max(100,stackData.length*4.2);
+    document.getElementById('stackCanvasContainer').style.width=`${dw}%`;
   }
-  stackChartActiveData = stackData;
-
-  charts['stack'] = new Chart(document.getElementById('stackChart'), {
+  stackChartActiveData=stackData;
+  charts['stack']=new Chart(document.getElementById('stackChart'),{
     type:'bar',
     data:{
       labels:stackData.map(s=>s.nama.replace('SDN ','').split(' ').slice(0,2).join(' ')),
       datasets:[
-        {label:'Lancar',data:stackData.map(s=>s.lancar),backgroundColor:C.green,borderRadius:2},
-        {label:'Belum Lancar',data:stackData.map(s=>s.belum),backgroundColor:C.amber,borderRadius:2},
-        {label:'Tidak Bisa',data:stackData.map(s=>s.tidak),backgroundColor:C.red,borderRadius:2}
+        {label:'Lancar',data:stackData.map(s=>s.lancar),backgroundColor:C.green,borderRadius:2,borderSkipped:false},
+        {label:'Belum Lancar',data:stackData.map(s=>s.belum),backgroundColor:C.amber,borderRadius:0},
+        {label:'Tidak Bisa',data:stackData.map(s=>s.tidak),backgroundColor:C.red,borderRadius:0},
       ]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
-      onClick: (e, elements) => {
-        if(elements.length > 0) {
-          const index = elements[0].index;
-          if(stackChartActiveData[index]) openModal(stackChartActiveData[index].no);
-        }
-      },
+      onClick:(e,els)=>{if(els.length>0&&stackChartActiveData[els[0].index])openModal(stackChartActiveData[els[0].index].no);},
       scales:{
-        x:{stacked:true,ticks:{font:{size:10},maxRotation:50}},
-        y:{stacked:true,grid:{color:'#edf0f5'}}
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:9.5},maxRotation:50},border:{display:false}},
+        y:{stacked:true,grid:{color:C.border},border:{display:false}}
       },
       plugins:{
-        legend:{position:'bottom'},
+        legend:{display:true,position:'bottom',labels:{font:{size:11},padding:14,usePointStyle:true,pointStyle:'circle'}},
         tooltip:{
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
           callbacks:{
-            title: ctx => stackChartActiveData[ctx[0].dataIndex].nama,
-            label: ctx => {
-              const sch = stackChartActiveData[ctx.dataIndex];
-              const pct = sch.tot > 0 ? (ctx.raw / sch.tot * 100).toFixed(1) : 0;
-              return ` ${ctx.dataset.label}: ${ctx.raw} siswa (${pct}%)`;
+            title:ctx=>stackChartActiveData[ctx[0].dataIndex].nama,
+            label:ctx=>{
+              const s=stackChartActiveData[ctx.dataIndex];
+              const p=s.tot>0?n2(ctx.raw/s.tot*100):0;
+              return ` ${ctx.dataset.label}: ${ctx.raw} (${p}%)`;
             }
           }
         }
@@ -1327,236 +1875,218 @@ function renderCharts(T, allSchoolsAggr, pctKec, focusText) {
     }
   });
 
-  let stackInsightHTML = '';
-  const highCount = validSchools.filter(s=>s.pct>=80).length;
-  const midCount = validSchools.filter(s=>s.pct>=60&&s.pct<80).length;
-  const lowCount = validSchools.filter(s=>s.pct<60).length;
-  const dominanKategori = (highCount >= lowCount) ? "kategori aman (Tinggi/Sedang)" : "kategori rawan (Rendah)";
-  
-  document.getElementById('stackToggle').style.display = (validSchools.length > 20 && isAllKec) ? 'flex' : 'none';
-
-  const narStack = `Analisis mendalam dari <strong>${validSchools.length} sekolah</strong> di ${focusText} mengidentifikasi bahwa mayoritas berada pada <strong>${dominanKategori}</strong>. Secara detail: <strong>${highCount} sekolah</strong> tinggi (≥80%), <strong>${midCount} sekolah</strong> sedang (60–79%), dan <strong>${lowCount} sekolah</strong> masih masuk kategori rendah (&lt;60%) yang memerlukan pemantauan ketat.`;
-  stackInsightHTML += genNarasi('Detail Distribusi Keseluruhan', narStack);
-  document.getElementById('stack-insight').innerHTML = stackInsightHTML;
-
-  // Render Analisis Terpadu Bawah
-  renderAnalisis(T, pctKec, focusText, allSchoolsAggr, highCount, midCount, lowCount, bestKec, worstKec, kecGap);
-}
-
-// ============================================================
-// ANALISIS SECTION
-// ============================================================
-function renderAnalisis(T, pctKec, cakupan, allSchoolsAggr, highCount, midCount, lowCount, bestKec, worstKec, kecGap) {
-  const validSchools = currentSchools.filter(s=>s.tot>0);
-  const sortedSchools = [...validSchools].sort((a,b)=>b.pct-a.pct);
-  const top1 = sortedSchools[0];
-  const bot1 = sortedSchools[sortedSchools.length-1];
-  const lowHadir = currentSchools.flatMap(s=>s.hadir).filter(h=>h<80).length;
-  const totalGuru = currentSchools.flatMap(s=>s.hadir).length;
-  const pctTidak = T.tot>0?(T.tidak/T.tot*100):0;
-
-  const cards = [
-    {
-      type:'ac-summary',
-      label:'Ringkasan Capaian',
-      title:`Status Mutu ${cakupan}`,
-      body:`Kelancaran BTQ tercatat pada angka <strong>${n2(pctKec)}%</strong> (Kategori: ${categoryLabel(pctKec)}). Distribusi mutu: <strong>${n2(highCount/Math.max(validSchools.length,1)*100)}%</strong> sekolah sudah berada di standar tinggi.`
-    },
-    {
-      type:'ac-trend',
-      label:'Fokus Lokasi',
-      title: selectedKecamatan === 'all' ? 'Distribusi Makro Kota Banjar' : `Kondisi Internal ${cakupan}`,
-      body: selectedKecamatan === 'all' ? `Kesenjangan <strong>${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} (${n2(bestKec.pct)}%) dan Kec. ${worstKec.name} (${n2(worstKec.pct)}%) memerlukan pemerataan program pembinaan.` : `Dalam wilayah ini, selisih antara sekolah terbaik (${top1?top1.nama:''}) dan terendah (${bot1?bot1.nama:''}) adalah <strong>${top1&&bot1?n2(top1.pct-bot1.pct):0}%</strong>.`
-    },
-    {
-      type:'ac-problem',
-      label:'Isu Kritis',
-      title:'Titik Lemah yang Perlu Penanganan',
-      body:`Masih terdapat <strong>${T.tidak.toLocaleString('id-ID')} siswa (${n2(pctTidak)}%)</strong> yang sama sekali belum mengenal huruf hijaiyah. Selain itu, <strong>${lowHadir} dari ${totalGuru} guru pembimbing</strong> memiliki tingkat kehadiran di bawah 80%.`
-    },
-    {
-      type:'ac-potential',
-      label:'Potensi Akselerasi',
-      title:'Peluang Strategis Jangka Pendek',
-      body:`Akselerasi tercepat dapat dicapai dengan memfokuskan intervensi metodologi langsung ke <strong>${lowCount} sekolah kategori rendah</strong>. Gunakan <strong>${top1?top1.nama:''}</strong> sebagai pusat rujukan praktik pengajaran yang efektif.`
-    }
-  ];
-
-  document.getElementById('analisis-grid').innerHTML = cards.map(c=>`
-    <div class="analisis-card ${c.type}">
-      <div class="ac-label">${c.label}</div>
-      <div class="ac-title">${c.title}</div>
-      <div class="ac-body">${c.body}</div>
+  const highC=valid.filter(s=>s.pct>=80).length;
+  const midC=valid.filter(s=>s.pct>=60&&s.pct<80).length;
+  const lowC=valid.filter(s=>s.pct<60).length;
+  document.getElementById('stackToggle').style.display=(valid.length>20&&isAll)?'flex':'none';
+  document.getElementById('stack-insight').innerHTML=`
+    <div class="insight-strip">
+      <div class="insight-item green"><div class="ii-label">Tinggi ≥80%</div><div class="ii-text"><strong>${highC} sekolah</strong> sudah memenuhi standar kelancaran BTQ.</div></div>
+      <div class="insight-item amber"><div class="ii-label">Sedang 60–79%</div><div class="ii-text"><strong>${midC} sekolah</strong> dalam zona perlu peningkatan.</div></div>
+      <div class="insight-item red"><div class="ii-label">Rendah &lt;60%</div><div class="ii-text"><strong>${lowC} sekolah</strong> memerlukan pendampingan intensif segera.</div></div>
     </div>
-  `).join('');
+  `;
 
-  document.getElementById('analisis-footer').innerHTML = `
-    <strong>Konklusi Eksekutif:</strong> Visualisasi data membuktikan bahwa pendekatan <em>one-size-fits-all</em> (kebijakan seragam) tidak lagi efektif untuk menangani BTQ. Dengan capaian saat ini (<strong>${n2(pctKec)}%</strong>), diperlukan kebijakan berbasis data yang bersifat asimetris: <strong>penguatan infrastruktur metode di sekolah rendah</strong> dan <strong>pemberian apresiasi/model rujukan pada sekolah berprestasi</strong>.
+  // ── Analysis Cards ──
+  const top1=sorted.length>0?sorted[0]:null;
+  const lowHadir=currentSchools.flatMap(s=>s.hadir).filter(h=>h<80).length;
+  const totalGuru=currentSchools.flatMap(s=>s.hadir).length;
+  const pKota=T.tot>0?(T.tidak/T.tot*100):0;
+
+  const sorted2=valid.sort((a,b)=>b.pct-a.pct);
+
+  document.getElementById('analysis-grid').innerHTML=`
+    <div class="analysis-card ac-blue">
+      <div class="ac-eyebrow">Capaian Utama</div>
+      <div class="ac-title">Kelancaran ${cakupan}</div>
+      <div class="ac-body">Rata-rata BTQ berada di <strong>${n2(pct)}%</strong>. ${highC} sekolah sudah di level tinggi, ${midC} sedang, dan ${lowC} masih rendah.</div>
+    </div>
+    <div class="analysis-card ${isAll?'ac-blue':'ac-amber'}">
+      <div class="ac-eyebrow">${isAll?'Peta Wilayah':'Konteks Internal'}</div>
+      <div class="ac-title">${isAll?'Disparitas Antar Kecamatan':'Rentang Kualitas Sekolah'}</div>
+      <div class="ac-body">${isAll?`Gap <strong>${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} dan Kec. ${worstKec.name} menunjukkan ketidakmerataan.`:`Sekolah terbaik <strong>${top10[0]?top10[0].nama:'-'}</strong> vs terendah <strong>${bot1?bot1.nama:'-'}</strong>: gap <strong>${top10[0]&&bot1?n2(top10[0].pct-bot1.pct):0}%</strong>.`}</div>
+    </div>
+    <div class="analysis-card ac-red">
+      <div class="ac-eyebrow">Isu Kritis</div>
+      <div class="ac-title">Titik Intervensi Prioritas</div>
+      <div class="ac-body"><strong>${fmt(T.tidak)} siswa (${n2(pKota)}%)</strong> sama sekali belum kenal huruf hijaiyah. <strong>${lowHadir}/${totalGuru} guru</strong> kehadirannya di bawah 80%.</div>
+    </div>
+    <div class="analysis-card ac-green">
+      <div class="ac-eyebrow">Potensi Akselerasi</div>
+      <div class="ac-title">Peluang Strategis</div>
+      <div class="ac-body">Fokuskan pendampingan ke <strong>${lowC} sekolah merah</strong>. Gunakan <strong>${top10[0]?top10[0].nama:'-'}</strong> sebagai sekolah percontohan metodologi BTQ.</div>
+    </div>
+  `;
+  document.getElementById('exec-banner').innerHTML=`
+    <strong>Konklusi Eksekutif —</strong> Dengan capaian saat ini <strong>${n2(pct)}%</strong>, kebijakan seragam tidak lagi cukup. Diperlukan pendekatan asimetris: <strong>penguatan intensif ke sekolah kategori rendah</strong> dan <strong>apresiasi serta peran model rujukan ke sekolah berprestasi</strong>.
   `;
 }
 
-// ============================================================
+// ────────────────────────────────────────────
 // TREND
-// ============================================================
+// ────────────────────────────────────────────
 function renderTrend(cakupan) {
-  const allPeriods = getAllPeriods();
-  const trendEl = document.getElementById('trendContent');
-  const insightEl = document.getElementById('trend-insight');
-
-  if(allPeriods.length < 2) {
-    trendEl.innerHTML = `<div class="trend-empty"><div class="te-icon">📊</div><div>Data tren historis akan muncul secara otomatis saat data bulan berikutnya diinput ke sistem.</div></div>`;
-    insightEl.innerHTML='';
-    return;
+  const allP=getAllPeriods();
+  const tEl=document.getElementById('trendContent');
+  const iEl=document.getElementById('trend-insight');
+  if(allP.length<2){
+    tEl.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data tren akan tersedia saat data bulan berikutnya dimasukkan.</div>`;
+    iEl.innerHTML='';return;
   }
-
-  const labels = allPeriods.map(p=>`${p.month.substring(0,3)} ${p.year}`);
-  const pctData = allPeriods.map(p => {
-    let raw = RAW_DATABASE[p.year][p.month];
+  const labels=allP.map(p=>`${p.month.substring(0,3)} ${p.year}`);
+  const pctData=allP.map(p=>{
+    let raw=RAW_DATABASE[p.year][p.month];
     if(selectedKecamatan!=='all') raw=raw.filter(s=>s.kecamatan===selectedKecamatan);
-    const T = computeTotals(aggregateSchools(raw));
+    const T=computeTotals(aggregateSchools(raw));
     return T.tot>0?parseFloat(n2(T.lancar/T.tot*100)):0;
   });
-
-  trendEl.innerHTML = '<div class="chart-wrap" style="height:260px"><canvas id="trendChart"></canvas></div>';
+  tEl.innerHTML='<div style="height:260px"><canvas id="trendChart"></canvas></div>';
   destroyChart('trend');
-  charts['trend'] = new Chart(document.getElementById('trendChart'), {
+  charts['trend']=new Chart(document.getElementById('trendChart'),{
     type:'line',
     data:{
       labels,
       datasets:[{
-        label:'% Rata-rata Lancar',
+        label:'% Lancar',
         data:pctData,
-        borderColor:'#163a62',
-        backgroundColor:'rgba(22,58,98,.08)',
-        pointBackgroundColor:'#163a62',
+        borderColor:C.blue,
+        backgroundColor:C.blueA,
+        pointBackgroundColor:C.blue,
         pointRadius:6,pointHoverRadius:8,
-        borderWidth:2.5,fill:true,tension:.3
+        borderWidth:2.5,fill:true,tension:.4
       }]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
       scales:{
-        y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#edf0f5'}},
-        x:{ticks:{font:{size:11,family:'DM Sans'}}}
+        y:{min:0,max:100,grid:{color:C.border},ticks:{callback:v=>v+'%',font:{size:11}},border:{display:false}},
+        x:{grid:{display:false},ticks:{font:{size:11}},border:{display:false}}
       },
-      plugins:{legend:{display:true,position:'bottom'},
-        tooltip:{callbacks:{label:ctx=>` ${ctx.raw}% siswa lancar`}}}
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
+          callbacks:{label:ctx=>` ${ctx.raw}% siswa lancar`}
+        }
+      }
     }
   });
-
-  const overallDiff = pctData[pctData.length-1] - pctData[0];
-  const isUp = overallDiff > 0;
-  let trendInsightHTML = genNarasi('Analisis Momentum', `Memantau perkembangan dari ${allPeriods.length} periode, tren kelancaran BTQ di wilayah ini menunjukkan pergerakan <strong>${isUp?'POSITIF (mengalami kenaikan '+n2(Math.abs(overallDiff))+'%)':'NEGATIF (mengalami penurunan '+n2(Math.abs(overallDiff))+'%)'}</strong> dibandingkan awal observasi.`);
-  insightEl.innerHTML = trendInsightHTML;
+  const diff=pctData[pctData.length-1]-pctData[0];
+  iEl.innerHTML=`
+    <div class="insight-strip">
+      <div class="insight-item ${diff>0?'green':diff<0?'red':'blue'}">
+        <div class="ii-label">Tren Keseluruhan</div>
+        <div class="ii-text">Dari ${allP.length} periode, kelancaran BTQ di ${cakupan} <strong>${diff>0?'meningkat +'+n2(diff)+'%':diff<0?'menurun '+n2(diff)+'%':'stabil'}</strong> dibanding awal observasi.</div>
+      </div>
+    </div>
+  `;
 }
 
-// ============================================================
+// ────────────────────────────────────────────
 // KESIMPULAN
-// ============================================================
-function renderKesimpulan(T, pctKec, allSchoolsAggr, cakupan, bestSch, worstSch) {
-  const sorted = [...currentSchools].sort((a,b)=>b.pct-a.pct).filter(s=>s.tot>0);
-  const best3 = sorted.slice(0,3).map(s=>`<strong>${s.nama}</strong> (${n2(s.pct)}%)`).join(', ');
-  const worst3 = sorted.slice(-3).reverse().map(s=>`<strong>${s.nama}</strong> (${n2(s.pct)}%)`).join(', ');
-  const lowCount = sorted.filter(s=>s.pct<60).length;
+// ────────────────────────────────────────────
+function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
+  const sorted=currentSchools.filter(s=>s.tot>0).sort((a,b)=>b.pct-a.pct);
+  const lowC=sorted.filter(s=>s.pct<60).length;
+  const pL=T.tot>0?n2(T.lancar/T.tot*100):0;
+  const pB=T.tot>0?n2(T.belum/T.tot*100):0;
+  const pK=T.tot>0?n2(T.tidak/T.tot*100):0;
 
-  let insightText = '';
-  if(selectedKecamatan==='all') {
-    const kecRanking = ["Langensari","Purwaharja","Pataruman","Banjar"].map(k=>{
+  let callout='';
+  if(isAll){
+    const kr=["Langensari","Purwaharja","Pataruman","Banjar"].map(k=>{
       const ks=allSchoolsAggr.filter(s=>s.kecamatan===k);
-      const tk=computeTotals(ks);
-      return {name:k,pct:tk.tot>0?(tk.lancar/tk.tot*100):0};
+      const t=computeTotals(ks);
+      return {name:k,pct:t.tot>0?(t.lancar/t.tot*100):0};
     }).sort((a,b)=>b.pct-a.pct);
-    insightText = `📊 <strong>Kecamatan ${kecRanking[0].name}</strong> memegang posisi teratas se-Kota Banjar dengan capaian <strong>${n2(kecRanking[0].pct)}%</strong>. Kebijakan afirmasi perlu segera difokuskan ke <strong>Kecamatan ${kecRanking[kecRanking.length-1].name}</strong> yang berada di angka terendah (<strong>${n2(kecRanking[kecRanking.length-1].pct)}%</strong>).`;
+    callout=`Kec. <strong>${kr[0].name}</strong> memegang posisi terbaik (${n2(kr[0].pct)}%). Kebijakan afirmatif harus segera diarahkan ke Kec. <strong>${kr[kr.length-1].name}</strong> (${n2(kr[kr.length-1].pct)}%).`;
   } else {
-    insightText = `🎯 Berfokus pada <strong>${cakupan}</strong>, <strong>${bestSch?bestSch.nama:''}</strong> tampil sebagai sekolah percontohan (${n2(bestSch?bestSch.pct:0)}%). Masih terdapat <strong>${lowCount} sekolah</strong> di bawah ambang batas kritis (60%) yang menuntut pendampingan intensif dari pengawas.`;
+    callout=`Fokus <strong>${cakupan}</strong> — <strong>${best?best.nama:'-'}</strong> adalah percontohan terbaik (${n2(best?best.pct:0)}%). Masih ada <strong>${lowC} sekolah</strong> di bawah ambang 60% yang butuh pendampingan.`;
   }
-
-  document.getElementById('insight-box-text').innerHTML = insightText;
-  document.getElementById('kesimpulan-text').innerHTML = `
-    Evaluasi sistematis atas data BTQ <strong>${cakupan}</strong> periode <strong>${currentMonth} ${currentYear}</strong> yang melibatkan <strong>${T.tot.toLocaleString('id-ID')} siswa</strong> menyimpulkan bahwa capaian kelancaran saat ini bertengger pada <strong>${n2(pctKec)}%</strong>. 
-    Dari data tersebut, <strong>${n2(T.tot>0?T.belum/T.tot*100:0)}% siswa masih pada tahap perlu pendampingan</strong>, dan <strong>${n2(T.tot>0?T.tidak/T.tot*100:0)}% secara radikal belum mengenal huruf dasar</strong>. Kesenjangan mutu masih terlihat kentara, dengan ${best3} sebagai capaian tertinggi, berbanding terbalik dengan ${worst3} di peringkat paling bawah.`;
-
-  document.getElementById('rekomendasi-list').innerHTML = [
-    `Pelaksanaan pendampingan <em>on-site</em> wajib dilakukan ke ${lowCount} sekolah berkategori merah (<60%) dengan melibatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
-    `Tingkat kehadiran guru yang bermasalah (di bawah batas toleransi 80%) harus diinvestigasi oleh Dinas Pendidikan untuk menjamin bahwa hak siswa memperoleh jam pelajaran agama terakomodasi penuh.`,
-    `Pengembangan sistem "Kakak Asuh/Tutor Sebaya Al-Qur'an" secara struktural di kelas IV dan V terbukti efektif memotong rasio keterlambatan baca.`,
-    `Gunakan dashboard analitik ini sebagai instrumen wajib dalam rapat koordinasi kepala sekolah bulanan demi memupuk kultur akuntabilitas berbasis data.`
-  ].map(r=>`<li style="margin-bottom:10px">${r}</li>`).join('');
+  document.getElementById('k-callout').innerHTML=callout;
+  document.getElementById('k-body').innerHTML=`
+    Evaluasi data BTQ <strong>${cakupan}</strong> periode <strong>${currentMonth} ${currentYear}</strong> mencakup <strong>${fmt(T.tot)} siswa</strong> dari ${currentSchools.length} sekolah. Capaian kelancaran saat ini <strong>${n2(pct)}%</strong> — dengan komposisi <strong>${pL}%</strong> sudah lancar, <strong>${pB}%</strong> belum lancar, dan <strong>${pK}%</strong> belum mengenal huruf hijaiyah.
+  `;
+  document.getElementById('k-reco').innerHTML=[
+    `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
+    `Investigasi guru dengan kehadiran di bawah 80% oleh Dinas Pendidikan untuk memastikan hak siswa atas pembelajaran agama terpenuhi.`,
+    `Kembangkan program "Tutor Sebaya Al-Qur'an" secara struktural di kelas IV–V untuk mempercepat penurunan angka ketidaklancaran.`,
+    `Gunakan dashboard ini sebagai instrumen wajib rapat koordinasi kepala sekolah bulanan, membudayakan akuntabilitas berbasis data.`
+  ].map((r,i)=>`<li><span class="reco-num">${i+1}</span><span>${r}</span></li>`).join('');
 }
 
-// ============================================================
-// MODAL & POPUP LOGIC
-// ============================================================
-let currentModalSchool = null;
-
+// ────────────────────────────────────────────
+// MODAL
+// ────────────────────────────────────────────
 function openModal(no) {
-  currentModalSchool = currentSchools.find(s=>s.no===no);
-  if(!currentModalSchool) return; // Fail-safe
-  const s = currentModalSchool;
-  document.getElementById('modalTitle').textContent = s.nama + ' — Profil Akademik';
+  currentModalSchool=currentSchools.find(s=>s.no===no);
+  if(!currentModalSchool) return;
+  document.getElementById('modalTitle').textContent=currentModalSchool.nama;
+  document.querySelectorAll('.m-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
   renderModalTab(0);
-  document.querySelectorAll('.modal-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
   document.getElementById('modalOverlay').classList.add('open');
 }
 
 function switchTab(idx) {
-  document.querySelectorAll('.modal-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.m-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
   renderModalTab(idx);
 }
 
 function renderModalTab(idx) {
-  const s = currentModalSchool;
+  const s=currentModalSchool;
   if(!s) return;
-  const el = document.getElementById('modalContent');
-  if(idx===0) {
-    el.innerHTML = `
+  const el=document.getElementById('modalContent');
+  if(idx===0){
+    el.innerHTML=`
       <table class="modal-table">
-        <thead><tr><th>Kelas</th><th>Total</th><th>Lancar</th><th>Belum Lancar</th><th>Tidak Bisa</th><th>% Lancar</th></tr></thead>
+        <thead><tr><th>Kelas</th><th>Total</th><th>Lancar</th><th>Belum</th><th>Tidak Bisa</th><th>% Lancar</th></tr></thead>
         <tbody>
-          <tr><td>Kelas IV</td><td>${s.kls4.tot}</td><td>${s.kls4.lancar}</td><td>${s.kls4.belum}</td><td>${s.kls4.tidak}</td>
-              <td>${s.kls4.tot>0?n2(s.kls4.lancar/s.kls4.tot*100):0}%</td></tr>
-          <tr><td>Kelas V</td><td>${s.kls5.tot}</td><td>${s.kls5.lancar}</td><td>${s.kls5.belum}</td><td>${s.kls5.tidak}</td>
-              <td>${s.kls5.tot>0?n2(s.kls5.lancar/s.kls5.tot*100):0}%</td></tr>
-          <tr style="font-weight:700;background:var(--navy-pale)"><td>TOTAL</td><td>${s.tot}</td><td>${s.lancar}</td>
-              <td>${s.belum}</td><td>${s.tidak}</td><td>${pctBadge(s.pct)}</td></tr>
+          <tr><td>Kelas IV</td><td>${s.kls4.tot}</td><td style="color:var(--green);font-weight:600">${s.kls4.lancar}</td><td>${s.kls4.belum}</td><td>${s.kls4.tidak}</td><td>${s.kls4.tot>0?pctPill(s.kls4.lancar/s.kls4.tot*100):'–'}</td></tr>
+          <tr><td>Kelas V</td><td>${s.kls5.tot}</td><td style="color:var(--green);font-weight:600">${s.kls5.lancar}</td><td>${s.kls5.belum}</td><td>${s.kls5.tidak}</td><td>${s.kls5.tot>0?pctPill(s.kls5.lancar/s.kls5.tot*100):'–'}</td></tr>
+          <tr style="font-weight:700;background:var(--bg)"><td>Total</td><td>${s.tot}</td><td style="color:var(--green)">${s.lancar}</td><td>${s.belum}</td><td>${s.tidak}</td><td>${s.tot>0?pctPill(s.pct):'–'}</td></tr>
         </tbody>
       </table>
-      ${s.warnings.length?`<div class="data-warning" style="display:block">⚠ <strong>Inkonsistensi terdeteksi:</strong><br> ${s.warnings.join('<br>')}</div>`:''}`;
+      ${s.warnings.length?`<div style="margin-top:12px;padding:10px 14px;background:var(--amber-dim);border-radius:8px;font-size:12.5px;color:var(--amber)">⚠ Inkonsistensi terdeteksi: ${s.warnings.join(', ')}</div>`:''}
+    `;
   } else if(idx===1) {
-    el.innerHTML = `
+    el.innerHTML=`
       <table class="modal-table">
-        <thead><tr><th>Nama Guru BTQ</th><th>Kehadiran</th><th>Status Validasi</th></tr></thead>
+        <thead><tr><th>Guru Pembimbing BTQ</th><th>Kehadiran</th><th>Status</th></tr></thead>
         <tbody>
           ${s.guru.map((g,i)=>`<tr>
-            <td>${g}</td><td>${s.hadir[i]}%</td>
-            <td>${s.hadir[i]>=100?'✅ Valid & Disiplin':s.hadir[i]>=80?'⚠️ Menengah':'❌ Defisit Kehadiran'}</td>
+            <td>${g}</td>
+            <td style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
+            <td>${s.hadir[i]>=90?'<span style="color:var(--green);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--amber);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--red);font-weight:600">✕ Defisit</span>'}</td>
           </tr>`).join('')}
         </tbody>
       </table>
-      <p class="modal-sub">Rata-rata stabilitas kehadiran pengajar: <strong>${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></p>`;
+      <div style="margin-top:10px;font-size:12px;color:var(--ink-3)">Rata-rata kehadiran: <strong style="color:var(--ink-1)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
+    `;
   } else {
-    const allP = getAllPeriods();
-    const histRows = allP.map(p=>{
+    const allP=getAllPeriods();
+    const rows=allP.map(p=>{
       const raw=RAW_DATABASE[p.year][p.month];
       const found=raw.find(r=>r.no===s.no);
       if(!found) return null;
       const agg=aggregateSchools([found])[0];
       return {period:`${p.month} ${p.year}`,pct:agg.pct,lancar:agg.lancar,tot:agg.tot};
     }).filter(Boolean);
-    if(histRows.length<2) {
-      el.innerHTML=`<div class="trend-empty"><div class="te-icon">📅</div><div>Sistem membutuhkan setidaknya 2 data bulan untuk membentuk riwayat komparasi.</div></div>`;
+    if(rows.length<2){
+      el.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📅</div>Butuh minimal 2 periode untuk menampilkan riwayat.</div>`;
     } else {
-      el.innerHTML=`<div class="modal-history">${histRows.map((h,i)=>{
-        let trend='';
-        if(i>0){const d=h.pct-histRows[i-1].pct;
-          trend=d>0?`<span style="color:var(--green)">+${n2(d)}%</span>`:
-                d<0?`<span style="color:var(--red)">${n2(d)}%</span>`:
-                '<span style="color:var(--gray-300)">–</span>';}
+      el.innerHTML=`<div>${rows.map((h,i)=>{
+        let diff='';
+        if(i>0){const d=h.pct-rows[i-1].pct;
+          diff=d>0.05?`<span style="color:var(--green);font-size:11.5px;font-weight:600">▲ +${n2(d)}%</span>`:
+               d<-0.05?`<span style="color:var(--red);font-size:11.5px;font-weight:600">▼ ${n2(d)}%</span>`:
+               `<span style="color:var(--ink-4);font-size:11.5px">–</span>`;}
         return `<div class="hist-row">
           <span class="hist-period">${h.period}</span>
-          <span>${h.lancar}/${h.tot} siswa</span>
+          <span style="font-size:12px;color:var(--ink-2)">${fmt(h.lancar)} / ${fmt(h.tot)} siswa</span>
           <span class="hist-pct" style="color:${h.pct>=80?'var(--green)':h.pct>=60?'var(--amber)':'var(--red)'}">${n2(h.pct)}%</span>
-          ${trend}</div>`;
+          ${diff}
+        </div>`;
       }).join('')}</div>`;
     }
   }
@@ -1567,9 +2097,9 @@ function closeModal(e) {
     document.getElementById('modalOverlay').classList.remove('open');
 }
 
-// ============================================================
-// SIDEBAR
-// ============================================================
+// ────────────────────────────────────────────
+// SIDEBAR TOGGLE
+// ────────────────────────────────────────────
 function openSidebar() {
   document.getElementById('sidebar').classList.add('open');
   document.getElementById('sidebarOverlay').classList.add('open');
@@ -1580,12 +2110,13 @@ function closeSidebar() {
   document.getElementById('sidebarOverlay').classList.remove('open');
   document.body.style.overflow='';
 }
-
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();closeSidebar();}
 });
 
+// ────────────────────────────────────────────
 // START
+// ────────────────────────────────────────────
 init();
 </script>
 </body>
