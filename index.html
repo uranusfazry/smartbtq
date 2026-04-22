@@ -22,7 +22,6 @@
   --ink-3:     #80868b;
   --ink-4:     #bdc1c6;
 
-  /* Official Material Colors for professional look */
   --blue:      #1a73e8; 
   --blue-dim:  #e8f0fe;
   --blue-mid:  #4285f4;
@@ -37,13 +36,11 @@
   --font:      'Sora', system-ui, sans-serif;
   --mono:      'JetBrains Mono', monospace;
 
-  /* Slightly sharper corners for formal dashboard feel */
   --r-sm:      4px;
   --r-md:      6px;
   --r-lg:      8px;
   --r-xl:      12px;
 
-  /* Subtler shadows for flat, modern design */
   --shadow-xs: 0 1px 2px 0 rgba(60,64,67,0.05);
   --shadow-sm: 0 1px 3px 0 rgba(60,64,67,0.1), 0 1px 2px 0 rgba(60,64,67,0.06);
   --shadow-md: 0 4px 6px -1px rgba(60,64,67,0.1), 0 2px 4px -1px rgba(60,64,67,0.06);
@@ -132,7 +129,6 @@ body {
 .btn-print:hover { background: var(--bg); color: var(--ink-1); border-color: var(--ink-4); }
 .btn-print svg { width: 14px; height: 14px; }
 
-/* Hamburger */
 .ham { display: none; background: none; border: none; cursor: pointer; padding: 10px; border-radius: var(--r-sm); margin-left: -6px; }
 .ham span { display: block; width: 18px; height: 2px; background: var(--ink-2); border-radius: 2px; margin: 3.5px 0; transition: all .2s; }
 
@@ -953,101 +949,217 @@ let charts = {};
 let barChartActiveData = [], stackChartActiveData = [];
 let currentModalSchool = null;
 
+// Fallback Hardcode Data Master jika Fetch JSON gagal
+const MARET_2026 = [
+  { no: 1, nama: "SDN 1 LANGENSARI", kecamatan: "Langensari", rows: [ { kls4:{total:26,lancar:8,belum:18,tidak:0},kls5:{total:22,lancar:14,belum:8,tidak:0},guru:"NUR LAELATUL AZIZAH, S.Pd",hadir:100}, { kls4:{total:29,lancar:11,belum:18,tidak:0},kls5:{total:23,lancar:12,belum:8,tidak:3},guru:"PURJIATI, S.Pd.I",hadir:75} ]},
+  { no: 2, nama: "SDN 2 LANGENSARI", kecamatan: "Langensari", rows: [ { kls4:{total:22,lancar:6,belum:14,tidak:2},kls5:{total:16,lancar:13,belum:3,tidak:0},guru:"PURWATI",hadir:100}, { kls4:{total:26,lancar:16,belum:10,tidak:0},kls5:{total:16,lancar:13,belum:3,tidak:0},guru:"SHOFI BADRIATUL HIDAYAH, S.H",hadir:100}, { kls4:{total:28,lancar:13,belum:11,tidak:4},kls5:{total:14,lancar:9,belum:3,tidak:2},guru:"SUCI SUSILOWATI, S.H",hadir:100} ]},
+  { no: 3, nama: "SDN 3 LANGENSARI", kecamatan: "Langensari", rows: [{ kls4:{total:24,lancar:14,belum:10,tidak:0},kls5:{total:28,lancar:22,belum:6,tidak:0},guru:"WAHIDATUL LAYLI YAHYA",hadir:100}]},
+  { no: 4, nama: "SDN 4 LANGENSARI", kecamatan: "Langensari", rows: [{ kls4:{total:17,lancar:11,belum:3,tidak:3},kls5:{total:22,lancar:16,belum:3,tidak:3},guru:"ZAKIYA NAILATUSSYARIFAH",hadir:84.6}]},
+  { no: 5, nama: "SDN 1 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:25,lancar:9,belum:10,tidak:6},kls5:{total:15,lancar:6,belum:7,tidak:2},guru:"AHLAN SYAEFUL MILLAH, S.Pd",hadir:91.6}]},
+  { no: 6, nama: "SDN 2 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:8,lancar:2,belum:1,tidak:5},kls5:{total:11,lancar:4,belum:3,tidak:4},guru:"APRIYANTI NUR ROHMAH",hadir:100}]},
+  { no: 7, nama: "SDN 3 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:16,lancar:5,belum:6,tidak:5},kls5:{total:17,lancar:8,belum:6,tidak:3},guru:"JIHARKAH",hadir:100}]},
+  { no: 8, nama: "SDN 4 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:14,lancar:6,belum:5,tidak:3},kls5:{total:14,lancar:5,belum:5,tidak:4},guru:"LAILATUN NAELI",hadir:100}]},
+  { no: 9, nama: "SDN 5 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:23,lancar:10,belum:13,tidak:0},kls5:{total:29,lancar:18,belum:11,tidak:0},guru:"NURJANAH, S.Pd.I",hadir:100}]},
+  { no: 10, nama: "SDN 6 REJASARI", kecamatan: "Langensari", rows: [{ kls4:{total:21,lancar:7,belum:7,tidak:7},kls5:{total:16,lancar:8,belum:6,tidak:2},guru:"AINI ZAHRO",hadir:100}]},
+  { no: 11, nama: "SDN 1 WARINGINSARI", kecamatan: "Langensari", rows: [ { kls4:{total:17,lancar:5,belum:12,tidak:0},kls5:{total:20,lancar:8,belum:12,tidak:0},guru:"HIKMATUL LEDYA YAHYA",hadir:100}, { kls4:{total:17,lancar:6,belum:11,tidak:0},kls5:{total:16,lancar:16,belum:0,tidak:0},guru:"SALISAH",hadir:100} ]},
+  { no: 12, nama: "SDN 2 WARINGINSARI", kecamatan: "Langensari", rows: [{ kls4:{total:11,lancar:6,belum:4,tidak:1},kls5:{total:22,lancar:10,belum:7,tidak:5},guru:"SITI NUR ASIAH, S.Pd",hadir:100}]},
+  { no: 13, nama: "SDN 3 WARINGINSARI", kecamatan: "Langensari", rows: [{ kls4:{total:18,lancar:12,belum:5,tidak:1},kls5:{total:19,lancar:13,belum:5,tidak:1},guru:"UMI BAROROH, S.Pd.I",hadir:100}]},
+  { no: 14, nama: "SDN 5 WARINGINSARI", kecamatan: "Langensari", rows: [{ kls4:{total:9,lancar:5,belum:2,tidak:2},kls5:{total:16,lancar:7,belum:7,tidak:2},guru:"ASEP SAEPUL MIRAJ, S. Kesos",hadir:100}]},
+  { no: 15, nama: "SDN 1 MUKTISARI", kecamatan: "Langensari", rows: [{ kls4:{total:31,lancar:11,belum:20,tidak:0},kls5:{total:33,lancar:23,belum:10,tidak:0},guru:"FATIMAH, S.Pd",hadir:100}]},
+  { no: 16, nama: "SDN 2 MUKTISARI", kecamatan: "Langensari", rows: [{ kls4:{total:24,lancar:12,belum:12,tidak:0},kls5:{total:26,lancar:19,belum:7,tidak:0},guru:"ARIFHA CATUR KHAIRUNNISA",hadir:84.4}]},
+  { no: 17, nama: "SDN 3 MUKTISARI", kecamatan: "Langensari", rows: [{ kls4:{total:20,lancar:15,belum:4,tidak:1},kls5:{total:18,lancar:14,belum:2,tidak:2},guru:"HASAN",hadir:100}]},
+  { no: 18, nama: "SDN 4 MUKTISARI", kecamatan: "Langensari", rows: [{ kls4:{total:24,lancar:6,belum:15,tidak:3},kls5:{total:16,lancar:5,belum:10,tidak:1},guru:"SANIA MUNAWAROH",hadir:100}]},
+  { no: 19, nama: "SDN 2 BOJONGKANTONG", kecamatan: "Langensari", rows: [{ kls4:{total:17,lancar:10,belum:5,tidak:2},kls5:{total:18,lancar:14,belum:2,tidak:2},guru:"M. IRHAM ZAINUL FATA",hadir:100}]},
+  { no: 20, nama: "SDN 3 BOJONGKANTONG", kecamatan: "Langensari", rows: [{ kls4:{total:31,lancar:4,belum:16,tidak:11},kls5:{total:20,lancar:8,belum:5,tidak:7},guru:"WINA SHAMROTUL FUADAH",hadir:100}]},
+  { no: 21, nama: "SDN 4 BOJONGKANTONG", kecamatan: "Langensari", rows: [{ kls4:{total:22,lancar:17,belum:3,tidak:2},kls5:{total:22,lancar:17,belum:3,tidak:2},guru:"IHSQAN WAHID",hadir:100}]},
+  { no: 22, nama: "SDN 1 KUJANGSARI", kecamatan: "Langensari", rows: [{ kls4:{total:27,lancar:13,belum:11,tidak:3},kls5:{total:28,lancar:12,belum:10,tidak:6},guru:"MILA ABIAH KHARISMA",hadir:100}]},
+  { no: 23, nama: "SDN 2 KUJANGSARI", kecamatan: "Langensari", rows: [{ kls4:{total:14,lancar:5,belum:9,tidak:0},kls5:{total:13,lancar:3,belum:10,tidak:0},guru:"NURUL AMALIA",hadir:100}]},
+  { no: 24, nama: "SDN 3 KUJANGSARI", kecamatan: "Langensari", rows: [ { kls4:{total:15,lancar:4,belum:7,tidak:4},kls5:{total:16,lancar:6,belum:7,tidak:3},guru:"NURUL HUDA, S.Pd.I",hadir:100}, { kls4:{total:13,lancar:3,belum:4,tidak:6},kls5:{total:16,lancar:9,belum:5,tidak:2},guru:"SALASATUN HIDAYATURROHMAH",hadir:100}, { kls4:{total:13,lancar:3,belum:5,tidak:5},kls5:{total:17,lancar:7,belum:5,tidak:5},guru:"LENI MAESAROH, S.Pd",hadir:33.3} ]},
+  { no: 25, nama: "SDN 4 KUJANGSARI", kecamatan: "Langensari", rows: [{ kls4:{total:36,lancar:32,belum:4,tidak:0},kls5:{total:24,lancar:19,belum:5,tidak:0},guru:"SOLIHAH, S.Pd",hadir:100}]},
+  { no: 26, nama: "SDN 7 KUJANGSARI", kecamatan: "Langensari", rows: [{ kls4:{total:30,lancar:14,belum:16,tidak:0},kls5:{total:14,lancar:11,belum:3,tidak:0},guru:"TITIN NADIROH",hadir:100}]},
+  { no: 27, nama: "SDN 1 PURWAHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:26,lancar:18,belum:8,tidak:0},kls5:{total:13,lancar:9,belum:4,tidak:0},guru:"Asep Undang Munawar",hadir:100}]},
+  { no: 28, nama: "SDN 2 PURWAHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:19,lancar:15,belum:2,tidak:2},kls5:{total:22,lancar:11,belum:9,tidak:2},guru:"Lilih Solihah",hadir:58}]},
+  { no: 29, nama: "SDN 1 KARANGPANIMBAL", kecamatan: "Purwaharja", rows: [{ kls4:{total:32,lancar:17,belum:10,tidak:5},kls5:{total:13,lancar:10,belum:1,tidak:2},guru:"Sri Nurmala,S.Pd.I",hadir:100}]},
+  { no: 30, nama: "SDN 2 KARANGPANIMBAL", kecamatan: "Purwaharja", rows: [{ kls4:{total:24,lancar:24,belum:0,tidak:0},kls5:{total:23,lancar:23,belum:0,tidak:0},guru:"Riva Lanisa",hadir:100}]},
+  { no: 31, nama: "SDN 1 RAHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:34,lancar:34,belum:0,tidak:0},kls5:{total:30,lancar:30,belum:0,tidak:0},guru:"Lia Nurmuhibah,S.Pd",hadir:100}]},
+  { no: 32, nama: "SDN 2 RAHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:0,lancar:0,belum:0,tidak:0},kls5:{total:0,lancar:0,belum:0,tidak:0},guru:"-",hadir:100}]},
+  { no: 33, nama: "SDN 1 MEKARHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:16,lancar:4,belum:12,tidak:0},kls5:{total:19,lancar:10,belum:9,tidak:0},guru:"Muna Maemunah",hadir:100}]},
+  { no: 34, nama: "SDN 2 MEKARHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:31,lancar:12,belum:18,tidak:1},kls5:{total:35,lancar:21,belum:14,tidak:0},guru:"Neli Mulyana",hadir:100}]},
+  { no: 35, nama: "SDN 3 MEKARHARJA", kecamatan: "Purwaharja", rows: [{ kls4:{total:39,lancar:6,belum:14,tidak:19},kls5:{total:31,lancar:14,belum:13,tidak:4},guru:"Ina Apriani",hadir:100}]},
+  { no: 36, nama: "SDN 1 PATARUMAN", kecamatan: "Pataruman", rows: [{ kls4:{total:25,lancar:16,belum:9,tidak:0},kls5:{total:22,lancar:17,belum:5,tidak:0},guru:"SYARAH AWALIAH",hadir:100}]},
+  { no: 37, nama: "SDN 2 PATARUMAN", kecamatan: "Pataruman", rows: [{ kls4:{total:34,lancar:15,belum:12,tidak:7},kls5:{total:25,lancar:13,belum:6,tidak:6},guru:"NAELAL AQIDAH, S.Pd.I",hadir:100}]},
+  { no: 38, nama: "SDN 3 PATARUMAN", kecamatan: "Pataruman", rows: [ { kls4:{total:14,lancar:4,belum:6,tidak:4},kls5:{total:20,lancar:5,belum:8,tidak:7},guru:"IHYA YAZID ASY SYAKIRI, S.Pd",hadir:100}, { kls4:{total:12,lancar:2,belum:8,tidak:2},kls5:{total:23,lancar:8,belum:11,tidak:4},guru:"MUHAMMAD DAUD, S.Pd.",hadir:75} ]},
+  { no: 39, nama: "SDN 4 PATARUMAN", kecamatan: "Pataruman", rows: [{ kls4:{total:12,lancar:5,belum:7,tidak:0},kls5:{total:13,lancar:7,belum:6,tidak:0},guru:"TIKA KARTIKA, S.Pd",hadir:83}]},
+  { no: 40, nama: "SDN 5 PATARUMAN", kecamatan: "Pataruman", rows: [{ kls4:{total:21,lancar:5,belum:16,tidak:0},kls5:{total:16,lancar:10,belum:6,tidak:0},guru:"BUNGA AULIYA",hadir:50}]},
+  { no: 41, nama: "SDN 1 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:20,lancar:3,belum:14,tidak:3},kls5:{total:23,lancar:12,belum:11,tidak:0},guru:"TITA NURLIA",hadir:66}]},
+  { no: 42, nama: "SDN 2 HEGARSARI", kecamatan: "Pataruman", rows: [ { kls4:{total:8,lancar:2,belum:6,tidak:0},kls5:{total:11,lancar:2,belum:9,tidak:0},guru:"SITI NURHASANAH",hadir:100}, { kls4:{total:6,lancar:1,belum:5,tidak:0},kls5:{total:9,lancar:1,belum:8,tidak:0},guru:"MIA ROHMIATI, S.Pd.",hadir:100}, { kls4:{total:22,lancar:5,belum:17,tidak:0},kls5:{total:16,lancar:5,belum:11,tidak:0},guru:"SANI SYAMROTUL FUADAH, S.H",hadir:100} ]},
+  { no: 43, nama: "SDN 5 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:14,lancar:8,belum:6,tidak:0},kls5:{total:17,lancar:9,belum:8,tidak:0},guru:"NENENG SURYATI",hadir:100}]},
+  { no: 44, nama: "SDN 6 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:22,lancar:12,belum:10,tidak:0},kls5:{total:25,lancar:16,belum:9,tidak:0},guru:"DEWI PRIANTI",hadir:100}]},
+  { no: 45, nama: "SDN 7 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:12,lancar:3,belum:4,tidak:5},kls5:{total:13,lancar:7,belum:3,tidak:3},guru:"SAEPUMILAH, SKM",hadir:83}]},
+  { no: 46, nama: "SDN 8 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:25,lancar:6,belum:9,tidak:10},kls5:{total:15,lancar:5,belum:7,tidak:3},guru:"SILPIA GITA CAHYANI",hadir:100}]},
+  { no: 47, nama: "SDN 9 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:22,lancar:10,belum:11,tidak:1},kls5:{total:20,lancar:11,belum:9,tidak:0},guru:"RESTY PUTRI DYNASTI AWALIYAH, S.Pd",hadir:100}]},
+  { no: 48, nama: "SDN 10 HEGARSARI", kecamatan: "Pataruman", rows: [{ kls4:{total:10,lancar:8,belum:2,tidak:0},kls5:{total:15,lancar:13,belum:2,tidak:0},guru:"WULAN HARDIANI DEVI",hadir:100}]},
+  { no: 49, nama: "SDN 1 MULYASARI", kecamatan: "Pataruman", rows: [ { kls4:{total:23,lancar:8,belum:12,tidak:3},kls5:{total:17,lancar:8,belum:8,tidak:1},guru:"ANDI JUANDI, S.Kom.I",hadir:100}, { kls4:{total:24,lancar:12,belum:12,tidak:0},kls5:{total:17,lancar:13,belum:4,tidak:0},guru:"NANANG KURNIAWAN",hadir:100} ]},
+  { no: 50, nama: "SDN 3 MULYASARI", kecamatan: "Pataruman", rows: [{ kls4:{total:20,lancar:1,belum:5,tidak:14},kls5:{total:19,lancar:5,belum:1,tidak:13},guru:"LELA NURLAELA FITRIA, S.Pd",hadir:100}]},
+  { no: 51, nama: "SDN SINARTANJUNG", kecamatan: "Pataruman", rows: [ { kls4:{total:22,lancar:13,belum:5,tidak:4},kls5:{total:16,lancar:9,belum:5,tidak:2},guru:"JUITA FETRA KANIA",hadir:100}, { kls4:{total:26,lancar:15,belum:6,tidak:5},kls5:{total:16,lancar:11,belum:2,tidak:3},guru:"YUANISA VIDYA WAHYUNI, S.Pd",hadir:100} ]},
+  { no: 52, nama: "SDN 1 BATULAWANG", kecamatan: "Pataruman", rows: [{ kls4:{total:17,lancar:10,belum:7,tidak:0},kls5:{total:11,lancar:7,belum:4,tidak:0},guru:"FAZRY IRAWAN, S.Pd",hadir:100}]},
+  { no: 53, nama: "SDN 2 BATULAWANG", kecamatan: "Pataruman", rows: [{ kls4:{total:19,lancar:1,belum:4,tidak:14},kls5:{total:14,lancar:8,belum:3,tidak:3},guru:"NUNING NURAIDAH",hadir:18}]},
+  { no: 54, nama: "SDN 3 BATULAWANG", kecamatan: "Pataruman", rows: [{ kls4:{total:11,lancar:1,belum:10,tidak:0},kls5:{total:13,lancar:10,belum:3,tidak:0},guru:"DEWI PIRLI",hadir:100}]},
+  { no: 55, nama: "SDN 4 BATULAWANG", kecamatan: "Pataruman", rows: [{ kls4:{total:14,lancar:7,belum:7,tidak:0},kls5:{total:14,lancar:8,belum:6,tidak:0},guru:"MUHAMMAD ANWAR RAIHAN",hadir:50}]},
+  { no: 56, nama: "SDN 1 KARYAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:14,lancar:6,belum:6,tidak:2},kls5:{total:14,lancar:6,belum:6,tidak:2},guru:"SITI NURAJIZAH, S.Pd",hadir:100}]},
+  { no: 57, nama: "SDN 2 KARYAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:14,lancar:9,belum:5,tidak:0},kls5:{total:18,lancar:11,belum:7,tidak:0},guru:"DILA NURLATIVAH",hadir:100}]},
+  { no: 58, nama: "SDN 3 KARYAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:23,lancar:16,belum:6,tidak:1},kls5:{total:20,lancar:17,belum:3,tidak:0},guru:"RISWANTO",hadir:83}]},
+  { no: 59, nama: "SDN 1 BINANGUN", kecamatan: "Pataruman", rows: [{ kls4:{total:29,lancar:14,belum:15,tidak:0},kls5:{total:23,lancar:13,belum:10,tidak:0},guru:"ADELA PUTRI MEILA FARHATAINI",hadir:50}]},
+  { no: 60, nama: "SDN 2 BINANGUN", kecamatan: "Pataruman", rows: [{ kls4:{total:18,lancar:7,belum:7,tidak:4},kls5:{total:22,lancar:16,belum:3,tidak:3},guru:"NURFADILLAH AL-AZIZIYAHIYYAH, S.Pd",hadir:100}]},
+  { no: 61, nama: "SDN 1 SUKAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:35,lancar:6,belum:22,tidak:7},kls5:{total:32,lancar:18,belum:12,tidak:2},guru:"ANQI QIANSARI",hadir:91}]},
+  { no: 62, nama: "SDN 2 SUKAMUKTI", kecamatan: "Pataruman", rows: [{ kls4:{total:15,lancar:4,belum:7,tidak:4},kls5:{total:18,lancar:6,belum:7,tidak:5},guru:"MOHAMAD RIF'AT ABDUL AZIZ",hadir:41}]},
+  { no: 63, nama: "SDN 1 BANJAR", kecamatan: "Banjar", rows: [ { kls4:{total:22,lancar:11,belum:11,tidak:0},kls5:{total:14,lancar:10,belum:4,tidak:0},guru:"Apip Kurniawan",hadir:100}, { kls4:{total:17,lancar:5,belum:7,tidak:5},kls5:{total:17,lancar:8,belum:2,tidak:7},guru:"Jidan Muhamad Muhsin",hadir:100}, { kls4:{total:19,lancar:11,belum:6,tidak:2},kls5:{total:16,lancar:10,belum:6,tidak:0},guru:"Yayah Siti Latifah",hadir:100} ]},
+  { no: 64, nama: "SDN 2 BANJAR", kecamatan: "Banjar", rows: [ { kls4:{total:22,lancar:2,belum:4,tidak:16},kls5:{total:21,lancar:15,belum:4,tidak:2},guru:"Imas Mafuah",hadir:100}, { kls4:{total:22,lancar:9,belum:7,tidak:6},kls5:{total:21,lancar:9,belum:7,tidak:5},guru:"Muhammad Sufi Abdul Jabbar",hadir:100} ]},
+  { no: 65, nama: "SDN 3 BANJAR", kecamatan: "Banjar", rows: [ { kls4:{total:33,lancar:15,belum:15,tidak:3},kls5:{total:27,lancar:15,belum:9,tidak:3},guru:"Siti Nur Leliah",hadir:100}, { kls4:{total:27,lancar:15,belum:12,tidak:0},kls5:{total:26,lancar:20,belum:6,tidak:0},guru:"Muhammad Azka Sulaiman",hadir:100} ]},
+  { no: 66, nama: "SDN 4 BANJAR", kecamatan: "Banjar", rows: [{ kls4:{total:30,lancar:9,belum:21,tidak:0},kls5:{total:21,lancar:11,belum:10,tidak:0},guru:"Azmy Muhammad Farhan, S.Pd",hadir:100}]},
+  { no: 67, nama: "SDN 5 BANJAR", kecamatan: "Banjar", rows: [ { kls4:{total:25,lancar:5,belum:13,tidak:7},kls5:{total:19,lancar:8,belum:7,tidak:4},guru:"Koharudin",hadir:100}, { kls4:{total:24,lancar:8,belum:14,tidak:2},kls5:{total:16,lancar:4,belum:6,tidak:6},guru:"Sopiatin",hadir:83} ]},
+  { no: 68, nama: "SDN 8 BANJAR", kecamatan: "Banjar", rows: [ { kls4:{total:23,lancar:10,belum:13,tidak:0},kls5:{total:17,lancar:8,belum:9,tidak:0},guru:"Emil Jamilah,S.Pd",hadir:83}, { kls4:{total:23,lancar:10,belum:10,tidak:3},kls5:{total:21,lancar:10,belum:9,tidak:2},guru:"Ela Nurlaela,S.Pd.I",hadir:83} ]},
+  { no: 69, nama: "SDN 1 MEKARSARI", kecamatan: "Banjar", rows: [{ kls4:{total:30,lancar:25,belum:5,tidak:0},kls5:{total:17,lancar:14,belum:3,tidak:0},guru:"Ali fuad Hasan",hadir:100}]},
+  { no: 70, nama: "SDN 3 MEKARSARI", kecamatan: "Banjar", rows: [ { kls4:{total:16,lancar:10,belum:6,tidak:0},kls5:{total:13,lancar:5,belum:8,tidak:0},guru:"Ai Nuraeni,S.Pd.I",hadir:83}, { kls4:{total:20,lancar:7,belum:13,tidak:0},kls5:{total:18,lancar:18,belum:0,tidak:0},guru:"Ina Hasanah,S.Pd",hadir:100} ]},
+  { no: 71, nama: "SDN 4 MEKARSARI", kecamatan: "Banjar", rows: [ { kls4:{total:23,lancar:3,belum:5,tidak:15},kls5:{total:17,lancar:6,belum:8,tidak:3},guru:"Andi Mustofa",hadir:91}, { kls4:{total:21,lancar:7,belum:3,tidak:11},kls5:{total:16,lancar:9,belum:6,tidak:1},guru:"Salwa Tsaniah Mujahidah",hadir:100} ]},
+  { no: 72, nama: "SDN 5 MEKARSARI", kecamatan: "Banjar", rows: [ { kls4:{total:25,lancar:13,belum:3,tidak:9},kls5:{total:14,lancar:10,belum:3,tidak:1},guru:"Wiwi yuningsih",hadir:100}, { kls4:{total:28,lancar:18,belum:8,tidak:2},kls5:{total:14,lancar:10,belum:3,tidak:1},guru:"Fadil Irfan H",hadir:66} ]},
+  { no: 73, nama: "SDN 1 BALOKANG", kecamatan: "Banjar", rows: [{ kls4:{total:24,lancar:4,belum:5,tidak:15},kls5:{total:30,lancar:20,belum:7,tidak:3},guru:"Aceng Kustiawan",hadir:100}]},
+  { no: 74, nama: "SDN 2 BALOKANG", kecamatan: "Banjar", rows: [{ kls4:{total:17,lancar:10,belum:7,tidak:0},kls5:{total:35,lancar:26,belum:9,tidak:0},guru:"Ela Elvina siti Padila,S.Pd.I",hadir:75}]},
+  { no: 75, nama: "SDN 3 BALOKANG", kecamatan: "Banjar", rows: [{ kls4:{total:22,lancar:17,belum:5,tidak:0},kls5:{total:22,lancar:9,belum:13,tidak:0},guru:"Lina Laila Yusrina",hadir:100}]},
+  { no: 76, nama: "SDN 1 CIBEUREUM", kecamatan: "Banjar", rows: [{ kls4:{total:24,lancar:13,belum:5,tidak:6},kls5:{total:15,lancar:8,belum:4,tidak:3},guru:"Ade Rosi Zakiah,M.Ag",hadir:100}]},
+  { no: 77, nama: "SDN 1 NEGLASARI", kecamatan: "Banjar", rows: [{ kls4:{total:22,lancar:12,belum:9,tidak:1},kls5:{total:20,lancar:18,belum:2,tidak:0},guru:"Ai Sarah Naudyah Cahyani",hadir:100}]},
+  { no: 78, nama: "SDN 2 NEGLASARI", kecamatan: "Banjar", rows: [{ kls4:{total:20,lancar:3,belum:6,tidak:11},kls5:{total:19,lancar:9,belum:7,tidak:3},guru:"Nurhamidah",hadir:91}]},
+  { no: 79, nama: "SDN 3 NEGLASARI", kecamatan: "Banjar", rows: [{ kls4:{total:23,lancar:5,belum:5,tidak:13},kls5:{total:19,lancar:9,belum:3,tidak:7},guru:"Pipit Padilah,S.Pd",hadir:100}]},
+  { no: 80, nama: "SDN 1 SITUBATU", kecamatan: "Banjar", rows: [{ kls4:{total:19,lancar:2,belum:15,tidak:2},kls5:{total:20,lancar:12,belum:8,tidak:0},guru:"Hilman Nursidik",hadir:75}]},
+  { no: 81, nama: "SDN 2 SITUBATU", kecamatan: "Banjar", rows: [{ kls4:{total:15,lancar:9,belum:4,tidak:2},kls5:{total:11,lancar:10,belum:1,tidak:0},guru:"Fikri Aili",hadir:100}]},
+  { no: 82, nama: "SDN 1 JAJAWAR", kecamatan: "Banjar", rows: [{ kls4:{total:30,lancar:14,belum:16,tidak:0},kls5:{total:25,lancar:15,belum:10,tidak:0},guru:"Dyina Aulia Rahmat,S.Ag",hadir:100}]}
+];
+
 // ────────────────────────────────────────────
 // PENGAMBILAN DATA (FETCH JSON)
 // ────────────────────────────────────────────
 async function loadData() {
   try {
-    const response = await fetch("data.json");
-    if (!response.ok) throw new Error("Gagal mengambil data.json");
-    const json = await response.json();
+    const res = await fetch("data.json");
+    const json = await res.json();
 
-    const MARET_2026 = json.MARET_2026;
-    const FEBRUARI_UPDATES = json.FEBRUARI_UPDATES;
-    const JANUARI_UPDATES = json.JANUARI_UPDATES;
-
-    // Build Februari
-    const FEBRUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
-      const update = FEBRUARI_UPDATES.find(u => u.nama_sekolah === s.nama);
-      if (update) {
-        const k4 = update.kelas_4 || {};
-        const k5 = update.kelas_5 || {};
-        
-        const k4_l = k4.lancar || 0;
-        const k4_b = k4.belum_lancar || 0;
-        const k4_t = k4.tidak_bisa || 0;
-        const k4_tot = k4.jumlah_siswa !== null ? k4.jumlah_siswa : (k4_l + k4_b + k4_t);
-
-        const k5_l = k5.lancar || 0;
-        const k5_b = k5.belum_lancar || 0;
-        const k5_t = k5.tidak_bisa || 0;
-        const k5_tot = k5.jumlah_siswa !== null ? k5.jumlah_siswa : (k5_l + k5_b + k5_t);
-
-        s.rows = [{
-          kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
-          kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
-          guru: s.rows.map(r=>r.guru).join(", "),
-          hadir: s.rows.reduce((sum, r) => sum + r.hadir, 0) / s.rows.length
-        }];
-      } else {
-        s.rows.forEach(r => {
-          r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-          r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-          r.hadir = 0;
-        });
+    // Mencari Master Struktur (mengandung rows, no, dsb) sebagai referensi dari data manapun yang punya format rows
+    let masterRef = null;
+    for (let y in json) {
+      for (let m in json[y]) {
+        if (json[y][m].length > 0 && json[y][m][0].rows) {
+          masterRef = json[y][m];
+          break;
+        }
       }
-      return s;
-    });
+      if (masterRef) break;
+    }
+    
+    if (!masterRef) masterRef = MARET_2026; // Jika tidak ditemukan format master di JSON, gunakan fallback
 
-    // Build Januari
-    const JANUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
-      const update = JANUARI_UPDATES.find(u => u.nama_sekolah === s.nama);
-      if (update) {
-        const k4 = update.kelas_4 || {};
-        const k5 = update.kelas_5 || {};
-        
-        const k4_l = k4.lancar || 0;
-        const k4_b = k4.belum_lancar || 0;
-        const k4_t = k4.tidak_bisa || 0;
-        const k4_tot = k4.jumlah_siswa !== null ? k4.jumlah_siswa : (k4_l + k4_b + k4_t);
-
-        const k5_l = k5.lancar || 0;
-        const k5_b = k5.belum_lancar || 0;
-        const k5_t = k5.tidak_bisa || 0;
-        const k5_tot = k5.jumlah_siswa !== null ? k5.jumlah_siswa : (k5_l + k5_b + k5_t);
-
-        s.rows = [{
-          kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
-          kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
-          guru: s.rows.map(r=>r.guru).join(", "),
-          hadir: s.rows.reduce((sum, r) => sum + r.hadir, 0) / s.rows.length
-        }];
-      } else {
-        s.rows.forEach(r => {
-          r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-          r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-          r.hadir = 0;
-        });
+    // Fungsi aman konversi angka
+    const parseNum = (v) => {
+      if (v === null || v === undefined) return 0;
+      if (typeof v === 'string') {
+        const match = v.match(/\d+/);
+        if (match) return parseFloat(match[0]);
       }
-      return s;
-    });
+      const n = parseFloat(v);
+      return isNaN(n) ? 0 : n;
+    };
 
-    RAW_DATABASE = { 2026: { "Januari": JANUARI_2026, "Februari": FEBRUARI_2026, "Maret": MARET_2026 } };
+    RAW_DATABASE = {};
 
-    // Setelah data selesai diambil dan disusun, mulai render aplikasi
-    init();
+    // Normalisasi struktur untuk semua bulan agar sesuai dengan format array rows
+    for (let year in json) {
+      RAW_DATABASE[year] = {};
+      for (let month in json[year]) {
+        const monthData = json[year][month];
+        
+        // Jika data sudah berbentuk master (memiliki rows), simpan langsung
+        if (monthData.length > 0 && monthData[0].rows) {
+          RAW_DATABASE[year][month] = monthData;
+        } else {
+          // Konversi dari format "Update/Baru" ke format "Master"
+          RAW_DATABASE[year][month] = masterRef.map(base => {
+            const update = monthData.find(u => u.nama_sekolah === base.nama);
+            const clone = JSON.parse(JSON.stringify(base));
+            
+            if (update) {
+              const k4 = update.kelas_4 || {};
+              const k5 = update.kelas_5 || {};
+              
+              const k4_l = parseNum(k4.lancar);
+              const k4_b = parseNum(k4.belum_lancar);
+              const k4_t = parseNum(k4.tidak_bisa);
+              const k4_tot = (k4.jumlah_siswa !== null && k4.jumlah_siswa !== undefined) ? parseNum(k4.jumlah_siswa) : (k4_l + k4_b + k4_t);
+              
+              const k5_l = parseNum(k5.lancar);
+              const k5_b = parseNum(k5.belum_lancar);
+              const k5_t = parseNum(k5.tidak_bisa);
+              const k5_tot = (k5.jumlah_siswa !== null && k5.jumlah_siswa !== undefined) ? parseNum(k5.jumlah_siswa) : (k5_l + k5_b + k5_t);
 
-  } catch (error) {
-    console.error("Gagal inisiasi data:", error);
-    alert("Terjadi kesalahan saat memuat data.json. Pastikan file tersedia.");
+              clone.rows = [{
+                kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
+                kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
+                guru: base.rows.map(r => r.guru).join(", "),
+                hadir: base.rows.reduce((sum, r) => sum + parseNum(r.hadir), 0) / base.rows.length
+              }];
+            } else {
+              // Jika tidak ada di data update, jadikan 0
+              clone.rows.forEach(r => {
+                r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
+                r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
+                r.hadir = 0;
+              });
+            }
+            return clone;
+          });
+        }
+      }
+    }
+    console.log("Data JSON berhasil dimuat dan dinormalisasi:", RAW_DATABASE);
+  } catch (err) {
+    console.warn("Gagal load JSON, menggunakan fallback data lama", err);
+    RAW_DATABASE = {
+      "2026": {
+        "Maret": MARET_2026
+      }
+    };
   }
+  initDashboard();
 }
 
 // ────────────────────────────────────────────
-// HELPERS
+// HELPERS & GETTERS
 // ────────────────────────────────────────────
 const n2 = n => parseFloat(n).toFixed(1);
 const fmt = n => n.toLocaleString('id-ID');
+
+function getAllPeriods() {
+  const monthOrder = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const result = [];
+  
+  const years = Object.keys(RAW_DATABASE).sort((a,b) => a - b);
+  years.forEach(year => {
+    const months = Object.keys(RAW_DATABASE[year]).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
+    months.forEach(month => {
+      result.push({ year, month });
+    });
+  });
+  return result;
+}
+
+function getPrevPeriod(year, month) {
+  const all = getAllPeriods();
+  const idx = all.findIndex(p => p.year == year && p.month == month);
+  if (idx > 0) return all[idx - 1];
+  return null;
+}
+
+function getCurrentData() {
+  return RAW_DATABASE[currentYear]?.[currentMonth] || [];
+}
 
 function aggregateSchools(rawArr) {
   return rawArr.map(s => {
@@ -1063,7 +1175,7 @@ function aggregateSchools(rawArr) {
       belum+=r.kls4.belum+r.kls5.belum; tidak+=r.kls4.tidak+r.kls5.tidak;
       k4t+=r.kls4.total;k4l+=r.kls4.lancar;k4b+=r.kls4.belum;k4k+=r.kls4.tidak;
       k5t+=r.kls5.total;k5l+=r.kls5.lancar;k5b+=r.kls5.belum;k5k+=r.kls5.tidak;
-      hadirArr.push(r.hadir); guruArr.push(r.guru);
+      hadirArr.push(parseFloat(r.hadir) || 0); guruArr.push(r.guru);
     });
     return {
       idx:s.no,no:s.no,nama:s.nama,kecamatan:s.kecamatan,
@@ -1084,32 +1196,6 @@ function computeTotals(schools) {
     tidak: schools.reduce((a,s)=>a+s.tidak,0),
     avgHadir: hadirAll.length ? hadirAll.reduce((a,b)=>a+b,0)/hadirAll.length : 0
   };
-}
-
-function getPrevPeriod(year,month) {
-  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const idx=months.indexOf(month);
-  if(idx<=0) {
-    const py=String(parseInt(year)-1);
-    if(!RAW_DATABASE[py]) return null;
-    const pym=Object.keys(RAW_DATABASE[py]);
-    return pym.length?{year:py,month:pym[pym.length-1]}:null;
-  }
-  for(let i=idx-1;i>=0;i--) {
-    if(RAW_DATABASE[year]&&RAW_DATABASE[year][months[i]]) return {year,month:months[i]};
-  }
-  return null;
-}
-
-function getAllPeriods() {
-  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const result=[];
-  Object.keys(RAW_DATABASE).sort().forEach(yr => {
-    months.forEach(mo => {
-      if(RAW_DATABASE[yr]&&RAW_DATABASE[yr][mo]) result.push({year:yr,month:mo});
-    });
-  });
-  return result;
 }
 
 function dataQuality(school) {
@@ -1135,11 +1221,14 @@ function showSection(id) {
 // ────────────────────────────────────────────
 // INIT
 // ────────────────────────────────────────────
-function init() {
-  const years=Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
-  currentYear=years[0];
-  const months=Object.keys(RAW_DATABASE[currentYear]);
-  currentMonth=months[months.length-1];
+function initDashboard() {
+  const allPeriods = getAllPeriods();
+  if(allPeriods.length === 0) return;
+  // Pilih periode terakhir berdasarkan urutan waktu
+  const latest = allPeriods[allPeriods.length - 1];
+  currentYear = latest.year;
+  currentMonth = latest.month;
+  
   populateSelects();
   showSection('view-ringkasan');
   render();
@@ -1156,7 +1245,10 @@ function populateSelects() {
 }
 
 function populateMonths() {
-  const months=Object.keys(RAW_DATABASE[currentYear]||{});
+  const months = Object.keys(RAW_DATABASE[currentYear]||{});
+  const monthOrder = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  months.sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
+  
   ['selMonth','sbMonth'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
@@ -1213,7 +1305,7 @@ function setStackMode(mode) {
 // RENDER
 // ────────────────────────────────────────────
 function render() {
-  const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth]||[];
+  const rawMaster = getCurrentData();
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
   let rawArr = rawMaster;
@@ -1808,9 +1900,18 @@ function renderModalTab(idx) {
     const allP=getAllPeriods();
     const rows=allP.map(p=>{
       const raw=RAW_DATABASE[p.year][p.month];
-      const found=raw.find(r=>r.no===s.no);
-      if(!found) return null;
-      const agg=aggregateSchools([found])[0];
+      // Cari dan sinkronkan dengan base data karena update format raw belum terstruktur full rows
+      let agg;
+      if (raw.length > 0 && !raw[0].rows) {
+          // Cari hasil agregation master khusus untuk logic history di modal
+          let tempAggr = aggregateSchools(raw);
+          agg = tempAggr.find(a => a.nama === s.nama);
+      } else {
+          const found=raw.find(r=>r.no===s.no);
+          if(!found) return null;
+          agg=aggregateSchools([found])[0];
+      }
+      if(!agg) return null;
       return {period:`${p.month} ${p.year}`,pct:agg.pct,lancar:agg.lancar,tot:agg.tot};
     }).filter(Boolean);
     if(rows.length<2){
@@ -1855,7 +1956,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();closeSidebar();}
 });
 
-// Jalankan saat dokumen ter-load (Data akan di fetch lebih dahulu)
+// Jalankan saat dokumen ter-load
 document.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
