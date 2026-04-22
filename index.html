@@ -999,7 +999,7 @@ async function loadData() {
       return s;
     });
 
-    // --- BAGIAN 1: STRUKTUR DATABASE 2025 HINGGA 2050 ---
+    // --- 1. STRUKTUR DATABASE BARU (2025 - 2050) ---
     RAW_DATABASE = {};
     for (let y = 2025; y <= 2050; y++) {
       RAW_DATABASE[y] = {};
@@ -1007,16 +1007,11 @@ async function loadData() {
     
     // Inisialisasi 2025 mulai dari Juli (kosong sebagai placeholder)
     ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'].forEach(m => {
-      RAW_DATABASE[2025][m] = []; 
+      RAW_DATABASE[2025][m] = [];
     });
 
     // Isi tahun 2026 dengan data yang sudah ada
-    RAW_DATABASE[2026] = {
-      "Januari": JANUARI_2026,
-      "Februari": FEBRUARI_2026,
-      "Maret": MARET_2026
-    };
-    // Tahun 2027-2050 akan menjadi objek {} yang sudah disiapkan di loop atas
+    RAW_DATABASE[2026] = { "Januari": JANUARI_2026, "Februari": FEBRUARI_2026, "Maret": MARET_2026 };
 
     // Setelah data selesai diambil dan disusun, mulai render aplikasi
     init();
@@ -1070,24 +1065,21 @@ function computeTotals(schools) {
   };
 }
 
-// Perbaikan untuk mencegah error pada grafik Tren jika array bulan tersebut kosong
+// 2. PERBAIKAN GRAFIK TREN AGAR MENGABAIKAN DATA KOSONG
 function getPrevPeriod(year,month) {
   const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const idx=months.indexOf(month);
-  
-  // Fungsi helper untuk mengecek apakah data di bulan tertentu benar-benar ada isinya
   const hasData = (y, m) => RAW_DATABASE[y] && Array.isArray(RAW_DATABASE[y][m]) && RAW_DATABASE[y][m].length > 0;
 
   if(idx<=0) {
     const py=String(parseInt(year)-1);
     if(!RAW_DATABASE[py]) return null;
     const pym=Object.keys(RAW_DATABASE[py]).filter(m => hasData(py, m));
-    return pym.length ? {year:py,month:pym[pym.length-1]} : null;
+    return pym.length?{year:py,month:pym[pym.length-1]}:null;
   }
   for(let i=idx-1;i>=0;i--) {
     if(hasData(year, months[i])) return {year,month:months[i]};
   }
-  // Lintas tahun jika bulan awal di tahun ini tidak punya previous
   const py=String(parseInt(year)-1);
   if(RAW_DATABASE[py]) {
     const pym=Object.keys(RAW_DATABASE[py]).filter(m => hasData(py, m));
@@ -1101,7 +1093,6 @@ function getAllPeriods() {
   const result=[];
   Object.keys(RAW_DATABASE).sort().forEach(yr => {
     months.forEach(mo => {
-      // Pastikan hanya periode yang ADA isinya yang masuk ke grafik Tren
       if(RAW_DATABASE[yr] && Array.isArray(RAW_DATABASE[yr][mo]) && RAW_DATABASE[yr][mo].length > 0) {
         result.push({year:yr,month:mo});
       }
@@ -1139,7 +1130,6 @@ function init() {
   render();
 }
 
-// --- BAGIAN 2: LOGIKA DROPDOWN PERIODE ---
 function initYearMonth() {
   // Set default ke Juli 2025
   if (!currentYear) currentYear = 2025;
@@ -1167,7 +1157,7 @@ function updateMonthDropdowns() {
     availableMonths = allMonths.slice(6); // Index 6 = Juli
   }
 
-  // Jika user pindah tahun dan bulan sebelumnya tidak ada di tahun baru, reset ke bulan pertama yg tersedia
+  // Jika user pindah tahun dan bulan sebelumnya tidak ada di tahun baru (misal: Jan 2026 -> 2025), reset ke bulan pertama yg tersedia
   if (!availableMonths.includes(currentMonth)) {
     currentMonth = availableMonths[0]; 
   }
@@ -1251,8 +1241,8 @@ function setStackMode(mode) {
 // RENDER
 // ────────────────────────────────────────────
 function render() {
-  // --- BAGIAN 3: HANDLE DATA KOSONG ---
-  const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth] || [];
+  // --- 3. HANDLING DATA KOSONG ---
+  const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth]||[];
   const isDataAvailable = Array.isArray(rawMaster) && rawMaster.length > 0;
   
   const allSchoolsAggr = aggregateSchools(rawMaster);
@@ -1298,7 +1288,7 @@ function render() {
   // Banner UI: Notifikasi Data Kosong / Anomali Data
   const dqBanner=document.getElementById('dqBanner');
   if (!isDataAvailable) {
-    dqBanner.innerHTML = `ℹ️ <strong>Data belum tersedia untuk periode ${periodStr}</strong>. Silakan pilih periode yang memiliki data.`;
+    dqBanner.innerHTML = `ℹ️ <strong>Data belum tersedia untuk periode ${periodStr}</strong>.`;
     dqBanner.className = "dq-banner";
     dqBanner.style.background = "var(--border-2)";
     dqBanner.style.borderColor = "var(--border)";
