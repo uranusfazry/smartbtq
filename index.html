@@ -1136,31 +1136,55 @@ function showSection(id) {
 // INIT
 // ────────────────────────────────────────────
 function init() {
-  const years=Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
-  currentYear=years[0];
-  const months=Object.keys(RAW_DATABASE[currentYear]);
-  currentMonth=months[months.length-1];
-  populateSelects();
+  initYearMonth();
   showSection('view-ringkasan');
   render();
 }
 
-function populateSelects() {
-  const years=Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
-  ['selYear','sbYear'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.innerHTML=years.map(y=>`<option value="${y}"${y==currentYear?' selected':''}>${y}</option>`).join('');
+function initYearMonth() {
+  // Set default ke Juli 2025
+  if (!currentYear) currentYear = 2025;
+  if (!currentMonth) currentMonth = 'Juli';
+
+  // Render opsi tahun (2025 - 2030)
+  let yearOptions = '';
+  for (let y = 2025; y <= 2030; y++) {
+    yearOptions += `<option value="${y}"${y == currentYear ? ' selected' : ''}>${y}</option>`;
+  }
+  ['selYear','sbYear'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = yearOptions;
   });
-  populateMonths();
+
+  updateMonthDropdowns();
 }
 
-function populateMonths() {
-  const months=Object.keys(RAW_DATABASE[currentYear]||{});
-  ['selMonth','sbMonth'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.innerHTML=months.map(m=>`<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join('');
+function updateMonthDropdowns() {
+  const allMonths = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  let availableMonths = [...allMonths];
+
+  // Khusus tahun 2025, bulan mulai dari Juli
+  if (currentYear == 2025) {
+    availableMonths = allMonths.slice(6); // Index 6 = Juli
+  }
+
+  // Jika user pindah tahun dan bulan sebelumnya tidak ada di tahun baru (misal: Jan 2026 -> 2025), reset ke bulan pertama yg tersedia
+  if (!availableMonths.includes(currentMonth)) {
+    currentMonth = availableMonths[0]; 
+  }
+
+  // Render opsi bulan
+  let monthOptions = '';
+  availableMonths.forEach(m => {
+    monthOptions += `<option value="${m}"${m == currentMonth ? ' selected' : ''}>${m}</option>`;
+  });
+
+  ['selMonth','sbMonth'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+      el.innerHTML = monthOptions;
+      el.value = currentMonth;
+    }
   });
 }
 
@@ -1171,15 +1195,23 @@ function syncSelects(kec, yr, mo) {
 }
 
 function onPeriodChange() {
-  const kec=(document.getElementById('selKecamatan')||{}).value||selectedKecamatan;
-  const yr=(document.getElementById('selYear')||{}).value||currentYear;
-  const mo=(document.getElementById('selMonth')||{}).value||currentMonth;
-  selectedKecamatan=kec; currentYear=yr; currentMonth=mo;
-  if(selectedKecamatan==='all') stackDisplayMode='top20';
-  else stackDisplayMode='all';
-  syncSelects(kec,yr,mo);
-  populateMonths();
-  sortMode='default';
+  const kec = (document.getElementById('selKecamatan')||{}).value || selectedKecamatan;
+  const yr = (document.getElementById('selYear')||{}).value || currentYear;
+  const mo = (document.getElementById('selMonth')||{}).value || currentMonth;
+  
+  selectedKecamatan = kec;
+  const yearChanged = (currentYear != yr);
+  currentYear = yr; 
+  currentMonth = mo;
+
+  // Jika tahun diganti, sesuaikan daftar bulan
+  if (yearChanged) updateMonthDropdowns();
+
+  if(selectedKecamatan === 'all') stackDisplayMode = 'top20';
+  else stackDisplayMode = 'all';
+  
+  syncSelects(selectedKecamatan, currentYear, currentMonth);
+  sortMode = 'default';
   refreshSortButtons();
   render();
 }
@@ -1190,10 +1222,17 @@ function onSidebarKec() {
   if(selectedKecamatan==='all') stackDisplayMode='top20'; else stackDisplayMode='all';
   sortMode='default'; refreshSortButtons(); render();
 }
+
 function onSidebarPeriod() {
-  currentYear=document.getElementById('sbYear').value;
-  currentMonth=document.getElementById('sbMonth').value;
-  syncSelects(selectedKecamatan,currentYear,currentMonth);
+  const yr = document.getElementById('sbYear').value;
+  const yearChanged = (currentYear != yr);
+  currentYear = yr;
+  currentMonth = document.getElementById('sbMonth').value;
+
+  // Jika tahun diganti dari sidebar, sesuaikan daftar bulan
+  if (yearChanged) updateMonthDropdowns();
+
+  syncSelects(selectedKecamatan, currentYear, currentMonth);
   sortMode='default'; refreshSortButtons(); render();
 }
 
