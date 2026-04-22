@@ -957,8 +957,7 @@ const MARET_2026 = [
         "guru": "Ahmad",
         "hadir": 95
       }
-    ],
-    "warnings": []
+    ]
   }
 ];
 
@@ -979,12 +978,11 @@ async function loadData() {
     const res = await fetch("data.json");
     const json = await res.json();
     RAW_DATABASE = json;
-
-    console.log("Data JSON:", RAW_DATABASE);
+    console.log("Data JSON loaded successfully");
   } catch (err) {
     console.warn("Gagal load JSON, pakai fallback");
     RAW_DATABASE = {
-      "2026": {
+      2026: {
         "Maret": MARET_2026
       }
     };
@@ -1014,26 +1012,51 @@ const fmt = n => n.toLocaleString('id-ID');
 
 function aggregateSchools(rawArr) {
   return rawArr.map(s => {
-    let tot=0,lancar=0,belum=0,tidak=0;
-    let k4t=0,k4l=0,k4b=0,k4k=0,k5t=0,k5l=0,k5b=0,k5k=0;
-    let hadirArr=[],guruArr=[],warnings=[];
-    s.rows.forEach(r => {
-      const k4s=r.kls4.lancar+r.kls4.belum+r.kls4.tidak;
-      const k5s=r.kls5.lancar+r.kls5.belum+r.kls5.tidak;
-      if(Math.abs(k4s-r.kls4.total)>1) warnings.push(`Kls4 ${r.guru}`);
-      if(Math.abs(k5s-r.kls5.total)>1) warnings.push(`Kls5 ${r.guru}`);
-      tot+=r.kls4.total+r.kls5.total; lancar+=r.kls4.lancar+r.kls5.lancar;
-      belum+=r.kls4.belum+r.kls5.belum; tidak+=r.kls4.tidak+r.kls5.tidak;
-      k4t+=r.kls4.total;k4l+=r.kls4.lancar;k4b+=r.kls4.belum;k4k+=r.kls4.tidak;
-      k5t+=r.kls5.total;k5l+=r.kls5.lancar;k5b+=r.kls5.belum;k5k+=r.kls5.tidak;
-      hadirArr.push(r.hadir); guruArr.push(r.guru);
+    let tot=0, lancar=0, belum=0, tidak=0;
+    let k4t=0, k4l=0, k4b=0, k4k=0, k5t=0, k5l=0, k5b=0, k5k=0;
+    let hadirArr=[], guruArr=[], warnings=[];
+    
+    (s.rows || []).forEach(r => {
+      const k4 = r.kls4 || {};
+      const k5 = r.kls5 || {};
+      
+      const r_lancar4 = parseFloat(k4.lancar) || 0;
+      const r_belum4 = parseFloat(k4.belum) || 0;
+      const r_tidak4 = parseFloat(k4.tidak) || 0;
+      const r_tot4 = parseFloat(k4.total) || (r_lancar4 + r_belum4 + r_tidak4);
+
+      const r_lancar5 = parseFloat(k5.lancar) || 0;
+      const r_belum5 = parseFloat(k5.belum) || 0;
+      const r_tidak5 = parseFloat(k5.tidak) || 0;
+      const r_tot5 = parseFloat(k5.total) || (r_lancar5 + r_belum5 + r_tidak5);
+
+      const k4s = r_lancar4 + r_belum4 + r_tidak4;
+      const k5s = r_lancar5 + r_belum5 + r_tidak5;
+
+      if(Math.abs(k4s - r_tot4) > 1) warnings.push(`Kls4 ${r.guru || '-'}`);
+      if(Math.abs(k5s - r_tot5) > 1) warnings.push(`Kls5 ${r.guru || '-'}`);
+
+      tot += (r_tot4 + r_tot5); 
+      lancar += (r_lancar4 + r_lancar5);
+      belum += (r_belum4 + r_belum5); 
+      tidak += (r_tidak4 + r_tidak5);
+
+      k4t += r_tot4; k4l += r_lancar4; k4b += r_belum4; k4k += r_tidak4;
+      k5t += r_tot5; k5l += r_lancar5; k5b += r_belum5; k5k += r_tidak5;
+
+      hadirArr.push(parseFloat(r.hadir) || 100);
+      guruArr.push(r.guru || "-");
     });
+
     return {
-      idx:s.no,no:s.no,nama:s.nama,kecamatan:s.kecamatan,
-      tot,lancar,belum,tidak,pct:tot>0?(lancar/tot*100):0,
-      kls4:{tot:k4t,lancar:k4l,belum:k4b,tidak:k4k},
-      kls5:{tot:k5t,lancar:k5l,belum:k5b,tidak:k5k},
-      guru:guruArr,hadir:hadirArr,rows:s.rows,warnings
+      idx: s.no || 0, no: s.no || 0, 
+      nama: s.nama || "Unknown", 
+      kecamatan: s.kecamatan || "-",
+      tot, lancar, belum, tidak, 
+      pct: tot > 0 ? (lancar / tot * 100) : 0,
+      kls4: { tot: k4t, lancar: k4l, belum: k4b, tidak: k4k },
+      kls5: { tot: k5t, lancar: k5l, belum: k5b, tidak: k5k },
+      guru: guruArr, hadir: hadirArr, rows: s.rows || [], warnings
     };
   });
 }
@@ -1050,17 +1073,9 @@ function computeTotals(schools) {
 }
 
 function getPrevPeriod(year,month) {
-  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const idx=months.indexOf(month);
-  if(idx<=0) {
-    const py=String(parseFloat(year)-1);
-    if(!RAW_DATABASE[py]) return null;
-    const pym=Object.keys(RAW_DATABASE[py]);
-    return pym.length?{year:py,month:pym[pym.length-1]}:null;
-  }
-  for(let i=idx-1;i>=0;i--) {
-    if(RAW_DATABASE[year]&&RAW_DATABASE[year][months[i]]) return {year,month:months[i]};
-  }
+  const periods = getAllPeriods();
+  const idx = periods.findIndex(p => p.year == year && p.month == month);
+  if (idx > 0) return periods[idx - 1];
   return null;
 }
 
@@ -1088,17 +1103,20 @@ function showSection(id) {
 // INIT
 // ────────────────────────────────────────────
 function init() {
-  const years=Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
-  currentYear=years[0];
-  const months=Object.keys(RAW_DATABASE[currentYear]);
-  currentMonth=months[months.length-1];
+  const years = Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
+  if(years.length === 0) return;
+  
+  currentYear = years[0];
+  const months = Object.keys(RAW_DATABASE[currentYear]);
+  currentMonth = months[months.length-1];
+  
   populateSelects();
   showSection('view-ringkasan');
   render();
 }
 
 function populateSelects() {
-  const years=Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
+  const years = Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
   ['selYear','sbYear'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
@@ -1108,7 +1126,7 @@ function populateSelects() {
 }
 
 function populateMonths() {
-  const months=Object.keys(RAW_DATABASE[currentYear]||{});
+  const months = Object.keys(RAW_DATABASE[currentYear] || {});
   ['selMonth','sbMonth'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
@@ -1193,7 +1211,7 @@ function render() {
   const prev=getPrevPeriod(currentYear,currentMonth);
   let chipHTML='';
   if(prev) {
-    let pRaw=RAW_DATABASE[prev.year][prev.month];
+    let pRaw=RAW_DATABASE[prev.year][prev.month] || [];
     if(!isAll) pRaw=pRaw.filter(s=>s.kecamatan===selectedKecamatan);
     const pT=computeTotals(aggregateSchools(pRaw));
     const pPct=pT.tot>0?(pT.lancar/pT.tot*100):0;
@@ -1628,7 +1646,7 @@ function renderTrend(cakupan) {
   }
   const labels=allP.map(p=>`${p.month.substring(0,3)} ${p.year}`);
   const pctData=allP.map(p=>{
-    let raw=RAW_DATABASE[p.year][p.month];
+    let raw=RAW_DATABASE[p.year][p.month] || [];
     if(selectedKecamatan!=='all') raw=raw.filter(s=>s.kecamatan===selectedKecamatan);
     const T=computeTotals(aggregateSchools(raw));
     return T.tot>0?parseFloat(n2(T.lancar/T.tot*100)):0;
@@ -1759,12 +1777,13 @@ function renderModalTab(idx) {
   } else {
     const allP=getAllPeriods();
     const rows=allP.map(p=>{
-      const raw=RAW_DATABASE[p.year][p.month];
+      const raw=RAW_DATABASE[p.year][p.month] || [];
       const found=raw.find(r=>r.no===s.no);
       if(!found) return null;
       const agg=aggregateSchools([found])[0];
       return {period:`${p.month} ${p.year}`,pct:agg.pct,lancar:agg.lancar,tot:agg.tot};
     }).filter(Boolean);
+    
     if(rows.length<2){
       el.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📅</div>Modul ini menyaratkan himpunan minimum dua periode valid.</div>`;
     } else {
