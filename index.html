@@ -1105,8 +1105,75 @@ function logout() {
   location.reload();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  /* ── Form Bindings & Animations ── */
+// ────────────────────────────────────────────
+// SPA NAVIGATION
+// ────────────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(l=>{
+    l.classList.toggle('active', l.getAttribute('data-target')===id);
+  });
+  if(window.innerWidth<=900) closeSidebar();
+  window.dispatchEvent(new Event('resize'));
+}
+
+// ────────────────────────────────────────────
+// SIDEBAR TOGGLE
+// ────────────────────────────────────────────
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* =========================
+   GLOBAL STATE & SETUP ENGINE (FINAL CODE)
+========================= */
+let RAW_DATABASE = {};
+let currentYear = null;
+let currentMonth = null;
+let currentKecamatan = "all";
+
+// Variabel existing dari render engine lama agar tidak error
+let selectedKecamatan = 'all';
+let currentSchools = [], filteredSchools = [];
+let sortMode = 'default';
+let stackDisplayMode = 'top20';
+let charts = {};
+let barChartActiveData = [], stackChartActiveData = [];
+let currentModalSchool = null;
+
+/* =========================
+   LOAD DATA JSON
+========================= */
+async function loadData() {
+  try {
+    const res = await fetch("data.json");
+    const json = await res.json();
+
+    if (!json || typeof json !== "object") {
+      throw new Error("Format JSON salah");
+    }
+
+    RAW_DATABASE = json;
+    console.log("DATA LOADED:", json);
+
+  } catch (err) {
+    console.error("Gagal load data.json:", err);
+    RAW_DATABASE = {};
+  }
+
+  initDashboard();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  /* ── Bindings form login ── */
   const form       = document.getElementById('loginForm');
   const usernameEl = document.getElementById('username');
   const passwordEl = document.getElementById('password');
@@ -1137,7 +1204,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function triggerShake() {
     card.classList.remove('shake');
-    void card.offsetWidth; /* reflow */
+    void card.offsetWidth;
     card.classList.add('shake');
     card.addEventListener('animationend', function () {
       card.classList.remove('shake');
@@ -1159,7 +1226,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-
     var user = usernameEl.value.trim();
     var pass = passwordEl.value;
 
@@ -1188,84 +1254,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }, delay);
   });
 
-  /* ── Check session initially ── */
   checkSession();
+  
+  // Call init fetch for data
+  loadData();
 });
-
-// ────────────────────────────────────────────
-// SPA NAVIGATION
-// ────────────────────────────────────────────
-function showSection(id) {
-  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(l=>{
-    l.classList.toggle('active', l.getAttribute('data-target')===id);
-  });
-  if(window.innerWidth<=900) closeSidebar();
-  window.dispatchEvent(new Event('resize'));
-}
-
-// ────────────────────────────────────────────
-// SIDEBAR TOGGLE
-// ────────────────────────────────────────────
-function openSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-/* =========================
-   GLOBAL STATE
-========================= */
-let RAW_DATABASE = {};
-let currentYear = null;
-let currentMonth = null;
-let currentKecamatan = "all";
-
-// State render engine untuk Charts/Table
-let selectedKecamatan = 'all';
-let currentSchools = [], filteredSchools = [];
-let sortMode = 'default';
-let stackDisplayMode = 'top20';
-let charts = {};
-let barChartActiveData = [], stackChartActiveData = [];
-let currentModalSchool = null;
-
-/* =========================
-   LOAD DATA JSON
-========================= */
-async function loadData() {
-  try {
-    const res = await fetch("data.json");
-    const json = await res.json();
-
-    if (!json || typeof json !== "object") {
-      throw new Error("Format JSON salah");
-    }
-
-    RAW_DATABASE = json;
-
-  } catch (err) {
-    console.error("Gagal load data:", err);
-    RAW_DATABASE = {};
-  }
-
-  initDashboard();
-}
-
-document.addEventListener("DOMContentLoaded", loadData);
 
 /* =========================
    INIT DASHBOARD
 ========================= */
 function initDashboard() {
   const years = Object.keys(RAW_DATABASE);
-  if (!years.length) return;
+  if (!years.length) {
+    console.error("Data kosong");
+    return;
+  }
+  
+  console.log("INIT OK");
 
   currentYear = years[0];
 
@@ -1285,49 +1290,58 @@ function initDropdown() {
   const sbYear = document.getElementById("sbYear");
   const sbMonth = document.getElementById("sbMonth");
 
-  selYear.innerHTML = "";
-  sbYear.innerHTML = "";
+  if(selYear) selYear.innerHTML = "";
+  if(sbYear) sbYear.innerHTML = "";
 
   Object.keys(RAW_DATABASE).forEach(y => {
-    selYear.add(new Option(y, y));
-    sbYear.add(new Option(y, y));
+    if(selYear) selYear.add(new Option(y, y));
+    if(sbYear) sbYear.add(new Option(y, y));
   });
 
-  selYear.value = currentYear;
-  sbYear.value = currentYear;
+  if(selYear) selYear.value = currentYear;
+  if(sbYear) sbYear.value = currentYear;
 
   updateMonthDropdown();
 
   /* HEADER */
-  selYear.onchange = () => {
-    currentYear = selYear.value;
-    updateMonthDropdown();
-    syncSidebar();
-    renderAll();
-  };
+  if(selYear) {
+    selYear.onchange = () => {
+      currentYear = selYear.value;
+      updateMonthDropdown();
+      syncSidebar();
+      renderAll();
+    };
+  }
 
-  selMonth.onchange = () => {
-    currentMonth = selMonth.value;
-    syncSidebar();
-    renderAll();
-  };
+  if(selMonth) {
+    selMonth.onchange = () => {
+      currentMonth = selMonth.value;
+      syncSidebar();
+      renderAll();
+    };
+  }
 
   /* SIDEBAR */
-  sbYear.onchange = (e) => {
-    currentYear = e.target.value;
-    updateMonthDropdown();
-    renderAll();
-  };
+  if(sbYear) {
+    sbYear.onchange = (e) => {
+      currentYear = e.target.value;
+      updateMonthDropdown();
+      renderAll();
+    };
+  }
 
-  sbMonth.onchange = (e) => {
-    currentMonth = e.target.value;
-    renderAll();
-  };
+  if(sbMonth) {
+    sbMonth.onchange = (e) => {
+      currentMonth = e.target.value;
+      renderAll();
+    };
+  }
 
   const selKec = document.getElementById("selKecamatan");
   if (selKec) {
     selKec.onchange = (e) => {
       currentKecamatan = e.target.value;
+      selectedKecamatan = currentKecamatan;
       syncSidebar();
       renderAll();
     };
@@ -1337,6 +1351,7 @@ function initDropdown() {
   if (sbKec) {
     sbKec.onchange = (e) => {
       currentKecamatan = e.target.value;
+      selectedKecamatan = currentKecamatan;
       renderAll();
     };
   }
@@ -1351,20 +1366,22 @@ function updateMonthDropdown() {
   const selMonth = document.getElementById("selMonth");
   const sbMonth = document.getElementById("sbMonth");
 
-  const months = Object.keys(RAW_DATABASE[currentYear]);
+  const months = Object.keys(RAW_DATABASE[currentYear] || {});
 
-  selMonth.innerHTML = "";
-  sbMonth.innerHTML = "";
+  if(selMonth) selMonth.innerHTML = "";
+  if(sbMonth) sbMonth.innerHTML = "";
 
   months.forEach(m => {
-    selMonth.add(new Option(m, m));
-    sbMonth.add(new Option(m, m));
+    if(selMonth) selMonth.add(new Option(m, m));
+    if(sbMonth) sbMonth.add(new Option(m, m));
   });
 
-  currentMonth = months[months.length - 1];
+  if (months.length > 0) {
+    currentMonth = months[months.length - 1];
+  }
 
-  selMonth.value = currentMonth;
-  sbMonth.value = currentMonth;
+  if(selMonth) selMonth.value = currentMonth;
+  if(sbMonth) sbMonth.value = currentMonth;
 }
 
 /* =========================
@@ -1374,10 +1391,16 @@ function syncSidebar() {
   const sbYear = document.getElementById("sbYear");
   const sbMonth = document.getElementById("sbMonth");
   const sbKec = document.getElementById("sbKecamatan");
+  const selYear = document.getElementById("selYear");
+  const selMonth = document.getElementById("selMonth");
+  const selKec = document.getElementById("selKecamatan");
 
   if (sbYear) sbYear.value = currentYear;
   if (sbMonth) sbMonth.value = currentMonth;
   if (sbKec) sbKec.value = currentKecamatan;
+  if (selYear) selYear.value = currentYear;
+  if (selMonth) selMonth.value = currentMonth;
+  if (selKec) selKec.value = currentKecamatan;
 }
 
 /* =========================
@@ -1398,20 +1421,26 @@ function getCurrentData() {
 ========================= */
 function renderAll() {
   const data = getCurrentData();
-  if (!data.length) return;
+  if (!data || data.length === 0) return;
 
   let total = 0, lancar = 0, belum = 0, tidak = 0;
+  let totalHadir = 0, countHadir = 0;
 
   data.forEach(s => {
     s.rows.forEach(r => {
-      total += (r.kls4?.total || 0) + (r.kls5?.total || 0);
+      const kls4Tot = r.kls4?.total || 0;
+      const kls5Tot = r.kls5?.total || 0;
+      total += kls4Tot + kls5Tot;
       lancar += (r.kls4?.lancar || 0) + (r.kls5?.lancar || 0);
       belum += (r.kls4?.belum || 0) + (r.kls5?.belum || 0);
       tidak += (r.kls4?.tidak || 0) + (r.kls5?.tidak || 0);
+      
+      if(r.hadir) { totalHadir += parseFloat(r.hadir); countHadir++; }
     });
   });
 
   const pct = total ? ((lancar / total) * 100).toFixed(1) : 0;
+  const avgHadir = countHadir ? (totalHadir / countHadir) : 0;
 
   /* HERO */
   const heroPct = document.getElementById("hero-pct");
@@ -1423,16 +1452,16 @@ function renderAll() {
   };
 
   setText("hs-sekolah", data.length);
-  setText("hs-siswa", total);
-  setText("hs-lancar", lancar);
-  setText("hs-belum", belum);
-  setText("hs-tidak", tidak);
+  setText("hs-siswa", total.toLocaleString('id-ID'));
+  setText("hs-lancar", lancar.toLocaleString('id-ID'));
+  setText("hs-belum", belum.toLocaleString('id-ID'));
+  setText("hs-tidak", tidak.toLocaleString('id-ID'));
 
   /* KPI */
   setText("kpi-sekolah", data.length);
-  setText("kpi-lancar", lancar);
-  setText("kpi-belum", belum);
-  setText("kpi-tidak", tidak);
+  setText("kpi-lancar", lancar.toLocaleString('id-ID'));
+  setText("kpi-belum", belum.toLocaleString('id-ID'));
+  setText("kpi-tidak", tidak.toLocaleString('id-ID'));
 
   /* PROGRESS BAR */
   const prog = document.getElementById("hero-prog");
@@ -1448,22 +1477,19 @@ function renderAll() {
     `;
   }
 
-  console.log("DATA:", data);
-
   // ---------------------------------------------------------
-  // INTEGRATION BEYOND HERO/KPI TO KEEP ALL UI DYNAMIC
+  // CHART, TABLE, INSIGHTS RENDER ENGINE CONNECTION
   // ---------------------------------------------------------
   const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth] || [];
   const allSchoolsAggr = aggregateSchools(rawMaster);
   currentSchools = aggregateSchools(data);
   filteredSchools = [...currentSchools];
 
-  const T = computeTotals(currentSchools);
+  const T = { tot: total, lancar, belum, tidak, avgHadir };
   const isAll = currentKecamatan === 'all';
   const cakupan = isAll ? 'Kota Banjar' : `Kec. ${currentKecamatan}`;
   const periodStr = `${currentMonth} ${currentYear}`;
 
-  // Update Page Texts & Extra KPI logic
   setText('r-title', `Ringkasan Eksekutif — ${cakupan}`);
   setText('r-subtitle', `Periode ${periodStr} · ${currentSchools.length} Satuan Pendidikan Negeri`);
   setText('g-title', `Analisis & Visualisasi — ${cakupan}`);
@@ -1473,7 +1499,6 @@ function renderAll() {
   setText('tabel-count-badge', `${currentSchools.length} Sekolah`);
   setText('analysis-period-badge', periodStr);
 
-  // Trend Chip
   const prev = getPrevPeriod(currentYear, currentMonth);
   let chipHTML = '';
   if(prev) {
@@ -1483,13 +1508,12 @@ function renderAll() {
     const pPct = pT.tot > 0 ? (pT.lancar / pT.tot * 100) : 0;
     const diff = parseFloat(pct) - pPct;
     if(diff > 0.05) chipHTML = `<span class="trend-chip chip-up">▲ +${diff.toFixed(1)}% dari ${prev.month}</span>`;
-    else if(diff < -0.05) chipHTML = `<span class="trend-chip chip-down">▼ ${diff.toFixed(1)}% dari ${prev.month}</span>`;
+    else if(diff < -0.05) chipHTML = `<span class="trend-chip chip-down">▼ ${Math.abs(diff).toFixed(1)}% dari ${prev.month}</span>`;
     else chipHTML = `<span class="trend-chip chip-flat">→ Stabil</span>`;
   }
   const tc = document.getElementById('r-trend-chip');
   if(tc) tc.innerHTML = chipHTML;
 
-  // DQ Banner
   const hasWarn = currentSchools.some(s => s.warnings && s.warnings.length > 0);
   const dqBanner = document.getElementById('dqBanner');
   if (dqBanner) dqBanner.classList.toggle('hidden', !hasWarn);
@@ -1504,7 +1528,6 @@ function renderAll() {
   const heroDescEl = document.getElementById('hero-desc');
   if(heroDescEl) heroDescEl.innerHTML = desc;
 
-  // Percentage logic on KPI boxes
   const pctL = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
   const pctB = T.tot > 0 ? (T.belum / T.tot * 100) : 0;
   const pctK = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
@@ -1524,11 +1547,9 @@ function renderAll() {
   const kqh = document.getElementById('kpi-q-hadir');
   if(kqh) kqh.className = 'kpi-badge ' + qH;
 
-  // Sync sort buttons
   sortMode = 'default';
   refreshSortButtons();
 
-  // Call rendering funcs
   renderTable();
   renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
   renderTrend(cakupan);
@@ -1536,15 +1557,16 @@ function renderAll() {
 }
 
 /* =========================
-   SIDEBAR FILTER
+   SIDEBAR FILTER HELPER
 ========================= */
 function onSidebarKec(){
   currentKecamatan = document.getElementById("sbKecamatan").value;
+  selectedKecamatan = currentKecamatan;
   renderAll();
 }
 
 // ────────────────────────────────────────────
-// HELPERS & DYNAMIC DATA FUNCTIONS
+// HELPERS & DYNAMIC DATA FUNCTIONS (EXACT REQUIRED STRUCTURE)
 // ────────────────────────────────────────────
 function getAllPeriods() {
   const result = [];
