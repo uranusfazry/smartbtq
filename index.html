@@ -962,104 +962,84 @@ async function loadData() {
     if (!response.ok) throw new Error("Gagal mengambil data.json");
     const json = await response.json();
 
-    // --- FUNGSI HELPER UNTUK MERAKIT DATA ---
-    const buildMonth = (baseData, updates) => {
-      if (!updates || updates.length === 0) return baseData;
-      return JSON.parse(JSON.stringify(baseData)).map(s => {
-        const update = updates.find(u => u.nama_sekolah === s.nama);
-        if (update) {
-          const k4 = update.kelas_4 || {};
-          const k5 = update.kelas_5 || {};
-          
-          const k4_l = k4.lancar || 0;
-          const k4_b = k4.belum_lancar || 0;
-          const k4_t = k4.tidak_bisa || 0;
-          const k4_tot = k4.jumlah_siswa !== null && k4.jumlah_siswa !== undefined ? k4.jumlah_siswa : (k4_l + k4_b + k4_t);
+    const MARET_2026 = json.MARET_2026;
+    const FEBRUARI_UPDATES = json.FEBRUARI_UPDATES;
+    const JANUARI_UPDATES = json.JANUARI_UPDATES;
 
-          const k5_l = k5.lancar || 0;
-          const k5_b = k5.belum_lancar || 0;
-          const k5_t = k5.tidak_bisa || 0;
-          const k5_tot = k5.jumlah_siswa !== null && k5.jumlah_siswa !== undefined ? k5.jumlah_siswa : (k5_l + k5_b + k5_t);
-
-          s.rows = [{
-            kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
-            kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
-            guru: s.rows.map(r=>r.guru).join(", "),
-            hadir: s.rows.reduce((sum, r) => sum + r.hadir, 0) / s.rows.length
-          }];
-        } else {
-          s.rows.forEach(r => {
-            r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-            r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-            r.hadir = 0;
-          });
-        }
-        return s;
-      });
-    };
-
-    // --- SISTEM DINAMIS TAHUN 2025 SAMPAI 2030 ---
-    RAW_DATABASE = {};
-    const monthNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-    
-    // Cari data acuan (base) untuk updates. Default ke MARET_2026 atau data apa saja yang tersedia utuh.
-    const baseData = json.MARET_2026 || json.BASE_DATA || [];
-
-    for (let y = 2025; y <= 2030; y++) {
-      let yearObj = {};
-      
-      monthNames.forEach(m => {
-        const mUpper = m.toUpperCase();
+    // Build Februari
+    const FEBRUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
+      const update = FEBRUARI_UPDATES.find(u => u.nama_sekolah === s.nama);
+      if (update) {
+        const k4 = update.kelas_4 || {};
+        const k5 = update.kelas_5 || {};
         
-        // Cek berbagai format penamaan kunci yang mungkin ada di data.json
-        const fullKey = `${mUpper}_${y}`;               // Cth: JANUARI_2025
-        const updateKey = `${mUpper}_${y}_UPDATES`;     // Cth: JANUARI_2025_UPDATES
-        const legacyUpdateKey = `${mUpper}_UPDATES`;    // Cth: JANUARI_UPDATES (format skrip lama)
-        
-        // 1. Format Object/Nested: json["2025"]["Januari"]
-        if (json[y] && json[y][m]) {
-          yearObj[m] = json[y][m];
-        }
-        // 2. Format Flat Full: json["JANUARI_2025"]
-        else if (json[fullKey]) {
-          yearObj[m] = json[fullKey];
-        }
-        // 3. Format Flat Updates: json["JANUARI_2025_UPDATES"]
-        else if (json[updateKey] && baseData.length > 0) {
-          yearObj[m] = buildMonth(baseData, json[updateKey]);
-        }
-        // 4. Backward Compatibility untuk skrip lama
-        // Skrip asli memakai JANUARI_UPDATES untuk 2026, dan JULI_UPDATES untuk 2025
-        else if (y === 2026 && ['Januari', 'Februari'].includes(m) && json[legacyUpdateKey] && baseData.length > 0) {
-          yearObj[m] = buildMonth(baseData, json[legacyUpdateKey]);
-        }
-        else if (y === 2025 && ['Juli', 'Agustus', 'Desember'].includes(m) && json[legacyUpdateKey] && baseData.length > 0) {
-          yearObj[m] = buildMonth(baseData, json[legacyUpdateKey]);
-        }
-        // Jika data utuh MARET_2026 pakai format standar lama
-        else if (y === 2026 && m === 'Maret' && json.MARET_2026) {
-          yearObj[m] = json.MARET_2026;
-        }
-      });
-      
-      if (Object.keys(yearObj).length > 0) {
-        RAW_DATABASE[y] = yearObj;
+        const k4_l = k4.lancar || 0;
+        const k4_b = k4.belum_lancar || 0;
+        const k4_t = k4.tidak_bisa || 0;
+        const k4_tot = k4.jumlah_siswa !== null ? k4.jumlah_siswa : (k4_l + k4_b + k4_t);
+
+        const k5_l = k5.lancar || 0;
+        const k5_b = k5.belum_lancar || 0;
+        const k5_t = k5.tidak_bisa || 0;
+        const k5_tot = k5.jumlah_siswa !== null ? k5.jumlah_siswa : (k5_l + k5_b + k5_t);
+
+        s.rows = [{
+          kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
+          kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
+          guru: s.rows.map(r=>r.guru).join(", "),
+          hadir: s.rows.reduce((sum, r) => sum + r.hadir, 0) / s.rows.length
+        }];
+      } else {
+        s.rows.forEach(r => {
+          r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
+          r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
+          r.hadir = 0;
+        });
       }
-    }
+      return s;
+    });
 
-    // Fallback jika sama sekali tidak menemukan data tapi MARET_2026 masih ada
-    if (Object.keys(RAW_DATABASE).length === 0 && json.MARET_2026) {
-       RAW_DATABASE = { 2026: { "Maret": json.MARET_2026 } };
-    } else if (Object.keys(RAW_DATABASE).length === 0) {
-       throw new Error("Tidak ada data valid dari 2025 hingga 2030 di file data.json.");
-    }
+    // Build Januari
+    const JANUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
+      const update = JANUARI_UPDATES.find(u => u.nama_sekolah === s.nama);
+      if (update) {
+        const k4 = update.kelas_4 || {};
+        const k5 = update.kelas_5 || {};
+        
+        const k4_l = k4.lancar || 0;
+        const k4_b = k4.belum_lancar || 0;
+        const k4_t = k4.tidak_bisa || 0;
+        const k4_tot = k4.jumlah_siswa !== null ? k4.jumlah_siswa : (k4_l + k4_b + k4_t);
+
+        const k5_l = k5.lancar || 0;
+        const k5_b = k5.belum_lancar || 0;
+        const k5_t = k5.tidak_bisa || 0;
+        const k5_tot = k5.jumlah_siswa !== null ? k5.jumlah_siswa : (k5_l + k5_b + k5_t);
+
+        s.rows = [{
+          kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
+          kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
+          guru: s.rows.map(r=>r.guru).join(", "),
+          hadir: s.rows.reduce((sum, r) => sum + r.hadir, 0) / s.rows.length
+        }];
+      } else {
+        s.rows.forEach(r => {
+          r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
+          r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
+          r.hadir = 0;
+        });
+      }
+      return s;
+    });
+
+    RAW_DATABASE = { 2026: { "Januari": JANUARI_2026, "Februari": FEBRUARI_2026, "Maret": MARET_2026 } };
 
     // Setelah data selesai diambil dan disusun, mulai render aplikasi
     init();
 
   } catch (error) {
     console.error("Gagal inisiasi data:", error);
-    alert("Terjadi kesalahan saat memuat data.json. Pastikan formatnya sudah benar atau periksa console browser.");
+    alert("Terjadi kesalahan saat memuat data.json. Pastikan file tersedia.");
   }
 }
 
