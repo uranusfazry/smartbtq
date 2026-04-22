@@ -6,10 +6,13 @@
 <title>SMART BTQ — Dashboard Analitik Pendidikan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Font untuk Halaman Login -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ────────────────────────────────────────────
    DESIGN TOKENS (MATERIAL DESIGN / GOOGLE STYLE)
+   (DASHBOARD STYLES)
 ──────────────────────────────────────────── */
 :root {
   --bg:        #f8f9fa;
@@ -22,7 +25,6 @@
   --ink-3:     #80868b;
   --ink-4:     #bdc1c6;
 
-  /* Official Material Colors for professional look */
   --blue:      #1a73e8; 
   --blue-dim:  #e8f0fe;
   --blue-mid:  #4285f4;
@@ -37,13 +39,11 @@
   --font:      'Sora', system-ui, sans-serif;
   --mono:      'JetBrains Mono', monospace;
 
-  /* Slightly sharper corners for formal dashboard feel */
   --r-sm:      4px;
   --r-md:      6px;
   --r-lg:      8px;
   --r-xl:      12px;
 
-  /* Subtler shadows for flat, modern design */
   --shadow-xs: 0 1px 2px 0 rgba(60,64,67,0.05);
   --shadow-sm: 0 1px 3px 0 rgba(60,64,67,0.1), 0 1px 2px 0 rgba(60,64,67,0.06);
   --shadow-md: 0 4px 6px -1px rgba(60,64,67,0.1), 0 2px 4px -1px rgba(60,64,67,0.06);
@@ -53,14 +53,8 @@
   --header-h:  64px;
 }
 
-/* ────────────────────────────────────────────
-   RESET & BASE
-──────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-}
+html, body { overflow-x: hidden; width: 100%; }
 html { scroll-behavior: smooth; font-size: 14px; overflow-wrap: break-word; }
 body {
   font-family: var(--font);
@@ -71,13 +65,88 @@ body {
 }
 
 /* ────────────────────────────────────────────
-   LAYOUT SHELL
+   LOGIN SCREEN STYLES (SCOPED)
+──────────────────────────────────────────── */
+#loginOverlay {
+  --bg:           #f0f4f8;
+  --surface:      #ffffff;
+  --blue:         #1a73e8;
+  --blue-hover:   #1557b0;
+  --blue-dim:     #e8f0fe;
+  --blue-glow:    rgba(26,115,232,0.18);
+  --red:          #d93025;
+  --red-dim:      #fce8e6;
+  --ink-1:        #1a1c1e;
+  --ink-2:        #444746;
+  --ink-3:        #80868b;
+  --ink-4:        #c4c7c5;
+  --border:       #dde1e7;
+  --border-focus: #1a73e8;
+  --r-input:      10px;
+  --r-card:       20px;
+  --r-btn:        10px;
+  --font-log:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --shadow-card:  0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 40px -5px rgba(0,0,0,0.08);
+  --shadow-focus: 0 0 0 3px var(--blue-glow);
+  --transition:   all .2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  position: fixed; inset: 0; z-index: 9999;
+  font-family: var(--font-log); background: var(--bg); color: var(--ink-1);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+#loginOverlay::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 800px 500px at 20% 20%, rgba(26,115,232,0.04) 0%, transparent 70%), radial-gradient(ellipse 600px 400px at 80% 80%, rgba(26,115,232,0.03) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+#loginOverlay::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(26,115,232,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; z-index: 0; }
+#loginOverlay .wrapper { position: relative; z-index: 1; width: 100%; max-width: 420px; animation: entranceAnim 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes entranceAnim { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+#loginOverlay .card { background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow-card); padding: 44px 40px 40px; border: 1px solid rgba(255,255,255,0.8); }
+#loginOverlay .brand { text-align: center; margin-bottom: 36px; }
+#loginOverlay .brand-logo { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; background: var(--blue-dim); border-radius: 14px; margin-bottom: 18px; }
+#loginOverlay .brand-logo svg { width: 26px; height: 26px; }
+#loginOverlay .brand-name { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; line-height: 1; margin-bottom: 8px; }
+#loginOverlay .brand-name .dark { color: var(--ink-1); }
+#loginOverlay .brand-name .blue { color: var(--blue); }
+#loginOverlay .brand-sub { font-size: 13px; color: var(--ink-3); font-weight: 400; line-height: 1.5; }
+#loginOverlay .divider { height: 1px; background: var(--border); margin-bottom: 28px; opacity: 0.6; }
+#loginOverlay .form-group { margin-bottom: 18px; text-align: left; }
+#loginOverlay label { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); margin-bottom: 7px; letter-spacing: 0.1px; }
+#loginOverlay .input-wrap { position: relative; }
+#loginOverlay .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-4); display: flex; align-items: center; pointer-events: none; transition: color .2s; }
+#loginOverlay .input-wrap:focus-within .input-icon { color: var(--blue); }
+#loginOverlay input[type="text"], #loginOverlay input[type="password"] { width: 100%; padding: 12px 14px 12px 42px; font-family: var(--font-log); font-size: 14px; font-weight: 500; color: var(--ink-1); background: #fafbfc; border: 1.5px solid var(--border); border-radius: var(--r-input); outline: none; transition: var(--transition); -webkit-appearance: none; box-shadow: none; }
+#loginOverlay input[type="text"]:focus, #loginOverlay input[type="password"]:focus { border-color: var(--border-focus); background: var(--surface); box-shadow: var(--shadow-focus); }
+#loginOverlay input[type="text"]::placeholder, #loginOverlay input[type="password"]::placeholder { color: var(--ink-4); font-weight: 400; }
+#loginOverlay input.has-toggle { padding-right: 46px; }
+#loginOverlay .toggle-pw { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--ink-4); padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color .15s, background .15s; }
+#loginOverlay .toggle-pw:hover { color: var(--ink-2); background: var(--bg); }
+#loginOverlay .toggle-pw:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+#loginOverlay .error-msg { display: none; align-items: center; gap: 7px; margin-top: 16px; padding: 11px 14px; background: var(--red-dim); border: 1px solid rgba(217,48,37,0.15); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--red); animation: fadeInMsg .25s ease-out both; }
+#loginOverlay .error-msg.visible { display: flex; }
+@keyframes fadeInMsg { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+#loginOverlay .btn-submit { width: 100%; margin-top: 22px; padding: 13px 20px; background: var(--blue); color: #fff; font-family: var(--font-log); font-size: 14.5px; font-weight: 600; border: none; border-radius: var(--r-btn); cursor: pointer; letter-spacing: 0.1px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .18s, transform .15s, box-shadow .18s; box-shadow: 0 2px 8px rgba(26,115,232,0.25), 0 1px 2px rgba(26,115,232,0.15); -webkit-appearance: none; position: relative; overflow: hidden; }
+#loginOverlay .btn-submit::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%); border-radius: inherit; }
+#loginOverlay .btn-submit:hover:not(:disabled) { background: var(--blue-hover); box-shadow: 0 4px 14px rgba(26,115,232,0.35), 0 2px 4px rgba(26,115,232,0.2); transform: translateY(-1px); }
+#loginOverlay .btn-submit:active:not(:disabled) { transform: translateY(0px); box-shadow: 0 2px 6px rgba(26,115,232,0.2); }
+#loginOverlay .btn-submit:disabled { opacity: 0.75; cursor: not-allowed; transform: none; }
+#loginOverlay .btn-submit:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+#loginOverlay .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 15% { transform: translateX(-6px); } 30% { transform: translateX(6px); } 45% { transform: translateX(-5px); } 60% { transform: translateX(5px); } 75% { transform: translateX(-3px); } 90% { transform: translateX(3px); } }
+#loginOverlay .card.shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+#loginOverlay .login-footer { text-align: center; margin-top: 22px; font-size: 12px; color: var(--ink-4); line-height: 1.6; }
+@media (max-width: 480px) { #loginOverlay .card { padding: 32px 24px 28px; border-radius: 16px; } #loginOverlay .brand-name { font-size: 23px; } }
+@media (max-width: 360px) { #loginOverlay .card { padding: 28px 18px; } }
+
+/* ────────────────────────────────────────────
+   LAYOUT SHELL (DASHBOARD)
 ──────────────────────────────────────────── */
 .shell {
-  display: grid;
+  display: none; /* Hidden by default until authenticated */
   grid-template-columns: var(--sidebar-w) 1fr;
   grid-template-rows: var(--header-h) 1fr;
   min-height: 100vh;
+}
+.shell.auth-success {
+  display: grid;
 }
 
 /* ────────────────────────────────────────────
@@ -122,15 +191,17 @@ body {
 .sel:focus { border-color: var(--blue); background-color: var(--surface); box-shadow: var(--shadow-focus); }
 
 .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-.btn-print {
+.btn-action {
   display: flex; align-items: center; gap: 6px;
   background: var(--surface); color: var(--ink-2);
   border: 1px solid var(--border); border-radius: var(--r-sm);
   padding: 6px 14px; font-family: var(--font); font-size: 12px; font-weight: 600;
   cursor: pointer; transition: all .15s; white-space: nowrap;
 }
-.btn-print:hover { background: var(--bg); color: var(--ink-1); border-color: var(--ink-4); }
-.btn-print svg { width: 14px; height: 14px; }
+.btn-action:hover { background: var(--bg); color: var(--ink-1); border-color: var(--ink-4); }
+.btn-action svg { width: 14px; height: 14px; }
+.btn-logout { color: var(--red); }
+.btn-logout:hover { background: var(--red-dim); color: var(--red); border-color: rgba(217,48,37,.3); }
 
 /* Hamburger */
 .ham { display: none; background: none; border: none; cursor: pointer; padding: 10px; border-radius: var(--r-sm); margin-left: -6px; }
@@ -444,13 +515,11 @@ tfoot td.c { text-align: center; }
 }
 
 @media(max-width:768px) {
-  /* Grid 1 Kolom untuk Layout */
   .kpi-grid, .charts-2col, .analysis-grid, .duo-grid, .insight-strip { 
     display: flex !important; flex-direction: column !important; gap: 16px !important; 
   }
   .pie-insight-grid { grid-template-columns: 1fr !important; }
   
-  /* Hero & Cards Optimization */
   .hero-metric { flex-direction: column; padding: 24px 20px; align-items: stretch; gap: 20px; }
   .hero-right { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
   .hero-stat { min-width: 0; padding: 14px 10px; }
@@ -460,27 +529,23 @@ tfoot td.c { text-align: center; }
   .chart-card-header, .chart-card-body { padding: 20px; }
   .conclusion-card { padding: 24px 20px; }
 
-  /* Typography & Spacing */
   .page-title { font-size: 20px; }
   .page-desc { font-size: 13px; margin-bottom: 24px; }
   .hero-pct { font-size: 48px; }
   .kpi-value { font-size: 28px; }
   .page-header { margin-bottom: 20px; }
 
-  /* Forms & Touch Targets (Min 44px) */
-  .sel, .search-input, .sort-btn, .btn-detail, .btn-print, .m-tab { min-height: 44px; }
+  .sel, .search-input, .sort-btn, .btn-action, .m-tab { min-height: 44px; }
   .sort-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-left: 0; margin-top: 12px; }
   .sort-btn { padding: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
   .search-input { width: 100%; }
   .table-toolbar { flex-direction: column; padding: 16px 20px; gap: 0; align-items: stretch; }
   .table-filter-sel { max-width: 100%; margin-top: 12px; }
   
-  /* Header Simplification */
   .header { height: 60px; padding: 0 16px; }
   .header-period-group, .header-sep, .header-right { display: none; }
   .header-brand-name { font-size: 16px; }
 
-  /* TABLE KE CARD LIST */
   table { border: none; width: 100%; }
   .table-surface { background: transparent; border: none; overflow: visible; margin-bottom: 0; }
   thead { display: none; }
@@ -510,7 +575,6 @@ tfoot td.c { text-align: center; }
   .td-name { font-size: 15px; font-weight: 600; color: var(--ink-1); }
   .btn-detail { width: 100%; justify-content: center; font-size: 13px; font-weight: 600; background: var(--surface); }
 
-  /* TFoot Ke Card */
   tfoot tr {
     display: flex; flex-direction: column; background: var(--blue-dim);
     border: 1px solid rgba(26,115,232,.2); border-radius: var(--r-md);
@@ -532,7 +596,6 @@ tfoot td.c { text-align: center; }
   }
   tfoot td[data-label="Sekolah"]::before { display: none; }
 
-  /* Modal Full Mobile Fix */
   .modal-box { width: 100%; height: 100%; max-height: 100vh; border-radius: 0; display: flex; flex-direction: column; }
   .modal-header { padding: 16px 20px; }
   .modal-tabs { padding: 0 20px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
@@ -558,20 +621,16 @@ tfoot td.c { text-align: center; }
   .hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px solid var(--border-2); padding-bottom: 8px; }
   .hist-pct { font-size: 16px; text-align: right; }
 
-  /* Fix Chart Overflow (Hapus horizontal scroll) */
   .chart-wrap { height: 260px !important; }
   .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
   .chart-scroll-inner { width: 100% !important; height: 320px; } 
 }
 
-/* ────────────────────────────────────────────
-   PRINT
-──────────────────────────────────────────── */
 @media print {
   .shell { display: block; }
   .header { position: relative; }
   .sidebar, .sidebar-overlay, .ham, .table-toolbar .sort-group,
-  .btn-print, .modal-overlay { display: none !important; }
+  .btn-action, .modal-overlay { display: none !important; }
   .view { display: block !important; margin-bottom: 24px; }
   .chart-card, .kpi-card, .table-surface { break-inside: avoid; border: 1px solid #ccc; }
   body { background: white; }
@@ -580,9 +639,89 @@ tfoot td.c { text-align: center; }
 </head>
 <body>
 
+<!-- ═══════════════ NEW STYLISH LOGIN SCREEN ═══════════════ -->
+<div id="loginOverlay">
+  <div class="wrapper">
+    <div class="card" id="loginCard">
+
+      <!-- Brand -->
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L3 7v5c0 5.25 3.83 10.17 9 11.38C17.17 22.17 21 17.25 21 12V7L12 2z" fill="#1a73e8" opacity="0.15"/>
+            <path d="M12 2L3 7v5c0 5.25 3.83 10.17 9 11.38C17.17 22.17 21 17.25 21 12V7L12 2z" stroke="#1a73e8" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M8 12l2.5 2.5L16 9" stroke="#1a73e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-name" aria-label="SMART BTQ">
+          <span class="dark">SMART</span><span class="blue">BTQ</span>
+        </div>
+        <div class="brand-sub">Dinas Pendidikan Kota Banjar</div>
+      </div>
+
+      <div class="divider" aria-hidden="true"></div>
+
+      <!-- Form -->
+      <form id="loginForm" novalidate autocomplete="off">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <div class="input-wrap">
+            <span class="input-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+            <input type="text" id="username" name="username" placeholder="Masukkan username admin" autocomplete="username" aria-label="Username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input type="password" id="password" name="password" placeholder="Masukkan password" autocomplete="current-password" class="has-toggle" aria-label="Password" required>
+            <button type="button" class="toggle-pw" id="togglePw" aria-label="Tampilkan password" title="Tampilkan/sembunyikan password">
+              <!-- Eye icon (show) -->
+              <svg id="iconShow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <!-- Eye-off icon (hide) -->
+              <svg id="iconHide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error message -->
+        <div class="error-msg" id="errorMsg" role="alert" aria-live="polite">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Username atau password salah. Silakan coba lagi.
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="btn-submit" id="btnSubmit" aria-label="Masuk ke sistem">
+          <span id="btnText">Masuk</span>
+        </button>
+
+      </form>
+    </div>
+
+    <div class="login-footer" aria-label="Informasi sistem">
+      SMART BTQ v1.0 &nbsp;·&nbsp; Dokumen Internal
+    </div>
+  </div>
+</div>
+
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<div class="shell">
+<div class="shell" id="mainShell">
 
   <!-- ═══════════════ HEADER ═══════════════ -->
   <header class="header">
@@ -607,15 +746,19 @@ tfoot td.c { text-align: center; }
         <option value="Banjar">Banjar</option>
       </select>
       <span class="period-label">Tahun</span>
-      <select class="sel" id="selYear" onchange="onPeriodChange()"></select>
+      <select class="sel" id="selYear"></select>
       <span class="period-label">Bulan</span>
-      <select class="sel" id="selMonth" onchange="onPeriodChange()"></select>
+      <select class="sel" id="selMonth"></select>
     </div>
 
     <div class="header-right">
-      <button class="btn-print" onclick="window.print()">
+      <button class="btn-action" onclick="window.print()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Cetak PDF
+      </button>
+      <button class="btn-action btn-logout" onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Logout
       </button>
     </div>
   </header>
@@ -648,8 +791,8 @@ tfoot td.c { text-align: center; }
         <option value="Pataruman">Pataruman</option>
         <option value="Banjar">Banjar</option>
       </select>
-      <select class="sel" id="sbYear" onchange="onSidebarPeriod()"></select>
-      <select class="sel" id="sbMonth" onchange="onSidebarPeriod()" style="margin-top:8px"></select>
+      <select class="sel" id="sbYear"></select>
+      <select class="sel" id="sbMonth" style="margin-top:8px"></select>
     </div>
   </aside>
 
@@ -940,11 +1083,123 @@ tfoot td.c { text-align: center; }
 <!-- ═══════════════ SCRIPT ═══════════════ -->
 <script>
 // ────────────────────────────────────────────
+// SISTEM AUTENTIKASI (LOGIN)
+// ────────────────────────────────────────────
+function checkSession() {
+  const isLogin = localStorage.getItem("isLogin");
+  if (isLogin === "true") {
+    showDashboard();
+  } else {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('username').focus();
+  }
+}
+
+function showDashboard() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('mainShell').classList.add('auth-success');
+}
+
+function logout() {
+  localStorage.removeItem("isLogin");
+  location.reload();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  /* ── Form Bindings & Animations ── */
+  const form       = document.getElementById('loginForm');
+  const usernameEl = document.getElementById('username');
+  const passwordEl = document.getElementById('password');
+  const btnSubmit  = document.getElementById('btnSubmit');
+  const btnText    = document.getElementById('btnText');
+  const errorMsg   = document.getElementById('errorMsg');
+  const card       = document.getElementById('loginCard');
+  const togglePw   = document.getElementById('togglePw');
+  const iconShow   = document.getElementById('iconShow');
+  const iconHide   = document.getElementById('iconHide');
+
+  togglePw.addEventListener('click', function () {
+    const isHidden = passwordEl.type === 'password';
+    passwordEl.type = isHidden ? 'text' : 'password';
+    iconShow.style.display = isHidden ? 'none' : '';
+    iconHide.style.display = isHidden ? ''     : 'none';
+    togglePw.setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Tampilkan password');
+    passwordEl.focus();
+  });
+
+  [usernameEl, passwordEl].forEach(function (el) {
+    el.addEventListener('input', function () {
+      if (errorMsg.classList.contains('visible')) {
+        errorMsg.classList.remove('visible');
+      }
+    });
+  });
+
+  function triggerShake() {
+    card.classList.remove('shake');
+    void card.offsetWidth; /* reflow */
+    card.classList.add('shake');
+    card.addEventListener('animationend', function () {
+      card.classList.remove('shake');
+    }, { once: true });
+  }
+
+  function setLoading(state) {
+    if (state) {
+      btnText.textContent = 'Memproses…';
+      btnSubmit.insertAdjacentHTML('afterbegin', '<span class="spinner" id="loadSpinner" aria-hidden="true"></span>');
+      btnSubmit.disabled = true;
+    } else {
+      btnText.textContent = 'Masuk';
+      var spinner = document.getElementById('loadSpinner');
+      if (spinner) spinner.remove();
+      btnSubmit.disabled = false;
+    }
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var user = usernameEl.value.trim();
+    var pass = passwordEl.value;
+
+    errorMsg.classList.remove('visible');
+    setLoading(true);
+
+    var delay = 800 + Math.random() * 400;
+
+    setTimeout(function () {
+      if (user === 'admin' && pass === 'uranusfazry123') {
+        localStorage.setItem('isLogin', 'true');
+        btnText.textContent = 'Berhasil…';
+        setTimeout(function () {
+          showDashboard();
+          setLoading(false);
+          usernameEl.value = '';
+          passwordEl.value = '';
+        }, 300);
+      } else {
+        setLoading(false);
+        errorMsg.classList.add('visible');
+        triggerShake();
+        passwordEl.value = '';
+        passwordEl.focus();
+      }
+    }, delay);
+  });
+
+  /* ── Check session initially ── */
+  checkSession();
+});
+
+// ────────────────────────────────────────────
 // DATABASE STATE 
 // ────────────────────────────────────────────
 let RAW_DATABASE = {};
+let currentYear = null;
+let currentMonth = null;
 
-// Fallback Dummy Data (MARET_2026) digunakan jika gagal fetch JSON
+// Fallback Dummy Data
 const MARET_2026 = [
   {
     "no": 1,
@@ -961,7 +1216,6 @@ const MARET_2026 = [
   }
 ];
 
-let currentYear = null, currentMonth = null;
 let selectedKecamatan = 'all';
 let currentSchools = [], filteredSchools = [];
 let sortMode = 'default';
@@ -977,34 +1231,158 @@ async function loadData() {
   try {
     const res = await fetch("data.json");
     const json = await res.json();
+    if (!json || typeof json !== "object") {
+      throw new Error("Format JSON tidak valid");
+    }
     RAW_DATABASE = json;
-    console.log("Data JSON loaded successfully");
   } catch (err) {
     console.warn("Gagal load JSON, pakai fallback");
     RAW_DATABASE = {
-      2026: {
+      2025: {
         "Maret": MARET_2026
       }
     };
   }
-  init();
+  initDashboard();
+}
+
+// Jalankan saat dokumen siap
+document.addEventListener("DOMContentLoaded", loadData);
+
+// ────────────────────────────────────────────
+// INIT DASHBOARD DAN DROPDOWN
+// ────────────────────────────────────────────
+function initDashboard() {
+  const years = Object.keys(RAW_DATABASE);
+  if (years.length === 0) return;
+  
+  currentYear = years[0];
+  const urutanBulan = [
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
+  ];
+  
+  const months = Object.keys(RAW_DATABASE[currentYear])
+    .sort((a,b)=> urutanBulan.indexOf(a) - urutanBulan.indexOf(b));
+    
+  currentMonth = months[months.length - 1];
+  
+  initDropdown();
+  renderAll();
+}
+
+function initDropdown() {
+  const yearSelect = document.getElementById("selYear");
+  const monthSelect = document.getElementById("selMonth");
+  const sbYearSelect = document.getElementById("sbYear");
+  
+  yearSelect.innerHTML = "";
+  sbYearSelect.innerHTML = "";
+  
+  Object.keys(RAW_DATABASE).forEach(year => {
+    const opt = document.createElement("option");
+    opt.value = year;
+    opt.textContent = year;
+    yearSelect.appendChild(opt);
+    
+    const optSb = document.createElement("option");
+    optSb.value = year;
+    optSb.textContent = year;
+    sbYearSelect.appendChild(optSb);
+  });
+  
+  yearSelect.value = currentYear;
+  updateMonthDropdown();
+  
+  // EVENT HEADER
+  yearSelect.addEventListener("change", () => {
+    currentYear = yearSelect.value;
+    updateMonthDropdown();
+    syncSidebar();
+    renderAll();
+  });
+  
+  monthSelect.addEventListener("change", () => {
+    currentMonth = monthSelect.value;
+    syncSidebar();
+    renderAll();
+  });
+
+  // EVENT SIDEBAR
+  document.getElementById("sbYear").addEventListener("change", (e) => {
+    currentYear = e.target.value;
+    updateMonthDropdown();
+    syncSidebar();
+    renderAll();
+  });
+
+  document.getElementById("sbMonth").addEventListener("change", (e) => {
+    currentMonth = e.target.value;
+    syncSidebar();
+    renderAll();
+  });
+  
+  syncSidebar();
+}
+
+function updateMonthDropdown() {
+  const monthSelect = document.getElementById("selMonth");
+  const sbMonthSelect = document.getElementById("sbMonth");
+  const urutanBulan = [
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
+  ];
+  
+  const months = Object.keys(RAW_DATABASE[currentYear] || {})
+    .sort((a,b)=> urutanBulan.indexOf(a) - urutanBulan.indexOf(b));
+  
+  monthSelect.innerHTML = "";
+  sbMonthSelect.innerHTML = "";
+  
+  months.forEach(month => {
+    const opt = document.createElement("option");
+    opt.value = month;
+    opt.textContent = month;
+    monthSelect.appendChild(opt);
+
+    const optSb = document.createElement("option");
+    optSb.value = month;
+    optSb.textContent = month;
+    sbMonthSelect.appendChild(optSb);
+  });
+  
+  if (!months.includes(currentMonth)) {
+    currentMonth = months[months.length - 1];
+  }
+  
+  monthSelect.value = currentMonth;
+  sbMonthSelect.value = currentMonth;
+}
+
+function syncSidebar() {
+  document.getElementById("sbYear").value = currentYear;
+  document.getElementById("sbMonth").value = currentMonth;
+  document.getElementById("selYear").value = currentYear;
+  document.getElementById("selMonth").value = currentMonth;
 }
 
 // ────────────────────────────────────────────
 // HELPERS & DYNAMIC DATA FUNCTIONS
 // ────────────────────────────────────────────
+function getCurrentData() {
+  return RAW_DATABASE[currentYear]?.[currentMonth] || [];
+}
+
 function getAllPeriods() {
   const result = [];
-  Object.keys(RAW_DATABASE).forEach(year => {
-    Object.keys(RAW_DATABASE[year]).forEach(month => {
+  const urutanBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  Object.keys(RAW_DATABASE).sort((a,b)=>a-b).forEach(year => {
+    const months = Object.keys(RAW_DATABASE[year]).sort((a,b)=> urutanBulan.indexOf(a) - urutanBulan.indexOf(b));
+    months.forEach(month => {
       result.push({ year, month });
     });
   });
   return result;
-}
-
-function getCurrentData() {
-  return RAW_DATABASE[currentYear]?.[currentMonth] || [];
 }
 
 const n2 = n => parseFloat(n).toFixed(1);
@@ -1100,71 +1478,22 @@ function showSection(id) {
 }
 
 // ────────────────────────────────────────────
-// INIT
+// EVENT HANDLERS
 // ────────────────────────────────────────────
-function init() {
-  const years = Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
-  if(years.length === 0) return;
-  
-  currentYear = years[0];
-  const months = Object.keys(RAW_DATABASE[currentYear]);
-  currentMonth = months[months.length-1];
-  
-  populateSelects();
-  showSection('view-ringkasan');
-  render();
-}
-
-function populateSelects() {
-  const years = Object.keys(RAW_DATABASE).sort((a,b)=>b-a);
-  ['selYear','sbYear'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.innerHTML=years.map(y=>`<option value="${y}"${y==currentYear?' selected':''}>${y}</option>`).join('');
-  });
-  populateMonths();
-}
-
-function populateMonths() {
-  const months = Object.keys(RAW_DATABASE[currentYear] || {});
-  ['selMonth','sbMonth'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.innerHTML=months.map(m=>`<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join('');
-  });
-}
-
-function syncSelects(kec, yr, mo) {
-  ['selKecamatan','sbKecamatan'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=kec;});
-  ['selYear','sbYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=yr;});
-  ['selMonth','sbMonth'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=mo;});
-}
-
 function onPeriodChange() {
-  const kec=(document.getElementById('selKecamatan')||{}).value||selectedKecamatan;
-  const yr=(document.getElementById('selYear')||{}).value||currentYear;
-  const mo=(document.getElementById('selMonth')||{}).value||currentMonth;
-  selectedKecamatan=kec; currentYear=yr; currentMonth=mo;
-  if(selectedKecamatan==='all') stackDisplayMode='top20';
-  else stackDisplayMode='all';
-  syncSelects(kec,yr,mo);
-  populateMonths();
-  sortMode='default';
-  refreshSortButtons();
-  render();
+  selectedKecamatan = document.getElementById('selKecamatan').value;
+  document.getElementById('sbKecamatan').value = selectedKecamatan; // sync
+  if(selectedKecamatan === 'all') stackDisplayMode = 'top20'; else stackDisplayMode = 'all';
+  sortMode = 'default'; refreshSortButtons();
+  renderAll();
 }
 
 function onSidebarKec() {
-  selectedKecamatan=document.getElementById('sbKecamatan').value;
-  syncSelects(selectedKecamatan,currentYear,currentMonth);
-  if(selectedKecamatan==='all') stackDisplayMode='top20'; else stackDisplayMode='all';
-  sortMode='default'; refreshSortButtons(); render();
-}
-function onSidebarPeriod() {
-  currentYear=document.getElementById('sbYear').value;
-  currentMonth=document.getElementById('sbMonth').value;
-  syncSelects(selectedKecamatan,currentYear,currentMonth);
-  sortMode='default'; refreshSortButtons(); render();
+  selectedKecamatan = document.getElementById('sbKecamatan').value;
+  document.getElementById('selKecamatan').value = selectedKecamatan; // sync
+  if(selectedKecamatan === 'all') stackDisplayMode = 'top20'; else stackDisplayMode = 'all';
+  sortMode = 'default'; refreshSortButtons();
+  renderAll();
 }
 
 function refreshSortButtons() {
@@ -1176,13 +1505,18 @@ function setStackMode(mode) {
   stackDisplayMode=mode;
   document.getElementById('btnStackTop20').classList.toggle('active',mode==='top20');
   document.getElementById('btnStackAll').classList.toggle('active',mode==='all');
-  render();
+  renderAll();
 }
 
 // ────────────────────────────────────────────
-// RENDER
+// RENDER ALL
 // ────────────────────────────────────────────
-function render() {
+function renderAll() {
+  console.log("RAW:", RAW_DATABASE);
+  console.log("YEAR:", currentYear);
+  console.log("MONTH:", currentMonth);
+  console.log("DATA:", getCurrentData());
+
   const rawMaster = getCurrentData();
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
@@ -1208,7 +1542,7 @@ function render() {
   document.getElementById('analysis-period-badge').textContent = periodStr;
 
   // Trend chip
-  const prev=getPrevPeriod(currentYear,currentMonth);
+  const prev = getPrevPeriod(currentYear, currentMonth);
   let chipHTML='';
   if(prev) {
     let pRaw=RAW_DATABASE[prev.year][prev.month] || [];
@@ -1294,7 +1628,6 @@ function renderTable() {
                  q==='partial'?'<span class="q-dot q-amber" title="Perlu Periksa"></span> Partial':
                  '<span class="q-dot q-red" title="Inkonsistensi"></span> Anomali';
     
-    // Menambahkan atribut data-label agar berfungsi pada tampilan Card (Mobile)
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td data-label="#">${i+1}</td>
@@ -1318,7 +1651,6 @@ function renderTable() {
   const T=computeTotals(filteredSchools);
   const p=T.tot>0?(T.lancar/T.tot*100):0;
   
-  // Footer tanpa colspan agar aman saat diubah jadi Card
   tfoot.innerHTML=`<tr>
     <td data-label="#"></td>
     <td data-label="Sekolah" class="c" style="font-weight:600;color:var(--ink-1)">Agregat (${display.length} sekolah)</td>
@@ -1826,8 +2158,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();closeSidebar();}
 });
 
-// Jalankan saat dokumen ter-load (Data akan di fetch lebih dahulu)
-document.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
 </html>
