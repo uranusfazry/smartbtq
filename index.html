@@ -956,39 +956,37 @@ let currentModalSchool = null;
 // ────────────────────────────────────────────
 // PENGAMBILAN DATA (FETCH JSON)
 // ────────────────────────────────────────────
-async function loadData() {
-  try {
-    const response = await fetch("data.json");
-    if (!response.ok) throw new Error("Gagal mengambil data.json");
-    const json = await response.json();
+function loadData() {
+  fetch("data.json")
+    .then(res => {
+      if (!res.ok) throw new Error("Gagal load JSON");
+      return res.json();
+    })
+    .then(json => {
+      RAW_DATABASE = {};
 
-    RAW_DATABASE = {};
+      Object.keys(json).forEach(key => {
+        // Abaikan jika format key bukan BULAN_TAHUN
+        if (!key.includes("_")) return;
+        
+        const [bulan, tahun] = key.split("_");
 
-    Object.keys(json).forEach(key => {
-      // Abaikan jika format key bukan BULAN_TAHUN
-      if (!key.includes("_")) return;
-      
-      // contoh: "MARET_2026"
-      const [bulan, tahun] = key.split("_");
+        if (!RAW_DATABASE[tahun]) {
+          RAW_DATABASE[tahun] = {};
+        }
 
-      if (!RAW_DATABASE[tahun]) {
-        RAW_DATABASE[tahun] = {};
-      }
+        const bulanFormatted = bulan.charAt(0) + bulan.slice(1).toLowerCase();
 
-      // Pastikan format menjadi Kapital di awal (contoh: "Maret")
-      const bulanFormatted =
-        bulan.charAt(0).toUpperCase() + bulan.slice(1).toLowerCase();
+        RAW_DATABASE[tahun][bulanFormatted] = json[key];
+      });
 
-      RAW_DATABASE[tahun][bulanFormatted] = json[key];
+      // Setelah data selesai diambil dan disusun, mulai render aplikasi
+      init();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Terjadi kesalahan saat memuat data.json");
     });
-
-    // Setelah data selesai diambil dan disusun, mulai render aplikasi
-    init();
-
-  } catch (error) {
-    console.error("Gagal inisiasi data:", error);
-    alert("Terjadi kesalahan saat memuat data.json. Pastikan file tersedia.");
-  }
 }
 
 // ────────────────────────────────────────────
@@ -997,28 +995,57 @@ async function loadData() {
 const n2 = n => parseFloat(n).toFixed(1);
 const fmt = n => n.toLocaleString('id-ID');
 
+function toNumber(val) {
+  if (typeof val === "number") return val;
+  return 0; // Jika string, null, atau undefined, ubah jadi 0 agar perhitungan tidak NaN
+}
+
 function aggregateSchools(rawArr) {
   return rawArr.map(s => {
     let tot=0,lancar=0,belum=0,tidak=0;
     let k4t=0,k4l=0,k4b=0,k4k=0,k5t=0,k5l=0,k5b=0,k5k=0;
     let hadirArr=[],guruArr=[],warnings=[];
-    s.rows.forEach(r => {
-      const k4s=r.kls4.lancar+r.kls4.belum+r.kls4.tidak;
-      const k5s=r.kls5.lancar+r.kls5.belum+r.kls5.tidak;
-      if(Math.abs(k4s-r.kls4.total)>1) warnings.push(`Kls4 ${r.guru}`);
-      if(Math.abs(k5s-r.kls5.total)>1) warnings.push(`Kls5 ${r.guru}`);
-      tot+=r.kls4.total+r.kls5.total; lancar+=r.kls4.lancar+r.kls5.lancar;
-      belum+=r.kls4.belum+r.kls5.belum; tidak+=r.kls4.tidak+r.kls5.tidak;
-      k4t+=r.kls4.total;k4l+=r.kls4.lancar;k4b+=r.kls4.belum;k4k+=r.kls4.tidak;
-      k5t+=r.kls5.total;k5l+=r.kls5.lancar;k5b+=r.kls5.belum;k5k+=r.kls5.tidak;
-      hadirArr.push(r.hadir); guruArr.push(r.guru);
-    });
+    
+    // Pastikan rows adalah array sebelum di-looping
+    if (Array.isArray(s.rows)) {
+      s.rows.forEach(r => {
+        // Ekstraksi data Kelas 4 yang aman (anti error)
+        const r_k4t = toNumber(r.kls4?.total);
+        const r_k4l = toNumber(r.kls4?.lancar);
+        const r_k4b = toNumber(r.kls4?.belum);
+        const r_k4k = toNumber(r.kls4?.tidak);
+        
+        // Ekstraksi data Kelas 5 yang aman (anti error)
+        const r_k5t = toNumber(r.kls5?.total);
+        const r_k5l = toNumber(r.kls5?.lancar);
+        const r_k5b = toNumber(r.kls5?.belum);
+        const r_k5k = toNumber(r.kls5?.tidak);
+
+        const k4s = r_k4l + r_k4b + r_k4k;
+        const k5s = r_k5l + r_k5b + r_k5k;
+        
+        if(Math.abs(k4s - r_k4t) > 1) warnings.push(`Kls4 ${r.guru || 'Tanpa Nama'}`);
+        if(Math.abs(k5s - r_k5t) > 1) warnings.push(`Kls5 ${r.guru || 'Tanpa Nama'}`);
+        
+        tot += (r_k4t + r_k5t); 
+        lancar += (r_k4l + r_k5l);
+        belum += (r_k4b + r_k5b); 
+        tidak += (r_k4k + r_k5k);
+        
+        k4t += r_k4t; k4l += r_k4l; k4b += r_k4b; k4k += r_k4k;
+        k5t += r_k5t; k5l += r_k5l; k5b += r_k5b; k5k += r_k5k;
+        
+        hadirArr.push(toNumber(r.hadir)); 
+        guruArr.push(r.guru || '-');
+      });
+    }
+    
     return {
-      idx:s.no,no:s.no,nama:s.nama,kecamatan:s.kecamatan,
+      idx:s.no,no:s.no,nama:s.nama||'Tanpa Nama',kecamatan:s.kecamatan||'-',
       tot,lancar,belum,tidak,pct:tot>0?(lancar/tot*100):0,
       kls4:{tot:k4t,lancar:k4l,belum:k4b,tidak:k4k},
       kls5:{tot:k5t,lancar:k5l,belum:k5b,tidak:k5k},
-      guru:guruArr,hadir:hadirArr,rows:s.rows,warnings
+      guru:guruArr,hadir:hadirArr,rows:s.rows||[],warnings
     };
   });
 }
