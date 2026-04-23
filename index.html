@@ -962,92 +962,25 @@ async function loadData() {
     if (!response.ok) throw new Error("Gagal mengambil data.json");
     const json = await response.json();
 
-    const MARET_2026 = json.MARET_2026;
-    const FEBRUARI_UPDATES = json.FEBRUARI_UPDATES;
-    const JANUARI_UPDATES = json.JANUARI_UPDATES;
+    RAW_DATABASE = {};
 
-    // Build Februari
-    const FEBRUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
-      const update = FEBRUARI_UPDATES.find(u => u.nama_sekolah === s.nama);
-      if (update) {
-        const k4 = update.kelas_4 || {};
-        const k5 = update.kelas_5 || {};
-        
-        const k4_l = k4.lancar || 0;
-        const k4_b = k4.belum_lancar || 0;
-        const k4_t = k4.tidak_bisa || 0;
-        const k4_tot = k4.jumlah_siswa !== null ? k4.jumlah_siswa : (k4_l + k4_b + k4_t);
+    Object.keys(json).forEach(key => {
+      // Abaikan jika format key bukan BULAN_TAHUN
+      if (!key.includes("_")) return;
+      
+      // contoh: "MARET_2026"
+      const [bulan, tahun] = key.split("_");
 
-        const k5_l = k5.lancar || 0;
-        const k5_b = k5.belum_lancar || 0;
-        const k5_t = k5.tidak_bisa || 0;
-        const k5_tot = k5.jumlah_siswa !== null ? k5.jumlah_siswa : (k5_l + k5_b + k5_t);
-
-        s.rows = [{
-          kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
-          kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
-          guru: s.rows.map(r=>r.guru).join(", "),
-          hadir: s.rows.reduce((sum, r) => sum + r.hadir, 0) / s.rows.length
-        }];
-      } else {
-        s.rows.forEach(r => {
-          r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-          r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-          r.hadir = 0;
-        });
+      if (!RAW_DATABASE[tahun]) {
+        RAW_DATABASE[tahun] = {};
       }
-      return s;
+
+      // Pastikan format menjadi Kapital di awal (contoh: "Maret")
+      const bulanFormatted =
+        bulan.charAt(0).toUpperCase() + bulan.slice(1).toLowerCase();
+
+      RAW_DATABASE[tahun][bulanFormatted] = json[key];
     });
-
-    // Build Januari
-    const JANUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
-      const update = JANUARI_UPDATES.find(u => u.nama_sekolah === s.nama);
-      if (update) {
-        const k4 = update.kelas_4 || {};
-        const k5 = update.kelas_5 || {};
-        
-        const k4_l = k4.lancar || 0;
-        const k4_b = k4.belum_lancar || 0;
-        const k4_t = k4.tidak_bisa || 0;
-        const k4_tot = k4.jumlah_siswa !== null ? k4.jumlah_siswa : (k4_l + k4_b + k4_t);
-
-        const k5_l = k5.lancar || 0;
-        const k5_b = k5.belum_lancar || 0;
-        const k5_t = k5.tidak_bisa || 0;
-        const k5_tot = k5.jumlah_siswa !== null ? k5.jumlah_siswa : (k5_l + k5_b + k5_t);
-
-        s.rows = [{
-          kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
-          kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
-          guru: s.rows.map(r=>r.guru).join(", "),
-          hadir: s.rows.reduce((sum, r) => sum + r.hadir, 0) / s.rows.length
-        }];
-      } else {
-        s.rows.forEach(r => {
-          r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-          r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
-          r.hadir = 0;
-        });
-      }
-      return s;
-    });
-
-  RAW_DATABASE = { 
-  2025: {
-    "Juli": MARET_2026,
-    "Agustus": MARET_2026,
-    "September": MARET_2026,
-    "Oktober": MARET_2026,
-    "November": MARET_2026,
-    "Desember": MARET_2026
-  },
-
-  2026: { 
-    "Januari": JANUARI_2026, 
-    "Februari": FEBRUARI_2026, 
-    "Maret": MARET_2026 
-  } 
-};
 
     // Setelah data selesai diambil dan disusun, mulai render aplikasi
     init();
@@ -1153,19 +1086,25 @@ function showSection(id) {
 function init() {
   initYearMonth();
   showSection('view-ringkasan');
-  render();
+  render(); // Handling fallback empty data sudah menggunakan RAW_DATABASE[currentYear]?.[currentMonth] || []
 }
 
 function initYearMonth() {
-  // Set default ke Juli 2025
-  if (!currentYear) currentYear = 2025;
-  if (!currentMonth) currentMonth = 'Juli';
+  // Ambil data tahun yang tersedia di JSON, lalu urutkan
+  const availableYears = Object.keys(RAW_DATABASE).sort();
+  if (availableYears.length === 0) return;
 
-  // Render opsi tahun (2025 - 2030)
-  let yearOptions = '';
-  for (let y = 2025; y <= 2030; y++) {
-    yearOptions += `<option value="${y}"${y == currentYear ? ' selected' : ''}>${y}</option>`;
+  // Set default ke tahun terbaru jika null
+  if (!currentYear || !RAW_DATABASE[currentYear]) {
+    currentYear = availableYears[availableYears.length - 1]; 
   }
+
+  // Render opsi tahun dinamis
+  let yearOptions = '';
+  availableYears.forEach(y => {
+    yearOptions += `<option value="${y}"${y == currentYear ? ' selected' : ''}>${y}</option>`;
+  });
+
   ['selYear','sbYear'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.innerHTML = yearOptions;
@@ -1176,16 +1115,15 @@ function initYearMonth() {
 
 function updateMonthDropdowns() {
   const allMonths = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  let availableMonths = [...allMonths];
+  
+  // Ambil hanya bulan yang mempunyai data di RAW_DATABASE untuk tahun terpilih
+  const monthsData = RAW_DATABASE[currentYear] || {};
+  let availableMonths = allMonths.filter(m => monthsData[m]);
 
-  // Khusus tahun 2025, bulan mulai dari Juli
-  if (currentYear == 2025) {
-    availableMonths = allMonths.slice(6); // Index 6 = Juli
-  }
-
-  // Jika user pindah tahun dan bulan sebelumnya tidak ada di tahun baru (misal: Jan 2026 -> 2025), reset ke bulan pertama yg tersedia
-  if (!availableMonths.includes(currentMonth)) {
-    currentMonth = availableMonths[0]; 
+  // Jika user pindah tahun atau baru pertama kali load (currentMonth null),
+  // reset dropdown bulan ke opsi terakhir yang tersedia di tahun tersebut
+  if (!availableMonths.includes(currentMonth) && availableMonths.length > 0) {
+    currentMonth = availableMonths[availableMonths.length - 1]; 
   }
 
   // Render opsi bulan
