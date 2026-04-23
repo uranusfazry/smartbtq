@@ -3,54 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SMART BTQ — Dashboard Analitik Pendidikan</title>
+<title>SIMBTQ — Dashboard Eksekutif BTQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ────────────────────────────────────────────
-   DESIGN TOKENS (MATERIAL DESIGN / GOOGLE STYLE)
+   DESIGN TOKENS
 ──────────────────────────────────────────── */
 :root {
-  --bg:        #f8f9fa;
+  --bg:        #f6f7f9;
   --surface:   #ffffff;
-  --border:    #dadce0;
-  --border-2:  #f1f3f4;
+  --border:    #e8eaee;
+  --border-2:  #f0f1f4;
 
-  --ink-1:     #202124;
-  --ink-2:     #5f6368;
-  --ink-3:     #80868b;
-  --ink-4:     #bdc1c6;
+  --ink-1:     #0f172a;
+  --ink-2:     #475569;
+  --ink-3:     #94a3b8;
+  --ink-4:     #cbd5e1;
 
-  /* Official Material Colors for professional look */
-  --blue:      #1a73e8; 
-  --blue-dim:  #e8f0fe;
-  --blue-mid:  #4285f4;
+  --blue:      #2563eb;
+  --blue-dim:  #eff4ff;
+  --blue-mid:  #3b82f6;
 
-  --green:     #188038;
-  --green-dim: #e6f4ea;
-  --amber:     #f29900;
-  --amber-dim: #fef7e0;
-  --red:       #d93025;
-  --red-dim:   #fce8e6;
+  --green:     #16a34a;
+  --green-dim: #f0fdf4;
+  --amber:     #d97706;
+  --amber-dim: #fffbeb;
+  --red:       #dc2626;
+  --red-dim:   #fff5f5;
 
   --font:      'Sora', system-ui, sans-serif;
   --mono:      'JetBrains Mono', monospace;
 
-  /* Slightly sharper corners for formal dashboard feel */
-  --r-sm:      4px;
-  --r-md:      6px;
-  --r-lg:      8px;
-  --r-xl:      12px;
+  --r-sm:      6px;
+  --r-md:      10px;
+  --r-lg:      14px;
+  --r-xl:      20px;
 
-  /* Subtler shadows for flat, modern design */
-  --shadow-xs: 0 1px 2px 0 rgba(60,64,67,0.05);
-  --shadow-sm: 0 1px 3px 0 rgba(60,64,67,0.1), 0 1px 2px 0 rgba(60,64,67,0.06);
-  --shadow-md: 0 4px 6px -1px rgba(60,64,67,0.1), 0 2px 4px -1px rgba(60,64,67,0.06);
-  --shadow-focus: 0 0 0 3px rgba(26,115,232,.18);
+  --shadow-xs: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+  --shadow-sm: 0 2px 8px rgba(15,23,42,.07), 0 1px 3px rgba(15,23,42,.05);
+  --shadow-md: 0 4px 16px rgba(15,23,42,.08), 0 2px 6px rgba(15,23,42,.05);
+  --shadow-focus: 0 0 0 3px rgba(37,99,235,.18);
 
-  --sidebar-w: 240px;
-  --header-h:  64px;
+  --sidebar-w: 220px;
+  --header-h:  60px;
 }
 
 /* ────────────────────────────────────────────
@@ -95,16 +92,17 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: var(--shadow-xs);
 }
 .header-brand {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: baseline;
+  gap: 10px;
   flex-shrink: 0;
 }
-.header-brand-name { font-size: 16px; font-weight: 700; color: var(--ink-1); letter-spacing: -.3px; }
-.header-brand-dot { color: var(--blue); font-weight: 700; margin-left: 2px; }
-.header-brand-sub { font-size: 11px; color: var(--ink-2); font-weight: 400; border-left: 1px solid var(--border); padding-left: 12px; margin-left: 4px; }
+.header-brand-name { font-size: 15px; font-weight: 700; color: var(--ink-1); letter-spacing: -.3px; }
+.header-brand-dot { color: var(--blue); font-weight: 700; }
+.header-brand-sub { font-size: 11px; color: var(--ink-3); font-weight: 400; letter-spacing: .3px; }
 .header-sep { width: 1px; height: 24px; background: var(--border); }
 .header-period-group { display: flex; align-items: center; gap: 8px; }
 .period-label { font-size: 11.5px; color: var(--ink-3); font-weight: 500; letter-spacing: .2px; }
@@ -112,24 +110,24 @@ body {
 .sel {
   appearance: none;
   background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-sm);
-  padding: 6px 28px 6px 12px;
+  padding: 5px 28px 5px 10px;
   font-family: var(--font); font-size: 12.5px; font-weight: 500; color: var(--ink-1);
   cursor: pointer; outline: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2380868b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 10px center;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 9px center;
   transition: border-color .15s, box-shadow .15s;
 }
-.sel:focus { border-color: var(--blue); background-color: var(--surface); box-shadow: var(--shadow-focus); }
+.sel:focus { border-color: var(--blue); box-shadow: var(--shadow-focus); }
 
 .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .btn-print {
   display: flex; align-items: center; gap: 6px;
-  background: var(--surface); color: var(--ink-2);
-  border: 1px solid var(--border); border-radius: var(--r-sm);
+  background: var(--blue); color: #fff;
+  border: none; border-radius: var(--r-sm);
   padding: 6px 14px; font-family: var(--font); font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all .15s; white-space: nowrap;
+  cursor: pointer; transition: background .15s, transform .1s; white-space: nowrap;
 }
-.btn-print:hover { background: var(--bg); color: var(--ink-1); border-color: var(--ink-4); }
+.btn-print:hover { background: #1d4ed8; transform: translateY(-1px); }
 .btn-print svg { width: 14px; height: 14px; }
 
 /* Hamburger */
@@ -143,184 +141,177 @@ body {
   grid-column: 1;
   grid-row: 2;
   background: var(--surface); border-right: 1px solid var(--border);
-  padding: 24px 16px;
+  padding: 20px 12px;
   display: flex; flex-direction: column; gap: 4px;
   position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h));
   overflow-y: auto;
 }
-.nav-section-label { font-size: 10.5px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 1.2px; padding: 12px 10px 8px; }
+.nav-section-label { font-size: 10px; font-weight: 600; color: var(--ink-4); text-transform: uppercase; letter-spacing: 1.2px; padding: 12px 10px 6px; }
 .nav-item {
-  display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--r-sm);
+  display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--r-sm);
   font-size: 13px; font-weight: 500; color: var(--ink-2);
   text-decoration: none; cursor: pointer; transition: background .12s, color .12s; border: none; background: none; width: 100%; text-align: left;
 }
 .nav-item:hover { background: var(--bg); color: var(--ink-1); }
 .nav-item.active { background: var(--blue-dim); color: var(--blue); font-weight: 600; }
-.nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; color: var(--ink-3); transition: color .12s; }
-.nav-item.active .nav-icon { color: var(--blue); }
+.nav-icon { width: 30px; height: 30px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 15px; background: var(--bg); flex-shrink: 0; transition: background .12s; }
+.nav-item.active .nav-icon { background: var(--blue-dim); }
 
-.sidebar-filter { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); }
+.sidebar-filter { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-2); }
 .sidebar-filter-label { font-size: 10.5px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; display: block; }
 .sidebar-filter select { width: 100%; margin-bottom: 8px; }
 
 /* ────────────────────────────────────────────
    MAIN CONTENT
 ──────────────────────────────────────────── */
-.main { 
-  grid-column: 2; grid-row: 2; padding: 32px 40px; min-width: 0; 
-  display: flex; flex-direction: column; min-height: calc(100vh - var(--header-h));
-}
+.main { grid-column: 2; grid-row: 2; padding: 28px 32px 60px; min-width: 0; }
 
-.view { display: none; animation: fadeUp .3s ease-out; flex: 1; }
+.view { display: none; animation: fadeUp .3s ease-out; }
 .view.active { display: block; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ────────────────────────────────────────────
-   PAGE HEADER & DESC
+   PAGE HEADER ROW
 ──────────────────────────────────────────── */
-.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 12px; }
-.page-title { font-size: 22px; font-weight: 600; color: var(--ink-1); letter-spacing: -.4px; line-height: 1.3; }
-.page-subtitle { font-size: 13.5px; color: var(--ink-2); margin-top: 4px; font-weight: 400; }
-
-.page-desc {
-  font-size: 13.5px;
-  color: var(--ink-2);
-  max-width: 850px;
-  margin-bottom: 28px;
-  line-height: 1.6;
-}
-
-.trend-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600; border: 1px solid transparent; }
-.chip-up    { background: var(--green-dim); color: var(--green); border-color: rgba(24,128,56,.2); }
-.chip-down  { background: var(--red-dim);   color: var(--red); border-color: rgba(217,48,37,.2); }
-.chip-flat  { background: var(--surface);   color: var(--ink-2); border-color: var(--border); }
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+.page-title { font-size: 20px; font-weight: 700; color: var(--ink-1); letter-spacing: -.4px; line-height: 1.3; }
+.page-subtitle { font-size: 13px; color: var(--ink-3); margin-top: 3px; font-weight: 400; }
+.trend-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.chip-up    { background: var(--green-dim); color: var(--green); }
+.chip-down  { background: var(--red-dim);   color: var(--red); }
+.chip-flat  { background: var(--bg);        color: var(--ink-3); }
 
 /* ────────────────────────────────────────────
-   FLAT CARDS (MINIMALIST)
+   KPI CARDS
 ──────────────────────────────────────────── */
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
-.kpi-card { background: var(--surface); border-radius: var(--r-lg); padding: 22px 24px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.kpi-card { background: var(--surface); border-radius: var(--r-lg); padding: 20px 22px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-2); position: relative; overflow: hidden; }
+.kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border-2); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+.kpi-card.accent-blue::after  { background: var(--blue); }
+.kpi-card.accent-green::after { background: var(--green); }
+.kpi-card.accent-amber::after { background: var(--amber); }
+.kpi-card.accent-red::after   { background: var(--red); }
 
-.kpi-label { font-size: 11.5px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
-.kpi-value { font-size: 32px; font-weight: 600; color: var(--ink-1); line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; margin-bottom: 8px; }
+.kpi-label { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; }
+.kpi-value { font-size: 30px; font-weight: 700; color: var(--ink-1); line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
 .kpi-card.accent-green .kpi-value { color: var(--green); }
 .kpi-card.accent-amber .kpi-value { color: var(--amber); }
 .kpi-card.accent-red   .kpi-value { color: var(--red); }
-.kpi-sub { font-size: 12px; color: var(--ink-3); line-height: 1.4; }
-.kpi-badge { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; background: var(--bg); color: var(--ink-2); margin-top: 10px; border: 1px solid var(--border-2); }
-.kpi-badge.valid   { background: var(--green-dim); color: var(--green); border-color: rgba(24,128,56,.15); }
-.kpi-badge.partial { background: var(--amber-dim); color: var(--amber); border-color: rgba(242,153,0,.15); }
-.kpi-badge.check   { background: var(--red-dim);   color: var(--red); border-color: rgba(217,48,37,.15); }
+.kpi-sub { font-size: 11.5px; color: var(--ink-3); margin-top: 6px; line-height: 1.4; }
+.kpi-badge { display: inline-block; font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 4px; background: var(--bg); color: var(--ink-3); margin-top: 6px; }
+.kpi-badge.valid   { background: var(--green-dim); color: var(--green); }
+.kpi-badge.partial { background: var(--amber-dim); color: var(--amber); }
+.kpi-badge.check   { background: var(--red-dim);   color: var(--red); }
 
 /* ────────────────────────────────────────────
    BIG HERO METRIC
 ──────────────────────────────────────────── */
-.hero-metric { background: var(--surface); border-radius: var(--r-xl); padding: 32px 36px; margin-bottom: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
-.hero-main { flex: 1; min-width: 220px; }
-.hero-label { font-size: 12px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-.hero-pct { font-size: 64px; font-weight: 600; letter-spacing: -3px; line-height: 1; color: var(--ink-1); font-variant-numeric: tabular-nums; }
-.hero-pct sup { font-size: 24px; letter-spacing: -1px; vertical-align: super; color: var(--ink-3); font-weight: 400; }
-.hero-desc { font-size: 13.5px; color: var(--ink-2); margin-top: 14px; line-height: 1.6; }
-.hero-desc strong { color: var(--ink-1); font-weight: 600; }
+.hero-metric { background: var(--surface); border-radius: var(--r-xl); padding: 28px 32px; margin-bottom: 14px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-2); display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+.hero-main { flex: 1; min-width: 180px; }
+.hero-label { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.hero-pct { font-size: 56px; font-weight: 700; letter-spacing: -3px; line-height: 1; color: var(--ink-1); font-variant-numeric: tabular-nums; }
+.hero-pct sup { font-size: 22px; letter-spacing: -1px; vertical-align: super; color: var(--ink-3); }
+.hero-desc { font-size: 13px; color: var(--ink-2); margin-top: 10px; line-height: 1.6; }
+.hero-desc strong { color: var(--blue); }
 
-.hero-right { display: flex; gap: 16px; flex-wrap: wrap; }
-.hero-stat { text-align: center; padding: 18px 20px; background: var(--bg); border-radius: var(--r-lg); min-width: 100px; border: 1px solid var(--border-2); }
-.hs-num { font-size: 22px; font-weight: 600; color: var(--ink-1); letter-spacing: -.5px; }
+.hero-right { display: flex; gap: 20px; flex-wrap: wrap; }
+.hero-stat { text-align: center; padding: 14px 18px; background: var(--bg); border-radius: var(--r-md); min-width: 90px; }
+.hs-num { font-size: 20px; font-weight: 700; color: var(--ink-1); letter-spacing: -.5px; }
 .hs-num.green { color: var(--green); }
 .hs-num.amber { color: var(--amber); }
 .hs-num.red   { color: var(--red); }
-.hs-lbl { font-size: 11px; color: var(--ink-3); font-weight: 500; margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.hs-lbl { font-size: 10.5px; color: var(--ink-3); font-weight: 500; margin-top: 3px; }
 
 /* Progress bar on hero */
-.hero-progress { margin-top: 18px; }
-.prog-row { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-2); margin-bottom: 6px; font-weight: 500; }
-.prog-bar { height: 8px; border-radius: 8px; background: var(--border-2); overflow: hidden; display: flex; }
+.hero-progress { margin-top: 14px; }
+.prog-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); margin-bottom: 5px; }
+.prog-bar { height: 6px; border-radius: 6px; background: var(--border); overflow: hidden; display: flex; }
 .prog-segment { height: 100%; transition: width .6s cubic-bezier(.4,0,.2,1); }
 
 /* ────────────────────────────────────────────
    SECTION HEADINGS
 ──────────────────────────────────────────── */
-.section-heading { font-size: 14px; font-weight: 600; color: var(--ink-1); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.section-heading-badge { font-size: 11.5px; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; text-transform: none; letter-spacing: 0; }
+.section-heading { font-size: 13px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-2); display: flex; align-items: center; justify-content: space-between; }
+.section-heading-badge { font-size: 11px; font-weight: 500; color: var(--ink-3); background: var(--bg); padding: 3px 10px; border-radius: 20px; text-transform: none; letter-spacing: 0; }
 
 /* ────────────────────────────────────────────
    CHART CARDS
 ──────────────────────────────────────────── */
-.chart-card { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border); margin-bottom: 24px; overflow: hidden; }
-.chart-card-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.chart-card-title { font-size: 14.5px; font-weight: 600; color: var(--ink-1); }
-.chart-card-sub   { font-size: 12.5px; color: var(--ink-3); margin-top: 4px; }
-.chart-card-body  { padding: 24px; }
+.chart-card { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border-2); box-shadow: var(--shadow-sm); margin-bottom: 20px; overflow: hidden; }
+.chart-card-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border-2); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.chart-card-title { font-size: 13.5px; font-weight: 600; color: var(--ink-1); }
+.chart-card-sub   { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.chart-card-body  { padding: 20px 22px; }
 
 .chart-wrap { position: relative; }
-.charts-2col { display: grid; grid-template-columns: 360px 1fr; gap: 24px; margin-bottom: 24px; }
+.charts-2col { display: grid; grid-template-columns: 340px 1fr; gap: 20px; margin-bottom: 20px; }
 .chart-scroll { overflow-x: auto; padding-bottom: 4px; }
-.chart-scroll::-webkit-scrollbar { height: 6px; }
-.chart-scroll::-webkit-scrollbar-track { background: var(--bg); border-radius: 3px; }
-.chart-scroll::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 3px; }
-.chart-scroll-inner { position: relative; height: 320px; }
+.chart-scroll::-webkit-scrollbar { height: 4px; }
+.chart-scroll::-webkit-scrollbar-track { background: var(--bg); border-radius: 2px; }
+.chart-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.chart-scroll-inner { position: relative; height: 300px; }
 
 /* ────────────────────────────────────────────
    INSIGHT PANELS
 ──────────────────────────────────────────── */
-.insight-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }
-.pie-insight-grid { grid-template-columns: repeat(3, 1fr); display: grid; gap: 16px; }
-.insight-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: 16px 20px; border-top: 3px solid transparent; }
-.insight-item.blue  { border-top-color: var(--blue); }
-.insight-item.green { border-top-color: var(--green); }
-.insight-item.amber { border-top-color: var(--amber); }
-.insight-item.red   { border-top-color: var(--red); }
-.ii-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .9px; color: var(--ink-2); margin-bottom: 6px; }
-.ii-text  { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
-.ii-text strong { color: var(--ink-1); font-weight: 600; }
+.insight-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+.pie-insight-grid { grid-template-columns: repeat(3, 1fr); display: grid; gap: 12px; }
+.insight-item { background: var(--bg); border-radius: var(--r-md); padding: 14px 16px; border-left: 3px solid transparent; }
+.insight-item.blue  { border-left-color: var(--blue); }
+.insight-item.green { border-left-color: var(--green); }
+.insight-item.amber { border-left-color: var(--amber); }
+.insight-item.red   { border-left-color: var(--red); }
+.ii-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px; color: var(--ink-3); margin-bottom: 5px; }
+.ii-text  { font-size: 12.5px; color: var(--ink-2); line-height: 1.6; }
+.ii-text strong { color: var(--ink-1); }
 
-.duo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
-.duo-card { padding: 16px 20px; border-radius: var(--r-md); border: 1px solid var(--border); cursor: pointer; transition: background .15s; }
-.duo-card:hover { background: var(--bg); }
-.duo-card.best  { background: var(--green-dim); border-color: rgba(24,128,56,.15); }
-.duo-card.worst { background: var(--red-dim);   border-color: rgba(217,48,37,.15); }
-.duo-lbl { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .9px; margin-bottom: 8px; }
+.duo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.duo-card { padding: 14px 16px; border-radius: var(--r-md); border: 1px solid var(--border-2); cursor: pointer; transition: box-shadow .15s, transform .12s; }
+.duo-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.duo-card.best  { background: var(--green-dim); border-color: rgba(22,163,74,.15); }
+.duo-card.worst { background: var(--red-dim);   border-color: rgba(220,38,38,.15); }
+.duo-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px; margin-bottom: 6px; }
 .duo-card.best  .duo-lbl { color: var(--green); }
 .duo-card.worst .duo-lbl { color: var(--red); }
-.duo-name { font-size: 13.5px; font-weight: 600; color: var(--ink-1); margin-bottom: 6px; line-height: 1.3; }
-.duo-pct  { font-size: 24px; font-weight: 600; letter-spacing: -1px; line-height: 1; }
+.duo-name { font-size: 12.5px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px; line-height: 1.3; }
+.duo-pct  { font-size: 22px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
 .duo-card.best  .duo-pct { color: var(--green); }
 .duo-card.worst .duo-pct { color: var(--red); }
-.duo-meta { font-size: 11.5px; color: var(--ink-3); margin-top: 6px; }
+.duo-meta { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
 
 /* ────────────────────────────────────────────
    TABLE
 ──────────────────────────────────────────── */
-.table-surface { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; }
-.table-toolbar { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; background: var(--bg); }
+.table-surface { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border-2); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 20px; }
+.table-toolbar { padding: 16px 20px; border-bottom: 1px solid var(--border-2); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .search-input {
-  flex: 1; min-width: 200px; padding: 8px 14px 8px 36px; border: 1px solid var(--border); border-radius: var(--r-sm);
-  font-family: var(--font); font-size: 13px; color: var(--ink-1);
-  background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2380868b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+  flex: 1; min-width: 180px; padding: 7px 12px 7px 34px; border: 1px solid var(--border); border-radius: var(--r-sm);
+  font-family: var(--font); font-size: 12.5px; color: var(--ink-1);
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
   outline: none; transition: border-color .15s, box-shadow .15s;
 }
 .search-input:focus { border-color: var(--blue); box-shadow: var(--shadow-focus); }
-.table-filter-sel { max-width: 220px; background-color: var(--surface); }
-.sort-group { display: flex; gap: 6px; margin-left: auto; }
-.sort-btn { padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); font-family: var(--font); font-size: 12px; font-weight: 500; color: var(--ink-2); cursor: pointer; transition: all .12s; }
-.sort-btn:hover { border-color: var(--ink-4); color: var(--ink-1); background: var(--bg); }
-.sort-btn.active { background: var(--blue-dim); color: var(--blue); border-color: rgba(26,115,232,.3); font-weight: 600; }
+.table-filter-sel { max-width: 200px; }
+.sort-group { display: flex; gap: 4px; margin-left: auto; }
+.sort-btn { padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); font-family: var(--font); font-size: 11.5px; font-weight: 500; color: var(--ink-2); cursor: pointer; transition: all .12s; }
+.sort-btn:hover { border-color: var(--blue-mid); color: var(--blue); }
+.sort-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
 table { width: 100%; border-collapse: collapse; }
-thead th { padding: 12px 24px; font-size: 11px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .5px; text-align: left; background: var(--surface); border-bottom: 1px solid var(--border); white-space: nowrap; }
+thead th { padding: 10px 16px; font-size: 10.5px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .7px; text-align: left; background: var(--bg); border-bottom: 1px solid var(--border-2); white-space: nowrap; }
 thead th.c { text-align: center; }
 tbody tr { border-bottom: 1px solid var(--border-2); transition: background .1s; }
 tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: var(--bg); }
-tbody td { padding: 14px 24px; font-size: 13.5px; color: var(--ink-1); }
+tbody tr:hover { background: #fafbfc; }
+tbody td { padding: 11px 16px; font-size: 13px; color: var(--ink-1); }
 tbody td.c { text-align: center; }
 .td-name { font-weight: 600; }
-.td-school-meta { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
-tfoot td { padding: 14px 24px; font-size: 13px; font-weight: 600; color: var(--ink-1); background: var(--bg); border-top: 1px solid var(--border); }
+.td-school-meta { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+tfoot td { padding: 11px 16px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); background: var(--bg); border-top: 1px solid var(--border); }
 tfoot td.c { text-align: center; }
 
 /* Pct Pill */
-.pct-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pct-pill { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .pill-high { background: var(--green-dim); color: var(--green); }
 .pill-mid  { background: var(--amber-dim); color: var(--amber); }
 .pill-low  { background: var(--red-dim);   color: var(--red); }
@@ -330,96 +321,82 @@ tfoot td.c { text-align: center; }
 .q-amber { background: var(--amber); }
 .q-red   { background: var(--red); }
 
-.btn-detail { padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); font-family: var(--font); font-size: 11.5px; font-weight: 500; color: var(--ink-2); cursor: pointer; transition: all .12s; }
-.btn-detail:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.btn-detail { padding: 4px 10px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); font-family: var(--font); font-size: 11px; font-weight: 500; color: var(--ink-2); cursor: pointer; transition: all .12s; }
+.btn-detail:hover { border-color: var(--blue); color: var(--blue); }
 
 /* ────────────────────────────────────────────
    ANALYSIS PANELS (BOTTOM)
 ──────────────────────────────────────────── */
-.analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.analysis-card { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 20px 24px; border-top: 4px solid var(--border); }
+.analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.analysis-card { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border-2); box-shadow: var(--shadow-xs); padding: 18px 20px; border-top: 3px solid var(--border); }
 .analysis-card.ac-blue   { border-top-color: var(--blue); }
 .analysis-card.ac-green  { border-top-color: var(--green); }
 .analysis-card.ac-amber  { border-top-color: var(--amber); }
 .analysis-card.ac-red    { border-top-color: var(--red); }
-.ac-eyebrow { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .9px; color: var(--ink-2); margin-bottom: 8px; }
-.ac-title   { font-size: 14px; font-weight: 600; color: var(--ink-1); margin-bottom: 8px; line-height: 1.4; }
-.ac-body    { font-size: 13px; color: var(--ink-2); line-height: 1.65; }
-.ac-body strong { color: var(--ink-1); font-weight: 600; }
+.ac-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .9px; color: var(--ink-3); margin-bottom: 7px; }
+.ac-title   { font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 7px; line-height: 1.3; }
+.ac-body    { font-size: 12.5px; color: var(--ink-2); line-height: 1.65; }
+.ac-body strong { color: var(--ink-1); }
 
-.exec-banner { background: var(--blue-dim); border: 1px solid rgba(26,115,232,.2); border-radius: var(--r-lg); padding: 20px 24px; color: var(--ink-1); font-size: 13.5px; line-height: 1.7; border-left: 4px solid var(--blue); }
-.exec-banner strong { color: var(--ink-1); font-weight: 600; }
+.exec-banner { background: var(--ink-1); border-radius: var(--r-lg); padding: 18px 22px; color: rgba(255,255,255,.8); font-size: 13px; line-height: 1.7; }
+.exec-banner strong { color: #fff; }
 
 /* ────────────────────────────────────────────
    KESIMPULAN
 ──────────────────────────────────────────── */
-.conclusion-card { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 32px 36px; margin-bottom: 24px; }
-.conclusion-card h3 { font-size: 16px; font-weight: 600; color: var(--ink-1); margin-bottom: 18px; letter-spacing: -.2px; }
-.highlight-callout { background: var(--bg); border-left: 3px solid var(--ink-4); border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 16px 20px; font-size: 13.5px; color: var(--ink-1); line-height: 1.65; margin-bottom: 20px; }
-.conclusion-body { font-size: 14px; color: var(--ink-2); line-height: 1.8; }
-.conclusion-body strong { color: var(--ink-1); font-weight: 600; }
-.reco-list { list-style: none; margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
-.reco-list li { display: flex; gap: 14px; align-items: flex-start; font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
-.reco-num { width: 24px; height: 24px; flex-shrink: 0; background: var(--blue); color: #fff; border-radius: 50%; font-size: 11.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+.conclusion-card { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border-2); box-shadow: var(--shadow-sm); padding: 28px 32px; margin-bottom: 20px; }
+.conclusion-card h3 { font-size: 15px; font-weight: 700; color: var(--ink-1); margin-bottom: 16px; letter-spacing: -.2px; }
+.highlight-callout { background: var(--blue-dim); border-left: 3px solid var(--blue); border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 14px 18px; font-size: 13px; color: var(--ink-1); line-height: 1.65; margin-bottom: 18px; }
+.conclusion-body { font-size: 13.5px; color: var(--ink-2); line-height: 1.8; }
+.conclusion-body strong { color: var(--ink-1); }
+.reco-list { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.reco-list li { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+.reco-num { width: 22px; height: 22px; flex-shrink: 0; background: var(--blue); color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
 
 /* ────────────────────────────────────────────
    TREND
 ──────────────────────────────────────────── */
-.trend-empty { text-align: center; padding: 48px 24px; color: var(--ink-3); font-size: 13.5px; }
-.trend-empty-icon { font-size: 32px; margin-bottom: 12px; }
+.trend-empty { text-align: center; padding: 48px 24px; color: var(--ink-3); font-size: 13px; }
+.trend-empty-icon { font-size: 32px; margin-bottom: 10px; }
 
 /* ────────────────────────────────────────────
    MODAL
 ──────────────────────────────────────────── */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(32,33,36,.6); backdrop-filter: blur(2px); z-index: 600; align-items: center; justify-content: center; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.5); backdrop-filter: blur(4px); z-index: 600; align-items: center; justify-content: center; }
 .modal-overlay.open { display: flex; }
-.modal-box { background: var(--surface); border-radius: var(--r-xl); width: 90%; max-width: 720px; max-height: 86vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,.2); position: relative; animation: fadeUp .25s ease-out; }
-.modal-header { padding: 24px 28px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; position: sticky; top: 0; background: var(--surface); z-index: 10; }
-.modal-title { font-size: 16px; font-weight: 600; color: var(--ink-1); letter-spacing: -.2px; }
-.modal-close { background: var(--bg); border: none; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--ink-2); flex-shrink: 0; transition: background .12s, color .12s; }
+.modal-box { background: var(--surface); border-radius: var(--r-xl); width: 90%; max-width: 680px; max-height: 86vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(15,23,42,.2); position: relative; animation: fadeUp .25s ease-out; }
+.modal-header { padding: 22px 26px 16px; border-bottom: 1px solid var(--border-2); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; position: sticky; top: 0; background: var(--surface); z-index: 10; }
+.modal-title { font-size: 15px; font-weight: 700; color: var(--ink-1); letter-spacing: -.2px; }
+.modal-close { background: var(--bg); border: none; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--ink-3); flex-shrink: 0; transition: background .12s, color .12s; }
 .modal-close:hover { background: var(--border); color: var(--ink-1); }
 
-.modal-tabs { display: flex; gap: 0; padding: 0 28px; border-bottom: 1px solid var(--border); }
-.m-tab { background: none; border: none; cursor: pointer; padding: 12px 16px; font-family: var(--font); font-size: 13px; font-weight: 500; color: var(--ink-3); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .12s; }
+.modal-tabs { display: flex; gap: 0; padding: 0 26px; border-bottom: 1px solid var(--border-2); }
+.m-tab { background: none; border: none; cursor: pointer; padding: 10px 14px; font-family: var(--font); font-size: 12.5px; font-weight: 500; color: var(--ink-3); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .12s; }
 .m-tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
 .m-tab:hover { color: var(--ink-1); }
 
-.modal-body { padding: 24px 28px; }
+.modal-body { padding: 22px 26px; }
 .m-tab-content { display: none; }
 .m-tab-content.active { display: block; }
 
-.modal-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-.modal-table th { background: var(--bg); padding: 10px 14px; font-size: 11px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .6px; text-align: left; border-bottom: 1px solid var(--border); }
-.modal-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-2); color: var(--ink-1); }
+.modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.modal-table th { background: var(--bg); padding: 8px 12px; font-size: 10.5px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .6px; text-align: left; border-bottom: 1px solid var(--border-2); }
+.modal-table td { padding: 9px 12px; border-bottom: 1px solid var(--border-2); color: var(--ink-1); }
 .modal-table tr:last-child td { border-bottom: none; }
 .modal-table tr:nth-child(even) td { background: var(--bg); }
 
-.hist-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: var(--r-sm); margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); }
-.hist-period { font-weight: 500; font-size: 13.5px; color: var(--ink-1); }
-.hist-pct { font-size: 14px; font-weight: 600; }
-.hist-diff { font-size: 12px; font-weight: 500; }
+.hist-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: var(--r-sm); margin-bottom: 6px; background: var(--bg); border: 1px solid var(--border-2); }
+.hist-period { font-weight: 500; font-size: 13px; color: var(--ink-1); }
+.hist-pct { font-size: 13px; font-weight: 700; }
+.hist-diff { font-size: 11.5px; font-weight: 500; }
 
-.dq-banner { display: none; background: var(--amber-dim); border: 1px solid rgba(242,153,0,.2); border-radius: var(--r-md); padding: 12px 16px; margin-bottom: 20px; font-size: 13px; color: var(--ink-1); display: flex; align-items: center; gap: 10px; }
-.dq-banner::before { content: "⚠"; color: var(--amber); font-weight: bold; }
+.dq-banner { display: none; background: var(--amber-dim); border: 1px solid rgba(217,119,6,.2); border-radius: var(--r-md); padding: 10px 14px; margin-bottom: 16px; font-size: 12.5px; color: var(--amber); display: flex; align-items: center; gap: 8px; }
 .dq-banner.hidden { display: none !important; }
-
-/* ────────────────────────────────────────────
-   FOOTER
-──────────────────────────────────────────── */
-.main-footer {
-  margin-top: auto;
-  padding-top: 32px;
-  text-align: center;
-  font-size: 11.5px;
-  color: var(--ink-3);
-  line-height: 1.6;
-}
-.main-footer strong { color: var(--ink-2); font-weight: 600; }
 
 /* ────────────────────────────────────────────
    SIDEBAR OVERLAY (Mobile)
 ──────────────────────────────────────────── */
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(32,33,36,.5); z-index: 400; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 400; }
 .sidebar-overlay.open { display: block; }
 
 /* ────────────────────────────────────────────
@@ -431,68 +408,61 @@ tfoot td.c { text-align: center; }
     position: fixed; top: 0; left: 0; bottom: 0;
     z-index: 500; width: 280px;
     transform: translateX(-100%); transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 100vh; padding: 20px 0; border-right: none;
+    height: 100vh; padding: 20px 0;
   }
   .sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
   .nav-item { padding: 12px 20px; margin: 0 12px; width: calc(100% - 24px); }
-  .nav-section-label { padding: 12px 20px 8px; }
+  .nav-section-label { padding: 12px 20px 6px; }
   .sidebar-filter { padding: 20px 16px; }
   
   .ham { display: flex; flex-direction: column; }
-  .main { grid-column: 1; padding: 24px 20px 48px; }
+  .main { grid-column: 1; padding: 20px 16px 48px; }
   .header-brand-sub { display: none; }
 }
 
 @media(max-width:768px) {
-  /* Grid 1 Kolom untuk Layout */
   .kpi-grid, .charts-2col, .analysis-grid, .duo-grid, .insight-strip { 
-    display: flex !important; flex-direction: column !important; gap: 16px !important; 
+    display: flex !important; flex-direction: column !important; gap: 12px !important; 
   }
   .pie-insight-grid { grid-template-columns: 1fr !important; }
   
-  /* Hero & Cards Optimization */
-  .hero-metric { flex-direction: column; padding: 24px 20px; align-items: stretch; gap: 20px; }
+  .hero-metric { flex-direction: column; padding: 20px 16px; align-items: stretch; gap: 16px; }
   .hero-right { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-  .hero-stat { min-width: 0; padding: 14px 10px; }
+  .hero-stat { min-width: 0; padding: 12px 8px; }
   .hero-stat:nth-child(5) { grid-column: span 2; }
   
-  .kpi-card { padding: 20px; }
-  .chart-card-header, .chart-card-body { padding: 20px; }
-  .conclusion-card { padding: 24px 20px; }
+  .kpi-card { padding: 16px; }
+  .chart-card-header, .chart-card-body { padding: 16px; }
+  .conclusion-card { padding: 20px 16px; }
 
-  /* Typography & Spacing */
-  .page-title { font-size: 20px; }
-  .page-desc { font-size: 13px; margin-bottom: 24px; }
-  .hero-pct { font-size: 48px; }
+  .page-title { font-size: 18px; line-height: 1.3; }
+  .hero-pct { font-size: 40px; }
   .kpi-value { font-size: 28px; }
   .page-header { margin-bottom: 20px; }
 
-  /* Forms & Touch Targets (Min 44px) */
   .sel, .search-input, .sort-btn, .btn-detail, .btn-print, .m-tab { min-height: 44px; }
   .sort-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-left: 0; margin-top: 12px; }
-  .sort-btn { padding: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .sort-btn { padding: 0; display: flex; align-items: center; justify-content: center; font-size: 11.5px; }
   .search-input { width: 100%; }
-  .table-toolbar { flex-direction: column; padding: 16px 20px; gap: 0; align-items: stretch; }
+  .table-toolbar { flex-direction: column; padding: 0 0 16px 0; gap: 0; align-items: stretch; }
   .table-filter-sel { max-width: 100%; margin-top: 12px; }
   
-  /* Header Simplification */
   .header { height: 60px; padding: 0 16px; }
   .header-period-group, .header-sep, .header-right { display: none; }
   .header-brand-name { font-size: 16px; }
 
-  /* TABLE KE CARD LIST */
   table { border: none; width: 100%; }
-  .table-surface { background: transparent; border: none; overflow: visible; margin-bottom: 0; }
+  .table-surface { background: transparent; border: none; box-shadow: none; overflow: visible; margin-bottom: 0; }
   thead { display: none; }
   
   tbody tr {
     display: flex; flex-direction: column; background: var(--surface);
-    border: 1px solid var(--border); border-radius: var(--r-md);
-    margin: 0 0 16px 0; padding: 16px;
+    border: 1px solid var(--border-2); border-radius: var(--r-md);
+    margin: 0 0 16px 0; padding: 16px; box-shadow: var(--shadow-xs);
   }
   tbody td {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 0; border-bottom: 1px solid var(--border-2);
+    padding: 10px 0; border-bottom: 1px dashed var(--border-2);
     text-align: right !important; font-size: 13.5px;
   }
   tbody td:last-child { border-bottom: none; padding-bottom: 0; padding-top: 12px; }
@@ -503,22 +473,21 @@ tfoot td.c { text-align: center; }
   tbody td[data-label="#"], tbody td[data-label="Kualitas"] { display: none; }
   tbody td[data-label="Sekolah"] {
     flex-direction: column; align-items: flex-start; text-align: left !important;
-    border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 4px;
+    border-bottom: 2px solid var(--border-2); padding-bottom: 12px; margin-bottom: 4px;
   }
   tbody td[data-label="Sekolah"]::before { display: none; }
   
-  .td-name { font-size: 15px; font-weight: 600; color: var(--ink-1); }
-  .btn-detail { width: 100%; justify-content: center; font-size: 13px; font-weight: 600; background: var(--surface); }
+  .td-name { font-size: 15px; font-weight: 700; color: var(--ink-1); }
+  .btn-detail { width: 100%; justify-content: center; font-size: 13px; font-weight: 600; }
 
-  /* TFoot Ke Card */
   tfoot tr {
     display: flex; flex-direction: column; background: var(--blue-dim);
-    border: 1px solid rgba(26,115,232,.2); border-radius: var(--r-md);
+    border: 1px solid rgba(37,99,235,.2); border-radius: var(--r-md);
     padding: 16px; margin: 0 0 16px 0;
   }
   tfoot td {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 0; border-bottom: 1px solid rgba(26,115,232,.1);
+    padding: 10px 0; border-bottom: 1px dashed rgba(37,99,235,.2);
     text-align: right !important; font-size: 14px; background: transparent !important;
   }
   tfoot td::before {
@@ -527,26 +496,25 @@ tfoot td.c { text-align: center; }
   }
   tfoot td[data-label="#"], tfoot td[data-label="Aksi"], tfoot td[data-label="Kualitas"] { display: none; }
   tfoot td[data-label="Sekolah"] {
-    flex-direction: row; border-bottom: 2px solid rgba(26,115,232,.2);
-    padding-bottom: 12px; margin-bottom: 4px; color: var(--blue); font-size: 14.5px; justify-content: center; text-align: center !important;
+    flex-direction: row; border-bottom: 2px solid rgba(37,99,235,.2);
+    padding-bottom: 12px; margin-bottom: 4px; color: var(--blue); font-size: 14px; justify-content: center; text-align: center !important;
   }
   tfoot td[data-label="Sekolah"]::before { display: none; }
 
-  /* Modal Full Mobile Fix */
   .modal-box { width: 100%; height: 100%; max-height: 100vh; border-radius: 0; display: flex; flex-direction: column; }
-  .modal-header { padding: 16px 20px; }
-  .modal-tabs { padding: 0 20px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-  .modal-body { padding: 20px; }
+  .modal-header { padding: 16px; }
+  .modal-tabs { padding: 0 16px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  .modal-body { padding: 16px; }
   
   .modal-table thead { display: none; }
   .modal-table tr {
     display: flex; flex-direction: column; background: var(--surface);
-    border: 1px solid var(--border); border-radius: var(--r-md);
+    border: 1px solid var(--border-2); border-radius: var(--r-md);
     margin-bottom: 12px; padding: 12px;
   }
   .modal-table td {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 0; border-bottom: 1px solid var(--border-2); text-align: right !important; background: transparent !important;
+    padding: 8px 0; border-bottom: 1px dashed var(--border-2); text-align: right !important; background: transparent !important;
   }
   .modal-table td:last-child { border-bottom: none; }
   .modal-table td::before {
@@ -554,11 +522,10 @@ tfoot td.c { text-align: center; }
     text-transform: uppercase; color: var(--ink-3); text-align: left;
   }
 
-  .hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 14px; }
-  .hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px solid var(--border-2); padding-bottom: 8px; }
+  .hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px; }
+  .hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px dashed var(--border-2); padding-bottom: 6px; }
   .hist-pct { font-size: 16px; text-align: right; }
 
-  /* Fix Chart Overflow (Hapus horizontal scroll) */
   .chart-wrap { height: 260px !important; }
   .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
   .chart-scroll-inner { width: 100% !important; height: 320px; } 
@@ -573,7 +540,7 @@ tfoot td.c { text-align: center; }
   .sidebar, .sidebar-overlay, .ham, .table-toolbar .sort-group,
   .btn-print, .modal-overlay { display: none !important; }
   .view { display: block !important; margin-bottom: 24px; }
-  .chart-card, .kpi-card, .table-surface { break-inside: avoid; border: 1px solid #ccc; }
+  .chart-card, .kpi-card, .table-surface { break-inside: avoid; }
   body { background: white; }
 }
 </style>
@@ -591,8 +558,8 @@ tfoot td.c { text-align: center; }
     </button>
 
     <div class="header-brand">
-      <span class="header-brand-name">SMART<span class="header-brand-dot">BTQ</span></span>
-      <span class="header-brand-sub">Smart Monitoring & Analytics Baca Tulis Al-Qur'an · Dinas Pendidikan Kota Banjar</span>
+      <span class="header-brand-name">SIM<span class="header-brand-dot">BTQ</span></span>
+      <span class="header-brand-sub">Dashboard Baca Tulis Al-Qur'an · Kota Banjar</span>
     </div>
 
     <div class="header-sep"></div>
@@ -622,21 +589,21 @@ tfoot td.c { text-align: center; }
 
   <!-- ═══════════════ SIDEBAR ═══════════════ -->
   <aside class="sidebar" id="sidebar">
-    <span class="nav-section-label">Menu Utama</span>
+    <span class="nav-section-label">Navigasi</span>
     <button class="nav-item active" data-target="view-ringkasan" onclick="showSection('view-ringkasan')">
-      <span class="nav-icon">◫</span> Ringkasan Eksekutif
+      <span class="nav-icon">◫</span> Ringkasan
     </button>
     <button class="nav-item" data-target="view-tabel" onclick="showSection('view-tabel')">
-      <span class="nav-icon">≡</span> Data Satuan Pendidikan
+      <span class="nav-icon">≡</span> Data Sekolah
     </button>
     <button class="nav-item" data-target="view-grafik" onclick="showSection('view-grafik')">
-      <span class="nav-icon">↗</span> Analisis & Visualisasi
+      <span class="nav-icon">↗</span> Grafik & Insight
     </button>
     <button class="nav-item" data-target="view-trend" onclick="showSection('view-trend')">
       <span class="nav-icon">∿</span> Tren Bulanan
     </button>
     <button class="nav-item" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan')">
-      <span class="nav-icon">◎</span> Evaluasi & Rekomendasi
+      <span class="nav-icon">◎</span> Kesimpulan
     </button>
 
     <div class="sidebar-filter">
@@ -649,7 +616,7 @@ tfoot td.c { text-align: center; }
         <option value="Banjar">Banjar</option>
       </select>
       <select class="sel" id="sbYear" onchange="onSidebarPeriod()"></select>
-      <select class="sel" id="sbMonth" onchange="onSidebarPeriod()" style="margin-top:8px"></select>
+      <select class="sel" id="sbMonth" onchange="onSidebarPeriod()" style="margin-top:6px"></select>
     </div>
   </aside>
 
@@ -658,19 +625,18 @@ tfoot td.c { text-align: center; }
 
     <!-- DQ Banner -->
     <div class="dq-banner hidden" id="dqBanner">
-      Ditemukan anomali validitas data pada beberapa satuan pendidikan. Mohon verifikasi ulang ke sekolah terkait.
+      ⚠ Ditemukan inkonsistensi data pada beberapa catatan. Verifikasi ke sekolah terkait disarankan.
     </div>
 
     <!-- ══ VIEW: RINGKASAN ══ -->
     <div id="view-ringkasan" class="view active">
       <div class="page-header">
         <div>
-          <div class="page-title" id="r-title">Ringkasan Eksekutif</div>
+          <div class="page-title" id="r-title">Memuat Data...</div>
           <div class="page-subtitle" id="r-subtitle">–</div>
         </div>
         <span id="r-trend-chip"></span>
       </div>
-      <p class="page-desc">Sistem SMART BTQ merupakan platform analitik untuk memantau capaian kemampuan baca tulis Al-Qur'an siswa sekolah dasar secara terintegrasi di tingkat kota.</p>
 
       <!-- Hero Metric -->
       <div class="hero-metric">
@@ -680,7 +646,7 @@ tfoot td.c { text-align: center; }
           <div class="hero-progress">
             <div class="prog-row">
               <span>Lancar</span>
-              <span>Belum Lancar</span>
+              <span>Belum</span>
               <span>Tidak Bisa</span>
             </div>
             <div class="prog-bar" id="hero-prog"></div>
@@ -702,7 +668,7 @@ tfoot td.c { text-align: center; }
           </div>
           <div class="hero-stat">
             <div class="hs-num amber" id="hs-belum">–</div>
-            <div class="hs-lbl">Belum</div>
+            <div class="hs-lbl">Belum Lancar</div>
           </div>
           <div class="hero-stat">
             <div class="hs-num red" id="hs-tidak">–</div>
@@ -716,7 +682,7 @@ tfoot td.c { text-align: center; }
         <div class="kpi-card accent-blue">
           <div class="kpi-label">Cakupan Wilayah</div>
           <div class="kpi-value" id="kpi-sekolah">–</div>
-          <div class="kpi-sub" id="kpi-sekolah-sub">Satuan Pendidikan Negeri</div>
+          <div class="kpi-sub" id="kpi-sekolah-sub">Sekolah Dasar Negeri</div>
           <span class="kpi-badge valid" id="kpi-q1">● Valid</span>
         </div>
         <div class="kpi-card accent-green">
@@ -750,7 +716,7 @@ tfoot td.c { text-align: center; }
     <div id="view-tabel" class="view">
       <div class="page-header">
         <div>
-          <div class="page-title">Data Satuan Pendidikan</div>
+          <div class="page-title">Data Per Sekolah</div>
           <div class="page-subtitle" id="tabel-sub">–</div>
         </div>
         <span class="section-heading-badge" id="tabel-count-badge">–</span>
@@ -797,7 +763,7 @@ tfoot td.c { text-align: center; }
     <div id="view-grafik" class="view">
       <div class="page-header">
         <div>
-          <div class="page-title" id="g-title">Analisis & Visualisasi</div>
+          <div class="page-title" id="g-title">Grafik & Analisis Visual</div>
           <div class="page-subtitle" id="g-sub">–</div>
         </div>
       </div>
@@ -811,7 +777,7 @@ tfoot td.c { text-align: center; }
           </div>
         </div>
         <div class="chart-card-body">
-          <div class="chart-wrap" style="height:240px"><canvas id="kecamatanChart"></canvas></div>
+          <div class="chart-wrap" style="height:220px"><canvas id="kecamatanChart"></canvas></div>
           <div class="insight-strip" id="kec-insight"></div>
         </div>
       </div>
@@ -827,7 +793,7 @@ tfoot td.c { text-align: center; }
           </div>
           <div class="chart-card-body">
             <div class="chart-wrap" style="height:220px"><canvas id="pieChart"></canvas></div>
-            <div id="pie-insight" style="margin-top:20px"></div>
+            <div id="pie-insight" style="margin-top:14px"></div>
           </div>
         </div>
         <div class="chart-card" style="margin-bottom:0">
@@ -839,7 +805,7 @@ tfoot td.c { text-align: center; }
           </div>
           <div class="chart-card-body">
             <div class="chart-wrap" style="height:220px"><canvas id="barChart"></canvas></div>
-            <div id="bar-insight" style="margin-top:20px"></div>
+            <div id="bar-insight" style="margin-top:14px"></div>
           </div>
         </div>
       </div>
@@ -848,8 +814,8 @@ tfoot td.c { text-align: center; }
       <div class="chart-card">
         <div class="chart-card-header">
           <div>
-            <div class="chart-card-title" id="stackTitle">Distribusi Lengkap Per Satuan Pendidikan</div>
-            <div class="chart-card-sub">Klik batang untuk detail informasi sekolah</div>
+            <div class="chart-card-title" id="stackTitle">Distribusi Lengkap Per Sekolah</div>
+            <div class="chart-card-sub">Klik batang untuk detail</div>
           </div>
           <div class="sort-group" id="stackToggle" style="display:none; width:auto;">
             <button class="sort-btn active" id="btnStackTop20" onclick="setStackMode('top20')">Top 20</button>
@@ -862,7 +828,7 @@ tfoot td.c { text-align: center; }
               <canvas id="stackChart"></canvas>
             </div>
           </div>
-          <div id="stack-insight" style="margin-top:20px"></div>
+          <div id="stack-insight" style="margin-top:14px"></div>
         </div>
       </div>
 
@@ -892,7 +858,7 @@ tfoot td.c { text-align: center; }
         </div>
         <div class="chart-card-body">
           <div id="trendContent"></div>
-          <div id="trend-insight" style="margin-top:20px"></div>
+          <div id="trend-insight" style="margin-top:14px"></div>
         </div>
       </div>
     </div>
@@ -901,8 +867,8 @@ tfoot td.c { text-align: center; }
     <div id="view-kesimpulan" class="view">
       <div class="page-header">
         <div>
-          <div class="page-title">Evaluasi & Rekomendasi</div>
-          <div class="page-subtitle" id="k-subtitle">Evaluasi sistematis data capaian BTQ</div>
+          <div class="page-title">Kesimpulan & Rekomendasi</div>
+          <div class="page-subtitle" id="k-subtitle">Evaluasi sistematis data BTQ</div>
         </div>
       </div>
       <div class="conclusion-card">
@@ -911,12 +877,6 @@ tfoot td.c { text-align: center; }
         <ul class="reco-list" id="k-reco"></ul>
       </div>
     </div>
-
-    <!-- ══ FOOTER ══ -->
-    <footer class="main-footer">
-      <p><strong>SMART BTQ v1.0</strong> · Dinas Pendidikan dan Kebudayaan Kota Banjar</p>
-      <p>Dokumen internal – tidak untuk publikasi eksternal</p>
-    </footer>
 
   </main>
 </div>
@@ -940,9 +900,9 @@ tfoot td.c { text-align: center; }
 <!-- ═══════════════ SCRIPT ═══════════════ -->
 <script>
 // ────────────────────────────────────────────
-// DATABASE STATE 
+// DATABASE STATE (FETCHED VIA API)
 // ────────────────────────────────────────────
-let RAW_DATABASE = {};
+let DATABASE = {};
 
 let currentYear = null, currentMonth = null;
 let selectedKecamatan = 'all';
@@ -954,110 +914,33 @@ let barChartActiveData = [], stackChartActiveData = [];
 let currentModalSchool = null;
 
 // ────────────────────────────────────────────
-// PENGAMBILAN DATA (FETCH JSON)
-// ────────────────────────────────────────────
-function loadData() {
-  fetch("data.json")
-    .then(res => {
-      if (!res.ok) throw new Error("Gagal load JSON");
-      return res.json();
-    })
-    .then(json => {
-      RAW_DATABASE = {};
-
-      Object.keys(json).forEach(key => {
-        // 1. Normalisasi key untuk membuang spasi kosong yang mungkin ada (misal: "JULI_2025 ")
-        const cleanKey = key.trim();
-        
-        // 2. Abaikan jika format key bukan BULAN_TAHUN
-        if (!cleanKey.includes("_")) return;
-        
-        const [bulan, tahun] = cleanKey.split("_");
-        
-        // 3. Pastikan data bulan dan tahun bisa diurai
-        if (!bulan || !tahun) return;
-
-        const cleanTahun = tahun.trim();
-        if (!RAW_DATABASE[cleanTahun]) {
-          RAW_DATABASE[cleanTahun] = {};
-        }
-
-        // 4. Normalisasi teks bulan (huruf pertama Kapital, sisanya kecil) bebas spasi
-        const cleanBulan = bulan.trim();
-        const bulanFormatted = cleanBulan.charAt(0).toUpperCase() + cleanBulan.slice(1).toLowerCase();
-
-        RAW_DATABASE[cleanTahun][bulanFormatted] = json[key];
-      });
-
-      // 5. Log debugging untuk memastikan semua bulan dan tahun terbaca (cek browser console)
-      console.log("RAW_DATABASE:", RAW_DATABASE);
-
-      // Setelah data selesai diambil dan disusun, mulai render aplikasi
-      init();
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Terjadi kesalahan saat memuat data.json");
-    });
-}
-
-// ────────────────────────────────────────────
 // HELPERS
 // ────────────────────────────────────────────
 const n2 = n => parseFloat(n).toFixed(1);
 const fmt = n => n.toLocaleString('id-ID');
-
-function toNumber(val) {
-  if (typeof val === "number") return val;
-  return 0; // Jika string, null, atau undefined, ubah jadi 0 agar perhitungan tidak NaN
-}
 
 function aggregateSchools(rawArr) {
   return rawArr.map(s => {
     let tot=0,lancar=0,belum=0,tidak=0;
     let k4t=0,k4l=0,k4b=0,k4k=0,k5t=0,k5l=0,k5b=0,k5k=0;
     let hadirArr=[],guruArr=[],warnings=[];
-    
-    // Pastikan rows adalah array sebelum di-looping
-    if (Array.isArray(s.rows)) {
-      s.rows.forEach(r => {
-        // Ekstraksi data Kelas 4 yang aman (anti error)
-        const r_k4t = toNumber(r.kls4?.total);
-        const r_k4l = toNumber(r.kls4?.lancar);
-        const r_k4b = toNumber(r.kls4?.belum);
-        const r_k4k = toNumber(r.kls4?.tidak);
-        
-        // Ekstraksi data Kelas 5 yang aman (anti error)
-        const r_k5t = toNumber(r.kls5?.total);
-        const r_k5l = toNumber(r.kls5?.lancar);
-        const r_k5b = toNumber(r.kls5?.belum);
-        const r_k5k = toNumber(r.kls5?.tidak);
-
-        const k4s = r_k4l + r_k4b + r_k4k;
-        const k5s = r_k5l + r_k5b + r_k5k;
-        
-        if(Math.abs(k4s - r_k4t) > 1) warnings.push(`Kls4 ${r.guru || 'Tanpa Nama'}`);
-        if(Math.abs(k5s - r_k5t) > 1) warnings.push(`Kls5 ${r.guru || 'Tanpa Nama'}`);
-        
-        tot += (r_k4t + r_k5t); 
-        lancar += (r_k4l + r_k5l);
-        belum += (r_k4b + r_k5b); 
-        tidak += (r_k4k + r_k5k);
-        
-        k4t += r_k4t; k4l += r_k4l; k4b += r_k4b; k4k += r_k4k;
-        k5t += r_k5t; k5l += r_k5l; k5b += r_k5b; k5k += r_k5k;
-        
-        hadirArr.push(toNumber(r.hadir)); 
-        guruArr.push(r.guru || '-');
-      });
-    }
-    
+    s.rows.forEach(r => {
+      const k4s=r.kls4.lancar+r.kls4.belum+r.kls4.tidak;
+      const k5s=r.kls5.lancar+r.kls5.belum+r.kls5.tidak;
+      if(Math.abs(k4s-r.kls4.total)>1) warnings.push(`Kls4 ${r.guru}`);
+      if(Math.abs(k5s-r.kls5.total)>1) warnings.push(`Kls5 ${r.guru}`);
+      tot+=r.kls4.total+r.kls5.total; lancar+=r.kls4.lancar+r.kls5.lancar;
+      belum+=r.kls4.belum+r.kls5.belum; tidak+=r.kls4.tidak+r.kls5.tidak;
+      k4t+=r.kls4.total;k4l+=r.kls4.lancar;k4b+=r.kls4.belum;k4k+=r.kls4.tidak;
+      k5t+=r.kls5.total;k5l+=r.kls5.lancar;k5b+=r.kls5.belum;k5k+=r.kls5.tidak;
+      hadirArr.push(r.hadir); guruArr.push(r.guru);
+    });
     return {
-      idx:s.no,no:s.no,nama:s.nama||'Tanpa Nama',kecamatan:s.kecamatan||'-',
+      idx:s.no,no:s.no,nama:s.nama,kecamatan:s.kecamatan,
       tot,lancar,belum,tidak,pct:tot>0?(lancar/tot*100):0,
       kls4:{tot:k4t,lancar:k4l,belum:k4b,tidak:k4k},
       kls5:{tot:k5t,lancar:k5l,belum:k5b,tidak:k5k},
-      guru:guruArr,hadir:hadirArr,rows:s.rows||[],warnings
+      guru:guruArr,hadir:hadirArr,rows:s.rows,warnings
     };
   });
 }
@@ -1078,12 +961,12 @@ function getPrevPeriod(year,month) {
   const idx=months.indexOf(month);
   if(idx<=0) {
     const py=String(parseInt(year)-1);
-    if(!RAW_DATABASE[py]) return null;
-    const pym=Object.keys(RAW_DATABASE[py]);
+    if(!DATABASE[py]) return null;
+    const pym=Object.keys(DATABASE[py]);
     return pym.length?{year:py,month:pym[pym.length-1]}:null;
   }
   for(let i=idx-1;i>=0;i--) {
-    if(RAW_DATABASE[year]&&RAW_DATABASE[year][months[i]]) return {year,month:months[i]};
+    if(DATABASE[year]&&DATABASE[year][months[i]]) return {year,month:months[i]};
   }
   return null;
 }
@@ -1091,9 +974,9 @@ function getPrevPeriod(year,month) {
 function getAllPeriods() {
   const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const result=[];
-  Object.keys(RAW_DATABASE).sort().forEach(yr => {
+  Object.keys(DATABASE).sort().forEach(yr => {
     months.forEach(mo => {
-      if(RAW_DATABASE[yr]&&RAW_DATABASE[yr][mo]) result.push({year:yr,month:mo});
+      if(DATABASE[yr]&&DATABASE[yr][mo]) result.push({year:yr,month:mo});
     });
   });
   return result;
@@ -1107,79 +990,68 @@ function dataQuality(school) {
 }
 
 // ────────────────────────────────────────────
-// SPA NAVIGATION
+// FETCH API
 // ────────────────────────────────────────────
-function showSection(id) {
-  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(l=>{
-    l.classList.toggle('active', l.getAttribute('data-target')===id);
-  });
-  if(window.innerWidth<=900) closeSidebar();
-  window.dispatchEvent(new Event('resize'));
-}
+const API_URL = "https://script.google.com/macros/s/AKfycbwud19YXXiOwLztp-IpoEWpZls_uy2yoegY_ZAcktO_Eda5LQqFYxsSyV-o0cUnlmXgPA/exec";
 
-// ────────────────────────────────────────────
-// INIT
-// ────────────────────────────────────────────
-function init() {
-  initYearMonth();
-  showSection('view-ringkasan');
-  render(); // Handling fallback empty data sudah menggunakan RAW_DATABASE[currentYear]?.[currentMonth] || []
-}
-
-function initYearMonth() {
-  // Ambil data tahun yang tersedia di JSON, lalu urutkan
-  const availableYears = Object.keys(RAW_DATABASE).sort();
-  if (availableYears.length === 0) return;
-
-  // Set default ke tahun terbaru jika null
-  if (!currentYear || !RAW_DATABASE[currentYear]) {
-    currentYear = availableYears[availableYears.length - 1]; 
-  }
-
-  // Render opsi tahun dinamis
-  let yearOptions = '';
-  availableYears.forEach(y => {
-    yearOptions += `<option value="${y}"${y == currentYear ? ' selected' : ''}>${y}</option>`;
-  });
-
-  ['selYear','sbYear'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.innerHTML = yearOptions;
-  });
-
-  updateMonthDropdowns();
-}
-
-function updateMonthDropdowns() {
-  const allMonths = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  
-  // Ambil hanya bulan yang mempunyai data di RAW_DATABASE untuk tahun terpilih
-  const monthsData = RAW_DATABASE[currentYear] || {};
-  
-  // 6. PERBAIKAN FILTER BULAN: pastikan nilainya tidak undefined
-  let availableMonths = allMonths.filter(m => monthsData[m] !== undefined);
-
-  // Jika user pindah tahun atau baru pertama kali load (currentMonth null),
-  // reset dropdown bulan ke opsi terakhir yang tersedia di tahun tersebut
-  if (!availableMonths.includes(currentMonth) && availableMonths.length > 0) {
-    currentMonth = availableMonths[availableMonths.length - 1]; 
-  }
-
-  // Render opsi bulan
-  let monthOptions = '';
-  availableMonths.forEach(m => {
-    monthOptions += `<option value="${m}"${m == currentMonth ? ' selected' : ''}>${m}</option>`;
-  });
-
-  ['selMonth','sbMonth'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) {
-      el.innerHTML = monthOptions;
-      el.value = currentMonth;
+async function loadData() {
+  try {
+    if(API_URL === "ISI_DENGAN_URL_WEB_APP") {
+      document.getElementById('r-title').textContent = "Konfigurasi Dibutuhkan";
+      document.getElementById('r-subtitle').textContent = "Silakan ganti ISI_DENGAN_URL_WEB_APP di dalam file index.html";
+      return;
     }
-  });
+
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    DATABASE = data;
+    
+    // Inisialisasi state awal
+    const years = Object.keys(DATABASE).sort((a,b)=>b-a);
+    if(years.length > 0) {
+      currentYear = years[0];
+      const months = Object.keys(DATABASE[currentYear]);
+      if(months.length > 0) currentMonth = months[months.length-1];
+    }
+
+    initDropdown();
+    showSection('view-ringkasan');
+    renderAll();
+  } catch (err) {
+    console.error("Error:", err);
+    document.getElementById('r-title').textContent = "Gagal Memuat Data";
+    document.getElementById('r-subtitle').textContent = "Periksa koneksi internet atau ketersediaan Server Google Apps Script.";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadData);
+
+// ────────────────────────────────────────────
+// DROPDOWNS & NAVIGATION
+// ────────────────────────────────────────────
+function initDropdown() {
+  const years = Object.keys(DATABASE).sort((a,b)=>b-a);
+
+  const selYear = document.getElementById("selYear");
+  const sbYear = document.getElementById("sbYear");
+
+  const opts = years.map(y => `<option value="${y}"${y==currentYear?' selected':''}>${y}</option>`).join("");
+  if(selYear) selYear.innerHTML = opts;
+  if(sbYear) sbYear.innerHTML = opts;
+
+  updateMonths();
+}
+
+function updateMonths() {
+  const year = document.getElementById("selYear").value || currentYear;
+  const months = Object.keys(DATABASE[year] || {});
+
+  const selMonth = document.getElementById("selMonth");
+  const sbMonth = document.getElementById("sbMonth");
+  
+  const opts = months.map(m => `<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join("");
+  if(selMonth) selMonth.innerHTML = opts;
+  if(sbMonth) sbMonth.innerHTML = opts;
 }
 
 function syncSelects(kec, yr, mo) {
@@ -1189,45 +1061,44 @@ function syncSelects(kec, yr, mo) {
 }
 
 function onPeriodChange() {
-  const kec = (document.getElementById('selKecamatan')||{}).value || selectedKecamatan;
-  const yr = (document.getElementById('selYear')||{}).value || currentYear;
-  const mo = (document.getElementById('selMonth')||{}).value || currentMonth;
-  
-  selectedKecamatan = kec;
-  const yearChanged = (currentYear != yr);
-  currentYear = yr; 
-  currentMonth = mo;
+  const kec=(document.getElementById('selKecamatan')||{}).value||selectedKecamatan;
+  selectedKecamatan=kec;
+  if(selectedKecamatan==='all') stackDisplayMode='top20';
+  else stackDisplayMode='all';
 
-  // Jika tahun diganti, sesuaikan daftar bulan
-  if (yearChanged) updateMonthDropdowns();
+  updateMonths();
 
-  if(selectedKecamatan === 'all') stackDisplayMode = 'top20';
-  else stackDisplayMode = 'all';
+  const yr=document.getElementById('selYear').value;
+  const mo=document.getElementById('selMonth').value;
+  syncSelects(kec,yr,mo);
   
-  syncSelects(selectedKecamatan, currentYear, currentMonth);
-  sortMode = 'default';
+  sortMode='default';
   refreshSortButtons();
-  render();
+  renderAll();
 }
 
 function onSidebarKec() {
   selectedKecamatan=document.getElementById('sbKecamatan').value;
-  syncSelects(selectedKecamatan,currentYear,currentMonth);
   if(selectedKecamatan==='all') stackDisplayMode='top20'; else stackDisplayMode='all';
-  sortMode='default'; refreshSortButtons(); render();
+  
+  const yr=document.getElementById('selYear').value;
+  const mo=document.getElementById('selMonth').value;
+  syncSelects(selectedKecamatan,yr,mo);
+  
+  sortMode='default'; refreshSortButtons(); renderAll();
 }
 
 function onSidebarPeriod() {
-  const yr = document.getElementById('sbYear').value;
-  const yearChanged = (currentYear != yr);
-  currentYear = yr;
-  currentMonth = document.getElementById('sbMonth').value;
-
-  // Jika tahun diganti dari sidebar, sesuaikan daftar bulan
-  if (yearChanged) updateMonthDropdowns();
-
-  syncSelects(selectedKecamatan, currentYear, currentMonth);
-  sortMode='default'; refreshSortButtons(); render();
+  const yr=document.getElementById('sbYear').value;
+  document.getElementById('selYear').value = yr;
+  
+  updateMonths();
+  
+  const mo=document.getElementById('sbMonth').value;
+  document.getElementById('selMonth').value = mo;
+  
+  syncSelects(selectedKecamatan,yr,mo);
+  sortMode='default'; refreshSortButtons(); renderAll();
 }
 
 function refreshSortButtons() {
@@ -1239,14 +1110,34 @@ function setStackMode(mode) {
   stackDisplayMode=mode;
   document.getElementById('btnStackTop20').classList.toggle('active',mode==='top20');
   document.getElementById('btnStackAll').classList.toggle('active',mode==='all');
-  render();
+  renderAll();
+}
+
+function showSection(id) {
+  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(l=>{
+    l.classList.toggle('active', l.getAttribute('data-target')===id);
+  });
+  if(window.innerWidth<=900) closeSidebar();
+  window.dispatchEvent(new Event('resize'));
 }
 
 // ────────────────────────────────────────────
-// RENDER
+// RENDER UTAMA
 // ────────────────────────────────────────────
-function render() {
-  const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth]||[];
+function renderAll() {
+  const year = document.getElementById("selYear").value || currentYear;
+  const month = document.getElementById("selMonth").value || currentMonth;
+
+  currentYear = year;
+  currentMonth = month;
+
+  // Akses data sesuai instruksi terbaru
+  const data = DATABASE[year]?.[month];
+  if (!data) return;
+
+  const rawMaster = data;
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
   let rawArr = rawMaster;
@@ -1261,20 +1152,20 @@ function render() {
   const cakupan = isAll?'Kota Banjar':`Kec. ${selectedKecamatan}`;
 
   // Page titles
-  document.getElementById('r-title').textContent = `Ringkasan Eksekutif — ${cakupan}`;
-  document.getElementById('r-subtitle').textContent = `Periode ${periodStr} · ${currentSchools.length} Satuan Pendidikan Negeri`;
-  document.getElementById('g-title').textContent = `Analisis & Visualisasi — ${cakupan}`;
+  document.getElementById('r-title').textContent = `Ringkasan — ${cakupan}`;
+  document.getElementById('r-subtitle').textContent = `Periode ${periodStr} · ${currentSchools.length} Sekolah Dasar Negeri`;
+  document.getElementById('g-title').textContent = `Grafik & Analisis — ${cakupan}`;
   document.getElementById('g-sub').textContent = `Periode ${periodStr}`;
-  document.getElementById('k-subtitle').textContent = `Evaluasi capaian analitik · ${cakupan} · ${periodStr}`;
+  document.getElementById('k-subtitle').textContent = `${cakupan} · ${periodStr}`;
   document.getElementById('tabel-sub').textContent = `${cakupan} · ${periodStr}`;
-  document.getElementById('tabel-count-badge').textContent = `${currentSchools.length} Sekolah`;
+  document.getElementById('tabel-count-badge').textContent = `${currentSchools.length} sekolah`;
   document.getElementById('analysis-period-badge').textContent = periodStr;
 
   // Trend chip
   const prev=getPrevPeriod(currentYear,currentMonth);
   let chipHTML='';
   if(prev) {
-    let pRaw=RAW_DATABASE[prev.year][prev.month];
+    let pRaw=DATABASE[prev.year][prev.month];
     if(!isAll) pRaw=pRaw.filter(s=>s.kecamatan===selectedKecamatan);
     const pT=computeTotals(aggregateSchools(pRaw));
     const pPct=pT.tot>0?(pT.lancar/pT.tot*100):0;
@@ -1296,15 +1187,15 @@ function render() {
   const pctB=T.tot>0?(T.belum/T.tot*100):0;
   const pctK=T.tot>0?(T.tidak/T.tot*100):0;
   document.getElementById('hero-prog').innerHTML=`
-    <div class="prog-segment" style="width:${pctL}%;background:var(--green)"></div>
-    <div class="prog-segment" style="width:${pctB}%;background:var(--amber)"></div>
-    <div class="prog-segment" style="width:${pctK}%;background:var(--red)"></div>
+    <div class="prog-segment" style="width:${pctL}%;background:#16a34a"></div>
+    <div class="prog-segment" style="width:${pctB}%;background:#d97706"></div>
+    <div class="prog-segment" style="width:${pctK}%;background:#dc2626"></div>
   `;
   const sorted=currentSchools.filter(s=>s.tot>0).sort((a,b)=>b.pct-a.pct);
   const best=sorted[0], worst=sorted[sorted.length-1];
   let desc='';
   if(best&&worst&&best.no!==worst.no) {
-    desc=`<strong>${best.nama}</strong> capaian terbaik (${n2(best.pct)}%) · <strong>${worst.nama}</strong> memerlukan perhatian (${n2(worst.pct)}%)`;
+    desc=`<strong>${best.nama}</strong> terbaik (${n2(best.pct)}%) · <strong>${worst.nama}</strong> butuh perhatian (${n2(worst.pct)}%)`;
   }
   document.getElementById('hero-desc').innerHTML=desc;
 
@@ -1316,19 +1207,21 @@ function render() {
 
   // KPIs
   document.getElementById('kpi-sekolah').textContent=currentSchools.length;
+  document.getElementById('kpi-sekolah-sub').textContent=`SD Negeri di ${cakupan}`;
   document.getElementById('kpi-lancar').textContent=fmt(T.lancar);
-  document.getElementById('kpi-pct-lancar').textContent=n2(pctL)+'% dari populasi';
+  document.getElementById('kpi-pct-lancar').textContent=n2(pctL)+'% dari total';
   document.getElementById('kpi-pct-lancar').className='kpi-badge '+(pctL>=60?'valid':'check');
   document.getElementById('kpi-belum').textContent=fmt(T.belum);
-  document.getElementById('kpi-pct-belum').textContent=n2(pctB)+'% dari populasi';
+  document.getElementById('kpi-pct-belum').textContent=n2(pctB)+'% dari total';
   document.getElementById('kpi-pct-belum').className='kpi-badge partial';
   document.getElementById('kpi-tidak').textContent=fmt(T.tidak);
-  document.getElementById('kpi-pct-tidak').textContent=n2(pctK)+'% dari populasi';
+  document.getElementById('kpi-pct-tidak').textContent=n2(pctK)+'% dari total';
   document.getElementById('kpi-hadir').textContent=n2(T.avgHadir)+'%';
   const qH = T.avgHadir>=90?'valid':T.avgHadir>=75?'partial':'check';
-  document.getElementById('kpi-q-hadir').textContent=T.avgHadir>=90?'● Terpenuhi':T.avgHadir>=75?'● Cukup':'● Defisit';
+  document.getElementById('kpi-q-hadir').textContent=T.avgHadir>=90?'● Baik':T.avgHadir>=75?'● Menengah':'● Perlu Perhatian';
   document.getElementById('kpi-q-hadir').className='kpi-badge '+qH;
 
+  // Render Section Terkait
   renderTable();
   renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
   renderTrend(cakupan);
@@ -1355,7 +1248,7 @@ function renderTable() {
     const q=dataQuality(s);
     const qLabel=q==='valid'?'<span class="q-dot q-green" title="Data Valid"></span> Valid':
                  q==='partial'?'<span class="q-dot q-amber" title="Perlu Periksa"></span> Partial':
-                 '<span class="q-dot q-red" title="Inkonsistensi"></span> Anomali';
+                 '<span class="q-dot q-red" title="Inkonsistensi"></span> Cek';
     
     // Menambahkan atribut data-label agar berfungsi pada tampilan Card (Mobile)
     const tr=document.createElement('tr');
@@ -1384,7 +1277,7 @@ function renderTable() {
   // Footer tanpa colspan agar aman saat diubah jadi Card
   tfoot.innerHTML=`<tr>
     <td data-label="#"></td>
-    <td data-label="Sekolah" class="c" style="font-weight:600;color:var(--ink-1)">Agregat (${display.length} sekolah)</td>
+    <td data-label="Sekolah" class="c" style="font-weight:600;color:var(--ink-1)">Total (${display.length} sekolah)</td>
     <td data-label="Siswa" class="c">${fmt(T.tot)}</td>
     <td data-label="Lancar" class="c" style="color:var(--green);font-weight:600">${fmt(T.lancar)}</td>
     <td data-label="% Lancar" class="c">${pctPill(p)}</td>
@@ -1421,12 +1314,12 @@ function sortTable(mode) {
 // CHARTS
 // ────────────────────────────────────────────
 const C = {
-  green:'#188038', greenA:'rgba(24,128,56,.15)',
-  amber:'#f29900', amberA:'rgba(242,153,0,.15)',
-  red:'#d93025',   redA:'rgba(217,48,37,.12)',
-  blue:'#1a73e8',  blueA:'rgba(26,115,232,.12)',
-  navy:'#202124',  navyA:'rgba(32,33,36,.06)',
-  ink2:'#5f6368', ink3:'#80868b', border:'#dadce0',
+  green:'rgba(22,163,74,1)', greenA:'rgba(22,163,74,.15)',
+  amber:'rgba(217,119,6,1)', amberA:'rgba(217,119,6,.15)',
+  red:'rgba(220,38,38,1)',   redA:'rgba(220,38,38,.12)',
+  blue:'rgba(37,99,235,1)',  blueA:'rgba(37,99,235,.12)',
+  navy:'rgba(15,23,42,1)',   navyA:'rgba(15,23,42,.06)',
+  ink2:'#475569', ink3:'#94a3b8', border:'#e8eaee',
 };
 
 function destroyChart(k){if(charts[k]){charts[k].destroy();charts[k]=null;}}
@@ -1457,7 +1350,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
           if(!isAll&&k.name===selectedKecamatan) return C.blue;
           return k.pct>=80?C.green:k.pct>=60?C.amber:C.red;
         }),
-        borderRadius:4,
+        borderRadius:6,
         borderSkipped:false,
       }]
     },
@@ -1471,8 +1364,8 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'rgba(32,33,36,.95)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',
-          padding:12,cornerRadius:6,
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
           callbacks:{label:ctx=>` Capaian: ${ctx.raw}%`}
         }
       }
@@ -1483,16 +1376,16 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
   if(isAll){
     kecInsightHTML=`
       <div class="insight-item green">
-        <div class="ii-label">Wilayah Unggul</div>
-        <div class="ii-text"><strong>Kec. ${bestKec.name}</strong> memimpin dengan rata-rata capaian <strong>${n2(bestKec.pct)}%</strong>. Direkomendasikan sebagai model tata kelola.</div>
+        <div class="ii-label">Terbaik</div>
+        <div class="ii-text"><strong>Kec. ${bestKec.name}</strong> unggul dengan rata-rata <strong>${n2(bestKec.pct)}%</strong>. Jadikan referensi.</div>
       </div>
       <div class="insight-item red">
-        <div class="ii-label">Area Defisit</div>
-        <div class="ii-text"><strong>Kec. ${worstKec.name}</strong> berada pada tingkat terendah (<strong>${n2(worstKec.pct)}%</strong>). Membutuhkan eskalasi intervensi.</div>
+        <div class="ii-label">Perhatian</div>
+        <div class="ii-text"><strong>Kec. ${worstKec.name}</strong> paling rendah <strong>${n2(worstKec.pct)}%</strong>. Butuh program khusus.</div>
       </div>
       <div class="insight-item amber">
-        <div class="ii-label">Indeks Kesenjangan</div>
-        <div class="ii-text">Selisih capaian antar kecamatan terlebar adalah <strong>${n2(kecGap)}%</strong>, mengindikasikan disparitas standar edukasi.</div>
+        <div class="ii-label">Kesenjangan</div>
+        <div class="ii-text">Gap antar kecamatan mencapai <strong>${n2(kecGap)}%</strong> menunjukkan ketidakmerataan mutu.</div>
       </div>
     `;
   } else {
@@ -1500,12 +1393,12 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     const rank=kecSorted.findIndex(k=>k.name===selectedKecamatan)+1;
     kecInsightHTML=`
       <div class="insight-item blue">
-        <div class="ii-label">Posisi Regional</div>
-        <div class="ii-text"><strong>Kec. ${selectedKecamatan}</strong> menempati peringkat <strong>${rank}</strong> dari 4 kecamatan dengan indeks capaian <strong>${n2(self.pct)}%</strong>.</div>
+        <div class="ii-label">Peringkat Kota</div>
+        <div class="ii-text"><strong>Kec. ${selectedKecamatan}</strong> berada di posisi ke-<strong>${rank}</strong> dari 4 kecamatan dengan capaian <strong>${n2(self.pct)}%</strong>.</div>
       </div>
       <div class="insight-item amber">
-        <div class="ii-label">Deviasi ke Puncak</div>
-        <div class="ii-text">Dibutuhkan akselerasi <strong>${n2(Math.abs(self.pct-bestKec.pct))}%</strong> untuk sejajar dengan performa wilayah terbaik (Kec. ${bestKec.name}).</div>
+        <div class="ii-label">Gap ke Terbaik</div>
+        <div class="ii-text">Diperlukan peningkatan <strong>${n2(Math.abs(self.pct-bestKec.pct))}%</strong> untuk menyamai Kec. ${bestKec.name} (${n2(bestKec.pct)}%).</div>
       </div>
     `;
   }
@@ -1523,19 +1416,19 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       datasets:[{
         data:[T.lancar,T.belum,T.tidak],
         backgroundColor:[C.green,C.amber,C.red],
-        borderWidth:0, hoverOffset:4,
+        borderWidth:0, hoverOffset:6,
       }]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
-      cutout:'70%',
+      cutout:'68%',
       plugins:{
         legend:{display:true,position:'bottom',labels:{
-          font:{size:11.5},padding:14, usePointStyle:true,pointStyle:'circle',
+          font:{size:11},padding:14, usePointStyle:true,pointStyle:'circle',
         }},
         tooltip:{
-          backgroundColor:'rgba(32,33,36,.95)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',
-          padding:12,cornerRadius:6,
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
           callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.parsed)} (${T.tot>0?n2(ctx.parsed/T.tot*100):0}%)`}
         }
       }
@@ -1543,9 +1436,9 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
   });
   document.getElementById('pie-insight').innerHTML=`
     <div class="insight-strip pie-insight-grid">
-      <div class="insight-item green"><div class="ii-label">Lancar</div><div class="ii-text" style="font-size:18px;font-weight:600;color:var(--green)">${n2(pL)}%</div><div class="ii-text">${fmt(T.lancar)} jiwa</div></div>
-      <div class="insight-item amber"><div class="ii-label">Belum</div><div class="ii-text" style="font-size:18px;font-weight:600;color:var(--amber)">${n2(pB)}%</div><div class="ii-text">${fmt(T.belum)} jiwa</div></div>
-      <div class="insight-item red"><div class="ii-label">Tidak Bisa</div><div class="ii-text" style="font-size:18px;font-weight:600;color:var(--red)">${n2(pK)}%</div><div class="ii-text">${fmt(T.tidak)} jiwa</div></div>
+      <div class="insight-item green"><div class="ii-label">Lancar</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--green)">${n2(pL)}%</div><div class="ii-text">${fmt(T.lancar)} siswa</div></div>
+      <div class="insight-item amber"><div class="ii-label">Belum</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--amber)">${n2(pB)}%</div><div class="ii-text">${fmt(T.belum)} siswa</div></div>
+      <div class="insight-item red"><div class="ii-label">Tidak Bisa</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--red)">${n2(pK)}%</div><div class="ii-text">${fmt(T.tidak)} siswa</div></div>
     </div>
   `;
 
@@ -1562,26 +1455,26 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       datasets:[{
         data:top10.map(s=>parseFloat(n2(s.pct))),
         backgroundColor:top10.map(s=>s.pct>=80?C.green:s.pct>=60?C.amber:C.red),
-        borderRadius:3,borderSkipped:false,
+        borderRadius:4,borderSkipped:false,
       }]
     },
     options:{
       indexAxis:'y',responsive:true,maintainAspectRatio:false,
       onClick:(e,els)=>{if(els.length>0&&barChartActiveData[els[0].index])openModal(barChartActiveData[els[0].index].no);},
       scales:{
-        x:{min:0,max:100,grid:{color:C.border},ticks:{callback:v=>v+'%',font:{size:11}},border:{display:false}},
-        y:{grid:{display:false},ticks:{font:{size:11}},border:{display:false}}
+        x:{min:0,max:100,grid:{color:C.border},ticks:{callback:v=>v+'%',font:{size:10}},border:{display:false}},
+        y:{grid:{display:false},ticks:{font:{size:10.5}},border:{display:false}}
       },
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'rgba(32,33,36,.95)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',
-          padding:12,cornerRadius:6,
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
           callbacks:{
             title:ctx=>barChartActiveData[ctx[0].dataIndex].nama,
             label:ctx=>{
               const s=barChartActiveData[ctx.dataIndex];
-              return [` ${n2(s.pct)}% lancar`,` ${fmt(s.lancar)} dari ${fmt(s.tot)} representasi populasi`];
+              return [` ${n2(s.pct)}% lancar`,` ${fmt(s.lancar)} dari ${fmt(s.tot)} siswa`];
             }
           }
         }
@@ -1592,16 +1485,16 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     document.getElementById('bar-insight').innerHTML=`
       <div class="duo-grid">
         <div class="duo-card best" onclick="openModal(${top10[0].no})">
-          <div class="duo-lbl">🏆 Tertinggi</div>
+          <div class="duo-lbl">🏆 Terbaik</div>
           <div class="duo-name">${top10[0].nama}</div>
           <div class="duo-pct">${n2(top10[0].pct)}%</div>
-          <div class="duo-meta">Kec. ${top10[0].kecamatan} · Populasi lulus: ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)}</div>
+          <div class="duo-meta">Kec. ${top10[0].kecamatan} · ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)} siswa</div>
         </div>
         <div class="duo-card worst" onclick="openModal(${bot1.no})">
-          <div class="duo-lbl">⚠ Defisit Kritis</div>
+          <div class="duo-lbl">⚠ Perhatian</div>
           <div class="duo-name">${bot1.nama}</div>
           <div class="duo-pct">${n2(bot1.pct)}%</div>
-          <div class="duo-meta">Kec. ${bot1.kecamatan} · Populasi lulus: ${fmt(bot1.lancar)}/${fmt(bot1.tot)}</div>
+          <div class="duo-meta">Kec. ${bot1.kecamatan} · ${fmt(bot1.lancar)}/${fmt(bot1.tot)} siswa</div>
         </div>
       </div>
     `;
@@ -1614,6 +1507,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     stackData=stackData.sort((a,b)=>b.pct-a.pct);
     if(isAll&&stackData.length>20) stackData=stackData.slice(0,20);
   }
+  // Tidak perlu kalkulasi width fixed, biarkan 100% untuk menghindari horizontal scroll.
   document.getElementById('stackCanvasContainer').style.width='100%';
   
   stackChartActiveData=stackData;
@@ -1623,22 +1517,22 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       labels:stackData.map(s=>s.nama.replace('SDN ','').split(' ').slice(0,2).join(' ')),
       datasets:[
         {label:'Lancar',data:stackData.map(s=>s.lancar),backgroundColor:C.green,borderRadius:2,borderSkipped:false},
-        {label:'Belum Lancar',data:stackData.map(s=>s.belum),backgroundColor:C.amber,borderRadius:0},
-        {label:'Tidak Bisa',data:stackData.map(s=>s.tidak),backgroundColor:C.red,borderRadius:0},
+        {label:'Belum',data:stackData.map(s=>s.belum),backgroundColor:C.amber,borderRadius:0},
+        {label:'Tidak',data:stackData.map(s=>s.tidak),backgroundColor:C.red,borderRadius:0},
       ]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
       onClick:(e,els)=>{if(els.length>0&&stackChartActiveData[els[0].index])openModal(stackChartActiveData[els[0].index].no);},
       scales:{
-        x:{stacked:true,grid:{display:false},ticks:{font:{size:10},maxRotation:45},border:{display:false}},
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:9.5},maxRotation:45},border:{display:false}},
         y:{stacked:true,grid:{color:C.border},border:{display:false}}
       },
       plugins:{
-        legend:{display:true,position:'bottom',labels:{font:{size:11.5},padding:14,usePointStyle:true,pointStyle:'circle'}},
+        legend:{display:true,position:'bottom',labels:{font:{size:11},padding:14,usePointStyle:true,pointStyle:'circle'}},
         tooltip:{
-          backgroundColor:'rgba(32,33,36,.95)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',
-          padding:12,cornerRadius:6,
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
           callbacks:{
             title:ctx=>stackChartActiveData[ctx[0].dataIndex].nama,
             label:ctx=>{
@@ -1658,9 +1552,9 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
   document.getElementById('stackToggle').style.display=(valid.length>20&&isAll)?'flex':'none';
   document.getElementById('stack-insight').innerHTML=`
     <div class="insight-strip">
-      <div class="insight-item green"><div class="ii-label">Kategori Unggul (≥80%)</div><div class="ii-text">Terdapat <strong>${highC} sekolah</strong> yang telah mencapai target optimasi standar kelancaran.</div></div>
-      <div class="insight-item amber"><div class="ii-label">Kategori Menengah (60–79%)</div><div class="ii-text"><strong>${midC} sekolah</strong> berada dalam ambang batas toleransi dan memerlukan dorongan programtik.</div></div>
-      <div class="insight-item red"><div class="ii-label">Kategori Defisit (&lt;60%)</div><div class="ii-text">Ditemukan <strong>${lowC} sekolah</strong> yang berstatus kritis dan wajib menerima supervisi segera.</div></div>
+      <div class="insight-item green"><div class="ii-label">Tinggi ≥80%</div><div class="ii-text"><strong>${highC} sekolah</strong> sudah memenuhi standar kelancaran BTQ.</div></div>
+      <div class="insight-item amber"><div class="ii-label">Sedang 60–79%</div><div class="ii-text"><strong>${midC} sekolah</strong> dalam zona perlu peningkatan.</div></div>
+      <div class="insight-item red"><div class="ii-label">Rendah &lt;60%</div><div class="ii-text"><strong>${lowC} sekolah</strong> memerlukan pendampingan intensif segera.</div></div>
     </div>
   `;
 
@@ -1671,28 +1565,28 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 
   document.getElementById('analysis-grid').innerHTML=`
     <div class="analysis-card ac-blue">
-      <div class="ac-eyebrow">Agregat Capaian</div>
-      <div class="ac-title">Rerata Analitik ${cakupan}</div>
-      <div class="ac-body">Capaian BTQ bertengger di <strong>${n2(pct)}%</strong>. Distribusi menunjukkan ${highC} unit pendidik unggul, ${midC} standar, dan ${lowC} di bawah minimum kelayakan.</div>
+      <div class="ac-eyebrow">Capaian Utama</div>
+      <div class="ac-title">Kelancaran ${cakupan}</div>
+      <div class="ac-body">Rata-rata BTQ berada di <strong>${n2(pct)}%</strong>. ${highC} sekolah sudah di level tinggi, ${midC} sedang, dan ${lowC} masih rendah.</div>
     </div>
     <div class="analysis-card ${isAll?'ac-blue':'ac-amber'}">
-      <div class="ac-eyebrow">${isAll?'Pemetaan Kewilayahan':'Konteks Internal Kewilayahan'}</div>
-      <div class="ac-title">${isAll?'Disparitas Antar Area Administrasi':'Spektrum Kinerja Pendidikan'}</div>
-      <div class="ac-body">${isAll?`Ditemukan disparitas indeks <strong>${n2(kecGap)}%</strong> antara unit kewilayahan tertinggi (Kec. ${bestKec.name}) dan terendah (Kec. ${worstKec.name}).`:`Sekolah acuan <strong>${top10[0]?top10[0].nama:'-'}</strong> mencatat selisih capaian <strong>${top10[0]&&bot1?n2(top10[0].pct-bot1.pct):0}%</strong> dibanding entitas terbawah <strong>${bot1?bot1.nama:'-'}</strong>.`}</div>
+      <div class="ac-eyebrow">${isAll?'Peta Wilayah':'Konteks Internal'}</div>
+      <div class="ac-title">${isAll?'Disparitas Antar Kecamatan':'Rentang Kualitas Sekolah'}</div>
+      <div class="ac-body">${isAll?`Gap <strong>${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} dan Kec. ${worstKec.name} menunjukkan ketidakmerataan.`:`Sekolah terbaik <strong>${top10[0]?top10[0].nama:'-'}</strong> vs terendah <strong>${bot1?bot1.nama:'-'}</strong>: gap <strong>${top10[0]&&bot1?n2(top10[0].pct-bot1.pct):0}%</strong>.`}</div>
     </div>
     <div class="analysis-card ac-red">
-      <div class="ac-eyebrow">Peringatan Sistem</div>
-      <div class="ac-title">Fokus Intervensi Strategis</div>
-      <div class="ac-body">Tercatat <strong>${fmt(T.tidak)} peserta didik (${n2(pKota)}%)</strong> berstatus buta huruf hijaiyah penuh. <strong>${lowHadir}/${totalGuru} staf pendidik</strong> dilaporkan absen kronis (&lt;80%).</div>
+      <div class="ac-eyebrow">Isu Kritis</div>
+      <div class="ac-title">Titik Intervensi Prioritas</div>
+      <div class="ac-body"><strong>${fmt(T.tidak)} siswa (${n2(pKota)}%)</strong> sama sekali belum kenal huruf hijaiyah. <strong>${lowHadir}/${totalGuru} guru</strong> kehadirannya di bawah 80%.</div>
     </div>
     <div class="analysis-card ac-green">
-      <div class="ac-eyebrow">Rekomendasi Manajerial</div>
-      <div class="ac-title">Ruang Peningkatan Rasional</div>
-      <div class="ac-body">Supervisi wajib dialokasikan kepada <strong>${lowC} satuan pendidikan kritis</strong>. Sistem tata kelola <strong>${top10[0]?top10[0].nama:'-'}</strong> perlu direplikasi.</div>
+      <div class="ac-eyebrow">Potensi Akselerasi</div>
+      <div class="ac-title">Peluang Strategis</div>
+      <div class="ac-body">Fokuskan pendampingan ke <strong>${lowC} sekolah merah</strong>. Gunakan <strong>${top10[0]?top10[0].nama:'-'}</strong> sebagai sekolah percontohan metodologi BTQ.</div>
     </div>
   `;
   document.getElementById('exec-banner').innerHTML=`
-    <strong>Intisari Eksekutif —</strong> Pada titik stabilitas <strong>${n2(pct)}%</strong>, kebijakan penyeragaman pembinaan terbukti inefisien. Dinas Pendidikan merekomendasikan transisi menuju skema asimetris: <strong>pembinaan berjenjang pada entitas defisit</strong> diiringi pelembagaan referensi metode instruksional dari entitas unggul.
+    <strong>Konklusi Eksekutif —</strong> Dengan capaian saat ini <strong>${n2(pct)}%</strong>, kebijakan seragam tidak lagi cukup. Diperlukan pendekatan asimetris: <strong>penguatan intensif ke sekolah kategori rendah</strong> dan <strong>apresiasi serta peran model rujukan ke sekolah berprestasi</strong>.
   `;
 }
 
@@ -1704,12 +1598,12 @@ function renderTrend(cakupan) {
   const tEl=document.getElementById('trendContent');
   const iEl=document.getElementById('trend-insight');
   if(allP.length<2){
-    tEl.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📊</div>Modul analitik tren membutuhkan setidaknya 2 rentang pengamatan aktif.</div>`;
+    tEl.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data tren akan tersedia saat data bulan berikutnya dimasukkan.</div>`;
     iEl.innerHTML='';return;
   }
   const labels=allP.map(p=>`${p.month.substring(0,3)} ${p.year}`);
   const pctData=allP.map(p=>{
-    let raw=RAW_DATABASE[p.year][p.month];
+    let raw=DATABASE[p.year][p.month];
     if(selectedKecamatan!=='all') raw=raw.filter(s=>s.kecamatan===selectedKecamatan);
     const T=computeTotals(aggregateSchools(raw));
     return T.tot>0?parseFloat(n2(T.lancar/T.tot*100)):0;
@@ -1727,7 +1621,7 @@ function renderTrend(cakupan) {
         backgroundColor:C.blueA,
         pointBackgroundColor:C.blue,
         pointRadius:6,pointHoverRadius:8,
-        borderWidth:3,fill:true,tension:.3
+        borderWidth:2.5,fill:true,tension:.4
       }]
     },
     options:{
@@ -1739,9 +1633,9 @@ function renderTrend(cakupan) {
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'rgba(32,33,36,.95)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.8)',
-          padding:12,cornerRadius:6,
-          callbacks:{label:ctx=>` ${ctx.raw}% representasi agregat`}
+          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
+          padding:10,cornerRadius:8,
+          callbacks:{label:ctx=>` ${ctx.raw}% siswa lancar`}
         }
       }
     }
@@ -1750,8 +1644,8 @@ function renderTrend(cakupan) {
   iEl.innerHTML=`
     <div class="insight-strip">
       <div class="insight-item ${diff>0?'green':diff<0?'red':'blue'}">
-        <div class="ii-label">Trajectory Monitoring</div>
-        <div class="ii-text">Berdasarkan hasil komparasi ${allP.length} periode observasi, profil kelancaran BTQ lingkup ${cakupan} teridentifikasi <strong>${diff>0?'mengalami eskalasi +'+n2(diff)+'%':diff<0?'menurun '+n2(diff)+'%':'stagnan'}</strong> terhadap baseline historis.</div>
+        <div class="ii-label">Tren Keseluruhan</div>
+        <div class="ii-text">Dari ${allP.length} periode, kelancaran BTQ di ${cakupan} <strong>${diff>0?'meningkat +'+n2(diff)+'%':diff<0?'menurun '+n2(diff)+'%':'stabil'}</strong> dibanding awal observasi.</div>
       </div>
     </div>
   `;
@@ -1774,19 +1668,19 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
       const t=computeTotals(ks);
       return {name:k,pct:t.tot>0?(t.lancar/t.tot*100):0};
     }).sort((a,b)=>b.pct-a.pct);
-    callout=`Kecamatan <strong>${kr[0].name}</strong> merepresentasikan indeks kesuksesan tertinggi (${n2(kr[0].pct)}%). Otoritas eksekutif diinstruksikan memberikan atensi afirmatif terhadap program perbaikan di Kec. <strong>${kr[kr.length-1].name}</strong> (${n2(kr[kr.length-1].pct)}%).`;
+    callout=`Kec. <strong>${kr[0].name}</strong> memegang posisi terbaik (${n2(kr[0].pct)}%). Kebijakan afirmatif harus segera diarahkan ke Kec. <strong>${kr[kr.length-1].name}</strong> (${n2(kr[kr.length-1].pct)}%).`;
   } else {
-    callout=`Konteks Observasi <strong>${cakupan}</strong> — Satuan pendidikan <strong>${best?best.nama:'-'}</strong> ditetapkan sebagai sentra keunggulan dengan skor utilitas (${n2(best?best.pct:0)}%). Masih terdeteksi eksistensi <strong>${lowC} institusi</strong> di bawah nilai mutu ideal 60%.`;
+    callout=`Fokus <strong>${cakupan}</strong> — <strong>${best?best.nama:'-'}</strong> adalah percontohan terbaik (${n2(best?best.pct:0)}%). Masih ada <strong>${lowC} sekolah</strong> di bawah ambang 60% yang butuh pendampingan.`;
   }
   document.getElementById('k-callout').innerHTML=callout;
   document.getElementById('k-body').innerHTML=`
-    Tinjauan empiris terhadap integritas literasi Al-Qur'an domain <strong>${cakupan}</strong> (Periode <strong>${currentMonth} ${currentYear}</strong>) mengolah entitas sejumlah <strong>${fmt(T.tot)} peserta didik</strong> dari basis populasi ${currentSchools.length} institusi. Metrik fungsional berada di level <strong>${n2(pct)}%</strong>. Fragmentasi mutu mendeskripsikan <strong>${pL}%</strong> sampel dinyatakan tuntas kompetensi, <strong>${pB}%</strong> berkategori adaptif-kurang, dan resiko permanen <strong>${pK}%</strong> pada ketidakmampuan absolut mengidentifikasi karakter dasar.
+    Evaluasi data BTQ <strong>${cakupan}</strong> periode <strong>${currentMonth} ${currentYear}</strong> mencakup <strong>${fmt(T.tot)} siswa</strong> dari ${currentSchools.length} sekolah. Capaian kelancaran saat ini <strong>${n2(pct)}%</strong> — dengan komposisi <strong>${pL}%</strong> sudah lancar, <strong>${pB}%</strong> belum lancar, dan <strong>${pK}%</strong> belum mengenal huruf hijaiyah.
   `;
   document.getElementById('k-reco').innerHTML=[
-    `Pengesahan alokasi jadwal pengawasan inspeksional (<em>on-site supervision</em>) secara absolut terhadap <strong>${lowC} entitas sekolah kritis</strong> (&lt;60%). Proses melibatkan elemen Pengawas PAI fungsional.`,
-    `Eksekusi audit presensi terhadap pendidik berlisensi (rata-rata kehadiran riil &lt;80%) oleh Divisi Pembinaan SD Dinas Pendidikan, demi restitusi waktu belajar peserta didik.`,
-    `Institusionalisasi kurikulum komplementer berbasis "Tutor Sebaya" di jenjang klasikal kelas tinggi (IV–V) sebagai mekanisme akselerasi mitigasi angka buta aksara hijaiyah.`,
-    `Sistem SMART BTQ dikukuhkan sebagai instrumen determinan dalam Rapat Koordinasi Eksekutif Kepala Sekolah secara periodik guna membakukan tata laksana institusi berbasis data.`
+    `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
+    `Investigasi guru dengan kehadiran di bawah 80% oleh Dinas Pendidikan untuk memastikan hak siswa atas pembelajaran agama terpenuhi.`,
+    `Kembangkan program "Tutor Sebaya Al-Qur'an" secara struktural di kelas IV–V untuk mempercepat penurunan angka ketidaklancaran.`,
+    `Gunakan dashboard ini sebagai instrumen wajib rapat koordinasi kepala sekolah bulanan, membudayakan akuntabilitas berbasis data.`
   ].map((r,i)=>`<li><span class="reco-num">${i+1}</span><span>${r}</span></li>`).join('');
 }
 
@@ -1814,50 +1708,50 @@ function renderModalTab(idx) {
   if(idx===0){
     el.innerHTML=`
       <table class="modal-table">
-        <thead><tr><th>Rombongan Belajar</th><th>Populasi</th><th>Tuntas</th><th>Defisit</th><th>Buta Aksara</th><th>Tingkat Kelulusan</th></tr></thead>
+        <thead><tr><th>Kelas</th><th>Total</th><th>Lancar</th><th>Belum</th><th>Tidak Bisa</th><th>% Lancar</th></tr></thead>
         <tbody>
-          <tr><td data-label="Rombongan Belajar">Kelas IV</td><td data-label="Populasi">${s.kls4.tot}</td><td data-label="Tuntas" style="color:var(--green);font-weight:600">${s.kls4.lancar}</td><td data-label="Defisit">${s.kls4.belum}</td><td data-label="Buta Aksara">${s.kls4.tidak}</td><td data-label="Tingkat Kelulusan">${s.kls4.tot>0?pctPill(s.kls4.lancar/s.kls4.tot*100):'–'}</td></tr>
-          <tr><td data-label="Rombongan Belajar">Kelas V</td><td data-label="Populasi">${s.kls5.tot}</td><td data-label="Tuntas" style="color:var(--green);font-weight:600">${s.kls5.lancar}</td><td data-label="Defisit">${s.kls5.belum}</td><td data-label="Buta Aksara">${s.kls5.tidak}</td><td data-label="Tingkat Kelulusan">${s.kls5.tot>0?pctPill(s.kls5.lancar/s.kls5.tot*100):'–'}</td></tr>
-          <tr style="font-weight:700;background:var(--bg)"><td data-label="Rombongan Belajar">Kumulatif</td><td data-label="Populasi">${s.tot}</td><td data-label="Tuntas" style="color:var(--green)">${s.lancar}</td><td data-label="Defisit">${s.belum}</td><td data-label="Buta Aksara">${s.tidak}</td><td data-label="Tingkat Kelulusan">${s.tot>0?pctPill(s.pct):'–'}</td></tr>
+          <tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--green);font-weight:600">${s.kls4.lancar}</td><td data-label="Belum Lancar">${s.kls4.belum}</td><td data-label="Tidak Bisa">${s.kls4.tidak}</td><td data-label="% Lancar">${s.kls4.tot>0?pctPill(s.kls4.lancar/s.kls4.tot*100):'–'}</td></tr>
+          <tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--green);font-weight:600">${s.kls5.lancar}</td><td data-label="Belum Lancar">${s.kls5.belum}</td><td data-label="Tidak Bisa">${s.kls5.tidak}</td><td data-label="% Lancar">${s.kls5.tot>0?pctPill(s.kls5.lancar/s.kls5.tot*100):'–'}</td></tr>
+          <tr style="font-weight:700;background:var(--bg)"><td data-label="Kelas">Total</td><td data-label="Total Siswa">${s.tot}</td><td data-label="Lancar" style="color:var(--green)">${s.lancar}</td><td data-label="Belum Lancar">${s.belum}</td><td data-label="Tidak Bisa">${s.tidak}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>
         </tbody>
       </table>
-      ${s.warnings.length?`<div style="margin-top:16px;padding:12px 16px;background:var(--amber-dim);border:1px solid rgba(242,153,0,.2);border-radius:6px;font-size:13px;color:var(--ink-1)"><strong>⚠ Identifikasi Anomali:</strong> Terdapat ketidaksesuaian rekapitulasi data sistematis pada atribut: ${s.warnings.join(', ')}</div>`:''}
+      ${s.warnings.length?`<div style="margin-top:12px;padding:10px 14px;background:var(--amber-dim);border-radius:8px;font-size:12.5px;color:var(--amber)">⚠ Inkonsistensi terdeteksi: ${s.warnings.join(', ')}</div>`:''}
     `;
   } else if(idx===1) {
     el.innerHTML=`
       <table class="modal-table">
-        <thead><tr><th>Identitas Staf Fungsional</th><th>Presensi Aktif</th><th>Klasifikasi Integritas</th></tr></thead>
+        <thead><tr><th>Guru Pembimbing BTQ</th><th>Kehadiran</th><th>Status</th></tr></thead>
         <tbody>
           ${s.guru.map((g,i)=>`<tr>
-            <td data-label="Identitas Guru">${g}</td>
-            <td data-label="Presensi Aktif" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
-            <td data-label="Klasifikasi Integritas">${s.hadir[i]>=90?'<span style="color:var(--green);font-weight:600">✓ Disiplin Tinggi</span>':s.hadir[i]>=75?'<span style="color:var(--amber);font-weight:600">⚠ Ambang Batas</span>':'<span style="color:var(--red);font-weight:600">✕ Malpraktik Kehadiran</span>'}</td>
+            <td data-label="Guru">${g}</td>
+            <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
+            <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--green);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--amber);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--red);font-weight:600">✕ Defisit</span>'}</td>
           </tr>`).join('')}
         </tbody>
       </table>
-      <div style="margin-top:14px;font-size:13px;color:var(--ink-3)">Agregasi stabilitas operasional tenaga pendidik: <strong style="color:var(--ink-1)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--ink-3)">Rata-rata kehadiran: <strong style="color:var(--ink-1)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
     `;
   } else {
     const allP=getAllPeriods();
     const rows=allP.map(p=>{
-      const raw=RAW_DATABASE[p.year][p.month];
+      const raw=DATABASE[p.year][p.month];
       const found=raw.find(r=>r.no===s.no);
       if(!found) return null;
       const agg=aggregateSchools([found])[0];
       return {period:`${p.month} ${p.year}`,pct:agg.pct,lancar:agg.lancar,tot:agg.tot};
     }).filter(Boolean);
     if(rows.length<2){
-      el.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📅</div>Modul ini menyaratkan himpunan minimum dua periode valid.</div>`;
+      el.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📅</div>Butuh minimal 2 periode untuk menampilkan riwayat.</div>`;
     } else {
       el.innerHTML=`<div>${rows.map((h,i)=>{
         let diff='';
         if(i>0){const d=h.pct-rows[i-1].pct;
-          diff=d>0.05?`<span style="color:var(--green);font-size:12px;font-weight:600">▲ +${n2(d)}%</span>`:
-               d<-0.05?`<span style="color:var(--red);font-size:12px;font-weight:600">▼ ${n2(d)}%</span>`:
-               `<span style="color:var(--ink-4);font-size:12px">–</span>`;}
+          diff=d>0.05?`<span style="color:var(--green);font-size:11.5px;font-weight:600">▲ +${n2(d)}%</span>`:
+               d<-0.05?`<span style="color:var(--red);font-size:11.5px;font-weight:600">▼ ${n2(d)}%</span>`:
+               `<span style="color:var(--ink-4);font-size:11.5px">–</span>`;}
         return `<div class="hist-row">
           <span class="hist-period">${h.period}</span>
-          <span style="font-size:13px;color:var(--ink-2)">${fmt(h.lancar)} / ${fmt(h.tot)} sampel empiris</span>
+          <span style="font-size:12px;color:var(--ink-2)">${fmt(h.lancar)} / ${fmt(h.tot)} siswa</span>
           <span class="hist-pct" style="color:${h.pct>=80?'var(--green)':h.pct>=60?'var(--amber)':'var(--red)'}">${n2(h.pct)}%</span>
           ${diff}
         </div>`;
@@ -1888,8 +1782,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();closeSidebar();}
 });
 
-// Jalankan saat dokumen ter-load (Data akan di fetch lebih dahulu)
-document.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
 </html>
