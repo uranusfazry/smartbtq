@@ -1032,7 +1032,19 @@ async function loadData() {
       return s;
     });
 
-    RAW_DATABASE = { 2026: { "Januari": JANUARI_2026, "Februari": FEBRUARI_2026, "Maret": MARET_2026 } };
+   RAW_DATABASE = { 
+  2025: {
+    "Juli": MARET_2026,
+    "Agustus": MARET_2026,
+    "Desember": MARET_2026
+  },
+
+  2026: { 
+    "Januari": JANUARI_2026, 
+    "Februari": FEBRUARI_2026, 
+    "Maret": MARET_2026 
+  } 
+};
 
     // Setelah data selesai diambil dan disusun, mulai render aplikasi
     init();
