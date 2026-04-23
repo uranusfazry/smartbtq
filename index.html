@@ -966,19 +966,31 @@ function loadData() {
       RAW_DATABASE = {};
 
       Object.keys(json).forEach(key => {
-        // Abaikan jika format key bukan BULAN_TAHUN
-        if (!key.includes("_")) return;
+        // 1. Normalisasi key untuk membuang spasi kosong yang mungkin ada (misal: "JULI_2025 ")
+        const cleanKey = key.trim();
         
-        const [bulan, tahun] = key.split("_");
+        // 2. Abaikan jika format key bukan BULAN_TAHUN
+        if (!cleanKey.includes("_")) return;
+        
+        const [bulan, tahun] = cleanKey.split("_");
+        
+        // 3. Pastikan data bulan dan tahun bisa diurai
+        if (!bulan || !tahun) return;
 
-        if (!RAW_DATABASE[tahun]) {
-          RAW_DATABASE[tahun] = {};
+        const cleanTahun = tahun.trim();
+        if (!RAW_DATABASE[cleanTahun]) {
+          RAW_DATABASE[cleanTahun] = {};
         }
 
-        const bulanFormatted = bulan.charAt(0) + bulan.slice(1).toLowerCase();
+        // 4. Normalisasi teks bulan (huruf pertama Kapital, sisanya kecil) bebas spasi
+        const cleanBulan = bulan.trim();
+        const bulanFormatted = cleanBulan.charAt(0).toUpperCase() + cleanBulan.slice(1).toLowerCase();
 
-        RAW_DATABASE[tahun][bulanFormatted] = json[key];
+        RAW_DATABASE[cleanTahun][bulanFormatted] = json[key];
       });
+
+      // 5. Log debugging untuk memastikan semua bulan dan tahun terbaca (cek browser console)
+      console.log("RAW_DATABASE:", RAW_DATABASE);
 
       // Setelah data selesai diambil dan disusun, mulai render aplikasi
       init();
@@ -1145,7 +1157,9 @@ function updateMonthDropdowns() {
   
   // Ambil hanya bulan yang mempunyai data di RAW_DATABASE untuk tahun terpilih
   const monthsData = RAW_DATABASE[currentYear] || {};
-  let availableMonths = allMonths.filter(m => monthsData[m]);
+  
+  // 6. PERBAIKAN FILTER BULAN: pastikan nilainya tidak undefined
+  let availableMonths = allMonths.filter(m => monthsData[m] !== undefined);
 
   // Jika user pindah tahun atau baru pertama kali load (currentMonth null),
   // reset dropdown bulan ke opsi terakhir yang tersedia di tahun tersebut
