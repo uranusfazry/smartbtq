@@ -900,7 +900,7 @@ tfoot td.c { text-align: center; }
 <!-- ═══════════════ SCRIPT ═══════════════ -->
 <script>
 // ────────────────────────────────────────────
-// DATABASE STATE (FETCHED VIA API)
+// GLOBAL STATE (100% FETCHED VIA API)
 // ────────────────────────────────────────────
 let DATABASE = {};
 
@@ -996,18 +996,15 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwud19YXXiOwLztp-IpoEWp
 
 async function loadData() {
   try {
-    if(API_URL === "ISI_DENGAN_URL_WEB_APP") {
-      document.getElementById('r-title').textContent = "Konfigurasi Dibutuhkan";
-      document.getElementById('r-subtitle').textContent = "Silakan ganti ISI_DENGAN_URL_WEB_APP di dalam file index.html";
-      return;
-    }
-
     const res = await fetch(API_URL);
     const data = await res.json();
+
+    console.log("DATA API:", data);
+
     DATABASE = data;
-    
-    // Inisialisasi state awal
+
     const years = Object.keys(DATABASE).sort((a,b)=>b-a);
+
     if(years.length > 0) {
       currentYear = years[0];
       const months = Object.keys(DATABASE[currentYear]);
@@ -1015,10 +1012,10 @@ async function loadData() {
     }
 
     initDropdown();
-    showSection('view-ringkasan');
     renderAll();
+
   } catch (err) {
-    console.error("Error:", err);
+    console.error("ERROR FETCH:", err);
     document.getElementById('r-title').textContent = "Gagal Memuat Data";
     document.getElementById('r-subtitle').textContent = "Periksa koneksi internet atau ketersediaan Server Google Apps Script.";
   }
@@ -1133,10 +1130,13 @@ function renderAll() {
   currentYear = year;
   currentMonth = month;
 
-  // Akses data sesuai instruksi terbaru
-  const data = DATABASE[year]?.[month];
-  if (!data) return;
+  if (!DATABASE[year] || !DATABASE[year][month]) {
+    console.warn("Data tidak ditemukan:", year, month);
+    return;
+  }
 
+  const data = DATABASE[year][month];
+  
   const rawMaster = data;
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
