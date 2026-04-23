@@ -1032,30 +1032,7 @@ async function loadData() {
       return s;
     });
 
-    // --- STRUKTUR DATABASE BARU (2025 - 2050) ---
-    RAW_DATABASE = {};
-    const allMonths = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-
-    for (let y = 2025; y <= 2050; y++) {
-      RAW_DATABASE[y] = {};
-      
-      if (y === 2025) {
-        ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'].forEach(m => {
-          RAW_DATABASE[y][m] = MARET_2026;
-        });
-      } else if (y === 2026) {
-        allMonths.forEach(m => {
-          if (m === 'Januari') RAW_DATABASE[y][m] = JANUARI_2026;
-          else if (m === 'Februari') RAW_DATABASE[y][m] = FEBRUARI_2026;
-          else if (m === 'Maret') RAW_DATABASE[y][m] = MARET_2026;
-          else RAW_DATABASE[y][m] = MARET_2026;
-        });
-      } else {
-        allMonths.forEach(m => {
-          RAW_DATABASE[y][m] = MARET_2026;
-        });
-      }
-    }
+    RAW_DATABASE = { 2026: { "Januari": JANUARI_2026, "Februari": FEBRUARI_2026, "Maret": MARET_2026 } };
 
     // Setelah data selesai diambil dan disusun, mulai render aplikasi
     init();
@@ -1169,9 +1146,9 @@ function initYearMonth() {
   if (!currentYear) currentYear = 2025;
   if (!currentMonth) currentMonth = 'Juli';
 
-  // Render opsi tahun (2025 - 2050)
+  // Render opsi tahun (2025 - 2030)
   let yearOptions = '';
-  for (let y = 2025; y <= 2050; y++) {
+  for (let y = 2025; y <= 2030; y++) {
     yearOptions += `<option value="${y}"${y == currentYear ? ' selected' : ''}>${y}</option>`;
   }
   ['selYear','sbYear'].forEach(id => {
