@@ -999,19 +999,63 @@ async function loadData() {
       return s;
     });
 
-    // --- 1. STRUKTUR DATABASE BARU (2025 - 2030) ---
-    RAW_DATABASE = {};
-    for (let y = 2025; y <= 2030; y++) {
-      RAW_DATABASE[y] = {};
-    }
-    
-    // Inisialisasi 2025 mulai dari Juli (kosong sebagai placeholder)
-    ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'].forEach(m => {
-      RAW_DATABASE[2025][m] = [];
+    // Build Januari
+    const JANUARI_2026 = JSON.parse(JSON.stringify(MARET_2026)).map(s => {
+      const update = JANUARI_UPDATES.find(u => u.nama_sekolah === s.nama);
+      if (update) {
+        const k4 = update.kelas_4 || {};
+        const k5 = update.kelas_5 || {};
+        
+        const k4_l = k4.lancar || 0;
+        const k4_b = k4.belum_lancar || 0;
+        const k4_t = k4.tidak_bisa || 0;
+        const k4_tot = k4.jumlah_siswa !== null ? k4.jumlah_siswa : (k4_l + k4_b + k4_t);
+
+        const k5_l = k5.lancar || 0;
+        const k5_b = k5.belum_lancar || 0;
+        const k5_t = k5.tidak_bisa || 0;
+        const k5_tot = k5.jumlah_siswa !== null ? k5.jumlah_siswa : (k5_l + k5_b + k5_t);
+
+        s.rows = [{
+          kls4: { total: k4_tot, lancar: k4_l, belum: k4_b, tidak: k4_t },
+          kls5: { total: k5_tot, lancar: k5_l, belum: k5_b, tidak: k5_t },
+          guru: s.rows.map(r=>r.guru).join(", "),
+          hadir: s.rows.reduce((sum, r) => sum + r.hadir, 0) / s.rows.length
+        }];
+      } else {
+        s.rows.forEach(r => {
+          r.kls4 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
+          r.kls5 = { total: 0, lancar: 0, belum: 0, tidak: 0 };
+          r.hadir = 0;
+        });
+      }
+      return s;
     });
 
-    // Isi tahun 2026 dengan data yang sudah ada
-    RAW_DATABASE[2026] = { "Januari": JANUARI_2026, "Februari": FEBRUARI_2026, "Maret": MARET_2026 };
+    // --- STRUKTUR DATABASE BARU (2025 - 2050) ---
+    RAW_DATABASE = {};
+    const allMonths = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    for (let y = 2025; y <= 2050; y++) {
+      RAW_DATABASE[y] = {};
+      
+      if (y === 2025) {
+        ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'].forEach(m => {
+          RAW_DATABASE[y][m] = MARET_2026;
+        });
+      } else if (y === 2026) {
+        allMonths.forEach(m => {
+          if (m === 'Januari') RAW_DATABASE[y][m] = JANUARI_2026;
+          else if (m === 'Februari') RAW_DATABASE[y][m] = FEBRUARI_2026;
+          else if (m === 'Maret') RAW_DATABASE[y][m] = MARET_2026;
+          else RAW_DATABASE[y][m] = MARET_2026;
+        });
+      } else {
+        allMonths.forEach(m => {
+          RAW_DATABASE[y][m] = MARET_2026;
+        });
+      }
+    }
 
     // Setelah data selesai diambil dan disusun, mulai render aplikasi
     init();
@@ -1065,25 +1109,17 @@ function computeTotals(schools) {
   };
 }
 
-// 2. PERBAIKAN GRAFIK TREN AGAR MENGABAIKAN DATA KOSONG
 function getPrevPeriod(year,month) {
   const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const idx=months.indexOf(month);
-  const hasData = (y, m) => RAW_DATABASE[y] && Array.isArray(RAW_DATABASE[y][m]) && RAW_DATABASE[y][m].length > 0;
-
   if(idx<=0) {
     const py=String(parseInt(year)-1);
     if(!RAW_DATABASE[py]) return null;
-    const pym=Object.keys(RAW_DATABASE[py]).filter(m => hasData(py, m));
+    const pym=Object.keys(RAW_DATABASE[py]);
     return pym.length?{year:py,month:pym[pym.length-1]}:null;
   }
   for(let i=idx-1;i>=0;i--) {
-    if(hasData(year, months[i])) return {year,month:months[i]};
-  }
-  const py=String(parseInt(year)-1);
-  if(RAW_DATABASE[py]) {
-    const pym=Object.keys(RAW_DATABASE[py]).filter(m => hasData(py, m));
-    return pym.length ? {year:py,month:pym[pym.length-1]} : null;
+    if(RAW_DATABASE[year]&&RAW_DATABASE[year][months[i]]) return {year,month:months[i]};
   }
   return null;
 }
@@ -1093,9 +1129,7 @@ function getAllPeriods() {
   const result=[];
   Object.keys(RAW_DATABASE).sort().forEach(yr => {
     months.forEach(mo => {
-      if(RAW_DATABASE[yr] && Array.isArray(RAW_DATABASE[yr][mo]) && RAW_DATABASE[yr][mo].length > 0) {
-        result.push({year:yr,month:mo});
-      }
+      if(RAW_DATABASE[yr]&&RAW_DATABASE[yr][mo]) result.push({year:yr,month:mo});
     });
   });
   return result;
@@ -1135,9 +1169,9 @@ function initYearMonth() {
   if (!currentYear) currentYear = 2025;
   if (!currentMonth) currentMonth = 'Juli';
 
-  // Render opsi tahun (2025 - 2030)
+  // Render opsi tahun (2025 - 2050)
   let yearOptions = '';
-  for (let y = 2025; y <= 2030; y++) {
+  for (let y = 2025; y <= 2050; y++) {
     yearOptions += `<option value="${y}"${y == currentYear ? ' selected' : ''}>${y}</option>`;
   }
   ['selYear','sbYear'].forEach(id => {
@@ -1241,10 +1275,7 @@ function setStackMode(mode) {
 // RENDER
 // ────────────────────────────────────────────
 function render() {
-  // --- 3. HANDLING DATA KOSONG ---
   const rawMaster = RAW_DATABASE[currentYear]?.[currentMonth]||[];
-  const isDataAvailable = Array.isArray(rawMaster) && rawMaster.length > 0;
-  
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
   let rawArr = rawMaster;
@@ -1271,7 +1302,7 @@ function render() {
   // Trend chip
   const prev=getPrevPeriod(currentYear,currentMonth);
   let chipHTML='';
-  if(prev && RAW_DATABASE[prev.year]?.[prev.month] && RAW_DATABASE[prev.year][prev.month].length > 0) {
+  if(prev) {
     let pRaw=RAW_DATABASE[prev.year][prev.month];
     if(!isAll) pRaw=pRaw.filter(s=>s.kecamatan===selectedKecamatan);
     const pT=computeTotals(aggregateSchools(pRaw));
@@ -1280,30 +1311,13 @@ function render() {
     if(diff>0.05) chipHTML=`<span class="trend-chip chip-up">▲ +${n2(diff)}% dari ${prev.month}</span>`;
     else if(diff<-0.05) chipHTML=`<span class="trend-chip chip-down">▼ ${n2(diff)}% dari ${prev.month}</span>`;
     else chipHTML=`<span class="trend-chip chip-flat">→ Stabil</span>`;
-  } else {
-    chipHTML=`<span class="trend-chip chip-flat">→ Menunggu Data Historis</span>`;
   }
   document.getElementById('r-trend-chip').innerHTML=chipHTML;
 
-  // Banner UI: Notifikasi Data Kosong / Anomali Data
+  // DQ banner
+  const hasWarn=currentSchools.some(s=>s.warnings.length>0);
   const dqBanner=document.getElementById('dqBanner');
-  if (!isDataAvailable) {
-    dqBanner.innerHTML = `ℹ️ <strong>Data belum tersedia untuk periode ${periodStr}</strong>.`;
-    dqBanner.className = "dq-banner";
-    dqBanner.style.background = "var(--border-2)";
-    dqBanner.style.borderColor = "var(--border)";
-    dqBanner.style.color = "var(--ink-2)";
-  } else {
-    const hasWarn=currentSchools.some(s=>s.warnings.length>0);
-    if (hasWarn) {
-      dqBanner.innerHTML = "⚠ Ditemukan anomali validitas data pada beberapa satuan pendidikan. Mohon verifikasi ulang ke sekolah terkait.";
-      dqBanner.className = "dq-banner";
-      dqBanner.removeAttribute('style');
-    } else {
-      dqBanner.className = "dq-banner hidden";
-      dqBanner.removeAttribute('style');
-    }
-  }
+  dqBanner.classList.toggle('hidden',!hasWarn);
 
   // Hero metric
   document.getElementById('hero-pct').innerHTML=`${n2(pct)}<sup>%</sup>`;
