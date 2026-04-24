@@ -757,7 +757,7 @@ body.dark .sidebar-filter {
       justify-content: center;
       background: radial-gradient(circle at top left, rgba(37,99,235,0.05), transparent 35%),
                   radial-gradient(circle at bottom right, rgba(59,130,246,0.04), transparent 40%),
-                  rgba(255,255,255,0.88);
+                  rgba(255,255,255,0.86);
       backdrop-filter: blur(28px) saturate(180%);
       -webkit-backdrop-filter: blur(28px) saturate(180%);
   }
@@ -796,12 +796,12 @@ body.dark .sidebar-filter {
       font-weight: 500;
   }
   .nav-item {
-      min-height: 78px;
       padding: 18px 24px;
       border-radius: 20px;
       font-size: 18px;
       font-weight: 600;
       gap: 18px;
+      min-height: 78px;
   }
   .nav-item.active {
       background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(37,99,235,0.03));
@@ -1095,84 +1095,10 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 .modal-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-2); color: var(--text-primary); }
 .modal-table tr:last-child td { border-bottom: none; }
 .modal-table tr:nth-child(even) td { background: var(--bg); }
-.hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px; border-radius: var(--r-md); }
-.hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px dashed var(--border-2); padding-bottom: 6px; }
-.hist-pct { font-size: 16px; text-align: right; }
-.chart-wrap { height: 260px !important; }
-.chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
-.chart-scroll-inner { width: 100% !important; height: 320px; } 
-
-  /* ────────────────────────────────────────────
-     MOBILE FULLSCREEN MENU UPGRADE (ENTERPRISE)
-  ──────────────────────────────────────────── */
-  @media (max-width: 768px) {
-  .sidebar {
-    align-items: flex-start;
-    justify-content: flex-start;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .sidebar::-webkit-scrollbar {
-    display: none;
-  }
-  .sidebar-inner {
-    width: 100%;
-    max-width: 100%;
-    padding: 28px 24px 32px;
-    margin: 0;
-    gap: 28px;
-    justify-content: flex-start;
-    align-items: stretch;
-  }
-  .btn-close-fs {
-    top: 18px;
-    right: 18px;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(148,163,184,0.18);
-    box-shadow: 0 8px 24px rgba(15,23,42,0.08);
-    z-index: 9999;
-  }
-  .fs-brand {
-    text-align: left;
-    padding-top: 32px;
-    padding-right: 56px;
-  }
-  .fs-brand h2 {
-    font-size: 42px;
-    line-height: 1.05;
-    letter-spacing: -1.5px;
-  }
-  .fs-brand p {
-    font-size: 15px;
-    margin-top: 10px;
-    line-height: 1.5;
-  }
-  .nav-item {
-    padding: 18px 20px;
-    border-radius: 22px;
-    gap: 18px;
-    font-size: 17px;
-    font-weight: 600;
-  }
-  .nav-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 16px;
-    font-size: 20px;
-  }
-  .sidebar-filter {
-    margin-top: 8px;
-    padding: 22px 18px;
-    border-radius: 22px;
-  }
-}
-
+.hist-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: var(--r-sm); margin-bottom: 6px; background: var(--surface-2); border: 1px solid var(--border-2); }
+.hist-period { font-weight: 500; font-size: 13px; color: var(--text-primary); }
+.hist-pct { font-size: 13px; font-weight: 700; }
+.hist-diff { font-size: 11.5px; font-weight: 500; }
 
 /* ────────────────────────────────────────────
    18. DQ BANNER
@@ -1384,8 +1310,76 @@ body.dark .fs-btn-dismiss:hover { background: rgba(255,255,255,0.05); color: var
   .chart-wrap { height: 260px !important; }
   .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
   .chart-scroll-inner { width: 100% !important; height: 320px; } 
-}
 
+  /* ────────────────────────────────────────────
+     MOBILE FULLSCREEN MENU UPGRADE (ENTERPRISE)
+  ──────────────────────────────────────────── */
+  .sidebar {
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  .sidebar-inner {
+    width: 100%;
+    max-width: 100%;
+    padding: 28px 24px 32px;
+    margin: 0;
+    gap: 28px;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+  .btn-close-fs {
+    top: 18px;
+    right: 18px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(148,163,184,0.18);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.08);
+    z-index: 9999;
+  }
+  .fs-brand {
+    text-align: left;
+    padding-top: 32px;
+    padding-right: 56px;
+  }
+  .fs-brand h2 {
+    font-size: 42px;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+  }
+  .fs-brand p {
+    font-size: 15px;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .nav-item {
+    padding: 18px 20px;
+    border-radius: 22px;
+    gap: 18px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .nav-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    font-size: 20px;
+  }
+  .sidebar-filter {
+    margin-top: 8px;
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+}
 
 /* ────────────────────────────────────────────
    21. ENTERPRISE DARK MODE: MOBILE + DESKTOP
@@ -2184,7 +2178,7 @@ let lastFocusedElement = null; // Menyimpan elemen yang terakhir ditekan
 
 function lockOverlayBackground() {
   if (overlayLockCount === 0) {
-    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    scrollPosition = window.scrollY || document.documentElement.scrollTop;
     const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
     // Tambah padding untuk kompensasi hilangnya scrollbar & set top untuk fixed
@@ -2205,17 +2199,17 @@ function unlockOverlayBackground(force = false) {
   if (overlayLockCount === 0 || force) {
     overlayLockCount = 0;
     
+    // Ambil posisi persis sebelum lock dihilangkan
+    const savedScrollY = Math.abs(parseInt(document.body.style.top || "0"));
+    
     document.body.classList.remove("overlay-lock");
     document.documentElement.classList.remove("overlay-lock");
     
     document.body.style.paddingRight = "";
     document.body.style.top = "";
     
-    // Logika restore scroll position bawaan secara instant
-    window.scrollTo({
-        top: scrollPosition,
-        behavior: "auto"
-    });
+    // Restore posisi secara sinkron, tanpa glitch / jump effect
+    window.scrollTo(0, savedScrollY);
   }
 }
 
@@ -2470,8 +2464,8 @@ function initFullscreenSystem() {
     });
   }
 
-  // Suggest automatically after short delay on load
-  setTimeout(suggestFullscreen, 3500);
+  // Tampilkan notifikasi segera setelah masuk dashboard (delay 1.5 detik agar loading selesai)
+  setTimeout(suggestFullscreen, 1500);
   updateFsUI(); // initial state check
 }
 
@@ -2534,10 +2528,7 @@ function suggestFullscreen() {
     fsPromptShown = true;
     lockOverlayBackground(); // Lock screen untul prompt
     
-    // Auto hide prompt after 10s if ignored
-    setTimeout(() => {
-      if(fsPromptShown) hideFsPrompt(false);
-    }, 10000);
+    // Dihapus: Auto hide 10 detik agar prompt menetap sampai user memilih
   }
 }
 
