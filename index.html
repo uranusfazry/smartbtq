@@ -2,8 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="SMART BTQ — Monitoring Baca Tulis Al-Qur'an">
+<meta name="theme-color" content="#ffffff" id="themeColorMeta">
 <title>SMART BTQ — Monitoring Baca Tulis Al-Qur'an</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -76,7 +77,6 @@
   --red-dim:    var(--danger-dim);
 
   /* Sidebar & Header */
-  --sidebar-w:  228px;
   --header-h:   64px;
 
   /* Transitions */
@@ -111,6 +111,16 @@ body.dark {
   --shadow-lg:  0 8px 32px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25);
   --shadow-focus: 0 0 0 3px rgba(37,99,235,.4);
 }
+
+/* ────────────────────────────────────────────
+   FULLSCREEN API NORMALIZATION
+──────────────────────────────────────────── */
+:fullscreen, ::-webkit-full-screen, ::-moz-full-screen, ::-ms-fullscreen {
+  background-color: var(--bg);
+  width: 100vw;
+  height: 100vh;
+}
+body:fullscreen { overflow-y: auto; }
 
 /* ────────────────────────────────────────────
    3. GLOBAL BASE
@@ -292,12 +302,11 @@ body {
 }
 
 /* ────────────────────────────────────────────
-   LAYOUT SHELL (DASHBOARD GRID)
+   LAYOUT SHELL (DASHBOARD GRID -> FLEX)
 ──────────────────────────────────────────── */
 .shell {
-  display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
-  grid-template-rows: var(--header-h) 1fr;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
@@ -313,7 +322,7 @@ body {
    4. HEADER — Clean & Elevated
 ──────────────────────────────────────────── */
 .header {
-  grid-column: 1 / -1; grid-row: 1;
+  width: 100%;
   height: var(--header-h);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -398,7 +407,7 @@ body.dark .sel:focus {
 }
 
 /* ────────────────────────────────────────────
-   6. BUTTONS
+   6. BUTTONS & HAMBURGER
 ──────────────────────────────────────────── */
 .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .btn-print {
@@ -412,48 +421,259 @@ body.dark .sel:focus {
 .btn-print:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(37,99,235,.2); }
 .btn-print svg { width: 14px; height: 14px; }
 
-/* Hamburger */
-.ham { display: none; background: none; border: none; cursor: pointer; padding: 8px; border-radius: var(--r-sm); margin-left: -4px; transition: var(--transition-fast); }
+/* Premium Fullscreen Button */
+.btn-fs-toggle {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border); 
+  border-radius: var(--r-md); padding: 8px 16px; font-size: 12.5px; font-weight: 600; 
+  cursor: pointer; transition: var(--transition-base); box-shadow: var(--shadow-xs);
+  white-space: nowrap; letter-spacing: 0.1px;
+}
+.btn-fs-toggle:hover { background: var(--border-2); border-color: var(--text-tertiary); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.btn-fs-toggle:active { transform: translateY(0); box-shadow: var(--shadow-xs); }
+.btn-fs-toggle svg { width: 14px; height: 14px; }
+
+/* Hamburger (Sama Desktop & Mobile) */
+.ham {
+  display: flex; 
+  flex-direction: column; 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  padding: 8px; 
+  border-radius: var(--r-sm); 
+  margin-left: -4px; 
+  transition: var(--transition-fast);
+}
 .ham:hover { background: var(--surface-2); }
 .ham span { display: block; width: 18px; height: 2px; background: var(--text-secondary); border-radius: 2px; margin: 3.5px 0; transition: var(--transition-base); }
 
+
 /* ────────────────────────────────────────────
-   7. SIDEBAR — Material-style navigation
+   7. FULLSCREEN MENU (ENTERPRISE UPGRADE)
 ──────────────────────────────────────────── */
 .sidebar {
-  grid-column: 1; grid-row: 2;
-  background: var(--surface); border-right: 1px solid var(--border);
-  padding: 16px 10px; gap: 2px; display: flex; flex-direction: column;
-  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h));
-  overflow-y: auto; transition: background 0.3s ease, border-color 0.3s ease;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+  overflow-y: auto;
 }
-.nav-section-label { font-size: 10px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1.4px; padding: 12px 12px 8px; }
+
+body.dark .sidebar {
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.sidebar.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Outer click target for overlay close */
+.fs-overlay-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Content Container */
+.sidebar-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 640px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  margin: auto;
+}
+
+.sidebar.open .sidebar-inner {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+
+/* Close Button Premium */
+.btn-close-fs {
+  position: absolute;
+  top: 32px;
+  right: 40px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2010;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.8);
+}
+.sidebar.open .btn-close-fs {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+  transition-delay: 0.2s;
+}
+.btn-close-fs:hover {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border-color: rgba(220, 38, 38, 0.3);
+  transform: scale(1.08) rotate(90deg);
+}
+body.dark .btn-close-fs {
+  background: var(--surface-2);
+}
+
+/* Menu Brand Header */
+.fs-brand {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.fs-brand h2 {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.fs-brand h2 span { color: var(--primary); }
+.fs-brand p {
+  font-size: 15px;
+  color: var(--text-tertiary);
+  margin-top: 6px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* Nav Wrapper */
+.fs-nav-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Premium Nav Item */
 .nav-item {
-  display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--r-md);
-  font-size: 13px; font-weight: 500; color: var(--text-secondary);
-  text-decoration: none; cursor: pointer; transition: var(--transition-fast);
-  border: none; background: none; width: 100%; text-align: left; position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 24px;
+  border-radius: var(--r-xl);
+  font-size: 16.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
 }
-.nav-item:hover { background: var(--surface-2); color: var(--text-primary); transform: translateX(2px); }
-.nav-item.active { background: var(--primary-dim); color: var(--primary); font-weight: 600; }
-.nav-item.active::before {
-  content: ''; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
-  width: 3px; height: 60%; background: var(--primary); border-radius: 0 3px 3px 0;
+.nav-item:hover {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
+body.dark .nav-item:hover {
+  background: var(--surface-2);
+}
+.nav-item.active {
+  background: var(--primary-dim);
+  border-color: rgba(37, 99, 235, 0.2);
+  color: var(--primary);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+}
+body.dark .nav-item.active {
+  background: rgba(37,99,235,0.15);
+}
+
 .nav-icon {
-  width: 32px; height: 32px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center;
-  font-size: 15px; background: var(--surface-2); flex-shrink: 0; transition: var(--transition-fast);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: var(--surface-2);
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
 }
-.nav-item.active .nav-icon { background: rgba(37,99,235,.15); }
-.nav-item:hover .nav-icon { background: var(--border); }
-.sidebar-filter { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-2); }
-.sidebar-filter-label { font-size: 10.5px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; display: block; }
-.sidebar-filter select { width: 100%; margin-bottom: 8px; }
+body.dark .nav-icon { background: rgba(0,0,0,0.2); }
+
+.nav-item.active .nav-icon {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+.nav-item:hover .nav-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Premium Filter Area in Menu */
+.sidebar-filter {
+  margin-top: 16px;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+body.dark .sidebar-filter {
+  background: var(--surface-2);
+}
+.sidebar-filter-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 16px;
+  display: block;
+  text-align: center;
+}
+.sidebar-filter select {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  font-size: 14.5px;
+  height: auto;
+  border-radius: var(--r-md);
+}
 
 /* ────────────────────────────────────────────
    8. MAIN CONTENT AREA
 ──────────────────────────────────────────── */
-.main { grid-column: 2; grid-row: 2; padding: 28px 32px 64px; min-width: 0; }
+.main { width: 100%; max-width: 1500px; margin: 0 auto; padding: 32px 36px 64px; min-width: 0; }
 .view { display: none; animation: viewEnter 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
 .view.active { display: block; }
 @keyframes viewEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -693,24 +913,130 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 400; }
-.sidebar-overlay.open { display: block; }
+
+/* ────────────────────────────────────────────
+   FULLSCREEN SUGGESTION PROMPT (ENTERPRISE TOAST)
+──────────────────────────────────────────── */
+.fs-prompt {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px) scale(0.95);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 20px 40px -8px rgba(15,23,42,0.15), 0 8px 16px -4px rgba(15,23,42,0.1);
+  padding: 14px 20px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fs-prompt.show {
+  transform: translateX(-50%) translateY(0) scale(1);
+  opacity: 1;
+  visibility: visible;
+}
+.fs-prompt-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--primary-dim);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fs-prompt-icon svg { width: 18px; height: 18px; }
+.fs-prompt-text { display: flex; flex-direction: column; gap: 2px; }
+.fs-prompt-text strong { font-size: 13.5px; color: var(--text-primary); font-weight: 700; letter-spacing: -0.2px; white-space: nowrap; }
+.fs-prompt-text span { font-size: 12px; color: var(--text-secondary); line-height: 1.2; white-space: nowrap; }
+.fs-prompt-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+  border-left: 1px solid var(--border);
+  padding-left: 16px;
+}
+.fs-btn-dismiss {
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: var(--transition-fast);
+}
+.fs-btn-dismiss:hover { color: var(--text-secondary); background: var(--surface-2); }
+.fs-btn-accept {
+  background: var(--primary);
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px 18px;
+  border-radius: 20px;
+  transition: var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+  white-space: nowrap;
+}
+.fs-btn-accept:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+}
+
+body.dark .fs-prompt {
+  background: rgba(15,23,42,0.85);
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 20px 40px -8px rgba(0,0,0,0.5);
+}
+body.dark .fs-prompt-actions { border-color: rgba(255,255,255,0.1); }
+body.dark .fs-btn-dismiss:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+
+@media (max-width: 640px) {
+  .fs-prompt {
+    bottom: 20px;
+    width: calc(100% - 32px);
+    border-radius: 24px;
+    padding: 16px;
+    flex-direction: column;
+    text-align: center;
+  }
+  .fs-prompt-text strong, .fs-prompt-text span { white-space: normal; }
+  .fs-prompt-actions {
+    margin-left: 0;
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    width: 100%;
+    justify-content: center;
+  }
+  body.dark .fs-prompt-actions { border-top-color: rgba(255,255,255,0.1); }
+  .btn-fs-toggle .btn-text { display: none; }
+  .btn-fs-toggle { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: var(--r-md); }
+  .btn-fs-toggle svg { margin: 0; width: 18px; height: 18px; }
+}
 
 
 /* ────────────────────────────────────────────
    20. RESPONSIVE BASE & MOBILE LAYOUT
 ──────────────────────────────────────────── */
 @media(max-width:900px) {
-  .shell { grid-template-columns: 1fr; }
-  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; z-index: 500; width: 280px; transform: translateX(-100%); transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1); height: 100vh; padding: 20px 0; }
-  .sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-  .nav-item { padding: 12px 20px; margin: 0 12px; width: calc(100% - 24px); }
-  .nav-section-label { padding: 12px 20px 6px; }
   .header-period-group { display: none; } /* Menyembunyikan filter dr header di HP agar tidak bertumpuk */
-  .sidebar-filter { display: block; } /* Menampilkan kembali filter di sidebar HP */
-  .ham { display: flex; flex-direction: column; }
-  .main { grid-column: 1; padding: 20px 16px 48px; }
   .header-brand-sub { display: none; }
+  .btn-close-fs { top: 20px; right: 20px; }
+  .sidebar-inner { padding: 24px; margin-top: 24px; gap: 24px; }
 }
 
 @media(max-width:768px) {
@@ -727,6 +1053,7 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   .hero-pct { font-size: 48px; }
   .kpi-value { font-size: 28px; }
   .page-header { margin-bottom: 20px; }
+  .main { padding: 20px 16px 48px; }
   
   .sel, .search-input, .sort-btn, .btn-detail, .m-tab { min-height: 44px; }
   .sort-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-left: 0; margin-top: 12px; }
@@ -792,7 +1119,6 @@ body.dark tbody tr:hover { background: rgba(255,255,255,.03); }
 body.dark .exec-banner { color: var(--text-secondary); }
 body.dark .chart-card, body.dark .kpi-card, body.dark .hero-metric, body.dark .table-surface, body.dark .conclusion-card, body.dark .analysis-card { border-color: var(--border); }
 body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .hero-stat { background: var(--surface-2); }
-body.dark .nav-item.active::before { background: var(--primary); }
 body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
 body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
 body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
@@ -815,21 +1141,14 @@ body.dark .pct-pill.pill-high { background: rgba(22, 163, 74, 0.15); color: #4ad
 body.dark .pct-pill.pill-mid { background: rgba(217, 119, 6, 0.15); color: #fbbf24; box-shadow: 0 0 10px rgba(217, 119, 6, 0.25); border: 1px solid rgba(251, 191, 36, 0.2); }
 body.dark .pct-pill.pill-low { background: rgba(220, 38, 38, 0.15); color: #f87171; box-shadow: 0 0 10px rgba(220, 38, 38, 0.25); border: 1px solid rgba(248, 113, 113, 0.2); }
 
-@media (max-width: 900px) {
-  body.dark .sidebar { background: #162032; border-right: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5); }
-  body.dark .nav-item { color: #94a3b8; }
-  body.dark .nav-item:hover { background: rgba(255, 255, 255, 0.03); color: #e2e8f0; }
-  body.dark .nav-item.active { background: rgba(37, 99, 235, 0.15); color: #60a5fa; box-shadow: inset 3px 0 0 #3b82f6; }
-  body.dark .nav-icon { background: rgba(0,0,0,0.2); }
-  body.dark .nav-item.active .nav-icon { background: rgba(37, 99, 235, 0.25); color: #60a5fa; }
-}
-
 @media (max-width: 768px) {
   body.dark .header { background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
   body.dark .ham span { background: #cbd5e1; }
   body.dark .btn-print { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; }
   body.dark .btn-print:hover { background: rgba(255, 255, 255, 0.1); }
   body.dark .btn-print[title="Keluar"] { background: rgba(220, 38, 38, 0.15); border-color: rgba(220, 38, 38, 0.3); color: #fca5a5; }
+  body.dark .btn-fs-toggle { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; }
+  body.dark .btn-fs-toggle:hover { background: rgba(255, 255, 255, 0.1); }
   
   body.dark .hero-metric, body.dark .kpi-card, body.dark .chart-card, body.dark .analysis-card, body.dark .conclusion-card { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); }
   body.dark .hero-stat { background: #162032; border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -1015,7 +1334,7 @@ body.dark .loading-progress-value {
 @media print {
   .shell { display: block; }
   .header { position: relative; }
-  .sidebar, .sidebar-overlay, .ham, .table-toolbar .sort-group, .btn-print, .modal-overlay { display: none !important; }
+  .sidebar, .ham, .table-toolbar .sort-group, .btn-print, .modal-overlay, .btn-fs-toggle, .fs-prompt { display: none !important; }
   .view { display: block !important; margin-bottom: 24px; }
   .chart-card, .kpi-card, .table-surface { break-inside: avoid; }
   body { background: white !important; }
@@ -1108,8 +1427,7 @@ body.dark .loading-progress-value {
 
 <!-- ═══════════════ VIEW: DASHBOARD ═══════════════ -->
 <div id="dashboardView" style="display: none;">
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
+  
   <div class="shell">
 
     <!-- ═══════════════ HEADER ═══════════════ -->
@@ -1127,6 +1445,18 @@ body.dark .loading-progress-value {
 
       <!-- ACTION BUTTONS -->
       <div class="header-right">
+        
+        <!-- Fullscreen Premium Toggle -->
+        <button class="btn-fs-toggle" id="fsToggleBtn" onclick="toggleFullscreen()" title="Layar Penuh">
+          <svg id="fsIconEnter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+          <svg id="fsIconExit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+          </svg>
+          <span class="btn-text" id="fsToggleText">Layar Penuh</span>
+        </button>
+
         <!-- Dark mode toggle is dynamically injected here via JS -->
         <button class="btn-print" onclick="window.print()" title="Cetak PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -1143,41 +1473,58 @@ body.dark .loading-progress-value {
       </div>
     </header>
 
-    <!-- ═══════════════ SIDEBAR ═══════════════ -->
-    <aside class="sidebar" id="sidebar">
-      <span class="nav-section-label">Navigasi</span>
-      <button class="nav-item active" data-target="view-ringkasan" onclick="showSection('view-ringkasan')">
-        <span class="nav-icon">◫</span> Ringkasan
-      </button>
-      <button class="nav-item" data-target="view-tabel" onclick="showSection('view-tabel')">
-        <span class="nav-icon">≡</span> Data Sekolah
-      </button>
-      <button class="nav-item" data-target="view-grafik" onclick="showSection('view-grafik')">
-        <span class="nav-icon">↗</span> Grafik & Insight
-      </button>
-      <button class="nav-item" data-target="view-trend" onclick="showSection('view-trend')">
-        <span class="nav-icon">∿</span> Tren Bulanan
-      </button>
-      <button class="nav-item" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan')">
-        <span class="nav-icon">◎</span> Kesimpulan
-      </button>
+    <!-- ═══════════════ FULLSCREEN SIDEBAR MENU ═══════════════ -->
+    <aside class="sidebar" id="sidebar" onclick="if(event.target === this) closeSidebar()">
+      <div class="fs-overlay-bg" onclick="closeSidebar()"></div>
+      
+      <div class="sidebar-inner">
+        <!-- Close Button -->
+        <button class="btn-close-fs" onclick="closeSidebar()" title="Tutup Menu (ESC)">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
 
-      <div class="sidebar-filter">
-        <span class="sidebar-filter-label">Filter Wilayah & Periode</span>
-        <select class="sel sidebar-filter select" id="sbKecamatan">
-          <option value="all">Semua Kecamatan</option>
-          <option value="Langensari">Langensari</option>
-          <option value="Purwaharja">Purwaharja</option>
-          <option value="Pataruman">Pataruman</option>
-          <option value="Banjar">Banjar</option>
-        </select>
-        <select class="sel" id="sbYear"></select>
-        <select class="sel" id="sbMonth" style="margin-top:6px"></select>
+        <div class="fs-brand">
+          <h2>SMART <span>BTQ</span></h2>
+          <p>Dashboard Navigasi Enterprise</p>
+        </div>
+
+        <nav class="fs-nav-wrapper">
+          <button class="nav-item active" data-target="view-ringkasan" onclick="showSection('view-ringkasan')">
+            <span class="nav-icon">◫</span> <span class="nav-text">Ringkasan Eksekutif</span>
+          </button>
+          <button class="nav-item" data-target="view-tabel" onclick="showSection('view-tabel')">
+            <span class="nav-icon">≡</span> <span class="nav-text">Data & Direktori Sekolah</span>
+          </button>
+          <button class="nav-item" data-target="view-grafik" onclick="showSection('view-grafik')">
+            <span class="nav-icon">↗</span> <span class="nav-text">Grafik & Insight Analitik</span>
+          </button>
+          <button class="nav-item" data-target="view-trend" onclick="showSection('view-trend')">
+            <span class="nav-icon">∿</span> <span class="nav-text">Tren Perkembangan Bulanan</span>
+          </button>
+          <button class="nav-item" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan')">
+            <span class="nav-icon">◎</span> <span class="nav-text">Kesimpulan & Rekomendasi</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-filter">
+          <span class="sidebar-filter-label">Filter Wilayah & Periode</span>
+          <select class="sel select" id="sbKecamatan">
+            <option value="all">Semua Kecamatan</option>
+            <option value="Langensari">Langensari</option>
+            <option value="Purwaharja">Purwaharja</option>
+            <option value="Pataruman">Pataruman</option>
+            <option value="Banjar">Banjar</option>
+          </select>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+            <select class="sel" id="sbYear"></select>
+            <select class="sel" id="sbMonth"></select>
+          </div>
+        </div>
       </div>
     </aside>
 
-    <!-- ═══════════════ MAIN ═══════════════ -->
-    <main class="main">
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+    <main class="main" id="mainContentArea">
 
       <!-- DQ Banner -->
       <div class="dq-banner hidden" id="dqBanner">
@@ -1454,6 +1801,23 @@ body.dark .loading-progress-value {
   </div>
 </div>
 
+<!-- ═══════════════ FULLSCREEN SUGGESTION PROMPT ═══════════════ -->
+<div class="fs-prompt" id="fsPrompt">
+  <div class="fs-prompt-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+    </svg>
+  </div>
+  <div class="fs-prompt-text">
+    <strong>Aktifkan Mode Layar Penuh</strong>
+    <span>Untuk pengalaman dashboard yang lebih optimal.</span>
+  </div>
+  <div class="fs-prompt-actions">
+    <button class="fs-btn-dismiss" onclick="hideFsPrompt(true)">Nanti</button>
+    <button class="fs-btn-accept" onclick="acceptFsPrompt()">Aktifkan</button>
+  </div>
+</div>
+
 <!-- ═══════════════ GLOBAL LOADING OVERLAY ═══════════════ -->
 <div id="globalLoadingOverlay" class="global-loading">
   <div class="loading-card">
@@ -1515,6 +1879,7 @@ async function showDashboardView() {
   
   // Inisialisasi event dan ambil data
   setupEventListeners(); 
+  initFullscreenSystem();
   await initDashboard();
 }
 
@@ -1680,17 +2045,13 @@ async function initDashboard() {
 
 // Event Dropdown Bersih (addEventListener)
 function setupEventListeners() {
-  const selTahun = document.getElementById("selYear");
   const sbTahun = document.getElementById("sbYear");
-  const selBulan = document.getElementById("selMonth");
   const sbBulan = document.getElementById("sbMonth");
-  const selKec = document.getElementById("selKecamatan");
   const sbKec = document.getElementById("sbKecamatan");
 
   const handleYearChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     currentYear = e.target.value;
-    if (selTahun) selTahun.value = currentYear;
     if (sbTahun) sbTahun.value = currentYear;
     
     initMonthDropdown(); 
@@ -1700,7 +2061,6 @@ function setupEventListeners() {
   const handleMonthChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     currentMonth = e.target.value;
-    if (selBulan) selBulan.value = currentMonth;
     if (sbBulan) sbBulan.value = currentMonth;
     
     loadData(currentYear, currentMonth);
@@ -1709,7 +2069,6 @@ function setupEventListeners() {
   const handleKecChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     selectedKecamatan = e.target.value;
-    if (selKec) selKec.value = selectedKecamatan;
     if (sbKec) sbKec.value = selectedKecamatan;
     
     stackDisplayMode = selectedKecamatan === 'all' ? 'top20' : 'all';
@@ -1725,12 +2084,118 @@ function setupEventListeners() {
     }
   };
 
-  if (selTahun) selTahun.onchange = handleYearChange;
   if (sbTahun) sbTahun.onchange = handleYearChange;
-  if (selBulan) selBulan.onchange = handleMonthChange;
   if (sbBulan) sbBulan.onchange = handleMonthChange;
-  if (selKec) selKec.onchange = handleKecChange;
   if (sbKec) sbKec.onchange = handleKecChange;
+}
+
+// ────────────────────────────────────────────
+// FULLSCREEN TRUE API SYSTEM
+// ────────────────────────────────────────────
+let fsPromptShown = false;
+let fsDismissTime = 0;
+
+function initFullscreenSystem() {
+  document.addEventListener('fullscreenchange', updateFsUI);
+  document.addEventListener('webkitfullscreenchange', updateFsUI);
+  document.addEventListener('mozfullscreenchange', updateFsUI);
+  document.addEventListener('MSFullscreenChange', updateFsUI);
+
+  // Add click listener on main area to suggest fullscreen if not active
+  const mainArea = document.getElementById('mainContentArea');
+  if(mainArea) {
+    mainArea.addEventListener('click', () => {
+      // Show prompt naturally upon interaction
+      setTimeout(suggestFullscreen, 100);
+    });
+  }
+
+  // Suggest automatically after short delay on load
+  setTimeout(suggestFullscreen, 3500);
+}
+
+function isFullscreenActive() {
+  return document.fullscreenElement || 
+         document.webkitFullscreenElement || 
+         document.mozFullScreenElement || 
+         document.msFullscreenElement;
+}
+
+function toggleFullscreen() {
+  const doc = document.documentElement;
+  
+  if (!isFullscreenActive()) {
+    if (doc.requestFullscreen) {
+      doc.requestFullscreen().catch(err => console.log(err));
+    } else if (doc.webkitRequestFullscreen) { /* Safari */
+      doc.webkitRequestFullscreen();
+    } else if (doc.msRequestFullscreen) { /* IE11 */
+      doc.msRequestFullscreen();
+    } else if (doc.mozRequestFullScreen) { /* Firefox */
+      doc.mozRequestFullScreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) { /* Firefox */
+      document.mozCancelFullScreen();
+    }
+  }
+}
+
+function updateFsUI() {
+  const isFs = isFullscreenActive();
+  const btnText = document.getElementById('fsToggleText');
+  const iconEnter = document.getElementById('fsIconEnter');
+  const iconExit = document.getElementById('fsIconExit');
+  
+  if(isFs) {
+    if(btnText) btnText.textContent = 'Keluar Layar Penuh';
+    if(iconEnter) iconEnter.style.display = 'none';
+    if(iconExit) iconExit.style.display = 'block';
+    hideFsPrompt(false);
+  } else {
+    if(btnText) btnText.textContent = 'Layar Penuh';
+    if(iconEnter) iconEnter.style.display = 'block';
+    if(iconExit) iconExit.style.display = 'none';
+    // When exited manually, maybe suggest again after a long cooldown
+    fsDismissTime = Date.now() - 300000; // Allow it to pop up again after 5 mins
+  }
+}
+
+function suggestFullscreen() {
+  if (isFullscreenActive()) return;
+  if (fsPromptShown) return;
+  
+  // 10 menit cooldown jika di-dismiss
+  if (Date.now() - fsDismissTime < 600000) return; 
+
+  const prompt = document.getElementById('fsPrompt');
+  if (prompt) {
+    prompt.classList.add('show');
+    fsPromptShown = true;
+    
+    // Auto hide prompt after 10s if ignored
+    setTimeout(() => {
+      if(fsPromptShown) hideFsPrompt(false);
+    }, 10000);
+  }
+}
+
+function hideFsPrompt(dismissedByUser = true) {
+  const prompt = document.getElementById('fsPrompt');
+  if (prompt) prompt.classList.remove('show');
+  if (dismissedByUser) fsDismissTime = Date.now();
+  setTimeout(() => { fsPromptShown = false; }, 600); // Allow animation to finish
+}
+
+function acceptFsPrompt() {
+  hideFsPrompt(false);
+  toggleFullscreen();
 }
 
 // ────────────────────────────────────────────
@@ -1859,9 +2324,7 @@ function initYearDropdown() {
   const years = Object.keys(DATABASE).sort((a, b) => b - a);
   const opts = years.map(y => `<option value="${y}">${y}</option>`).join("");
   
-  const selY = document.getElementById("selYear");
   const sbY = document.getElementById("sbYear");
-  if (selY) { selY.innerHTML = opts; selY.value = currentYear; }
   if (sbY) { sbY.innerHTML = opts; sbY.value = currentYear; }
 }
 
@@ -1871,7 +2334,6 @@ function initMonthDropdown() {
 
   if (months.length === 0) {
     const noOpt = '<option value="">- Kosong -</option>';
-    if (document.getElementById("selMonth")) document.getElementById("selMonth").innerHTML = noOpt;
     if (document.getElementById("sbMonth")) document.getElementById("sbMonth").innerHTML = noOpt;
     return;
   }
@@ -1882,9 +2344,7 @@ function initMonthDropdown() {
 
   const opts = months.map(m => `<option value="${m}">${m}</option>`).join("");
   
-  const selM = document.getElementById("selMonth");
   const sbM = document.getElementById("sbMonth");
-  if (selM) { selM.innerHTML = opts; selM.value = currentMonth; }
   if (sbM) { sbM.innerHTML = opts; sbM.value = currentMonth; }
 }
 
@@ -2005,21 +2465,22 @@ function showSection(id) {
   document.querySelectorAll('.nav-item').forEach(l => {
     l.classList.toggle('active', l.getAttribute('data-target') === id);
   });
-  if(window.innerWidth <= 900) closeSidebar();
+  // ALWAYS close sidebar immediately after navigating
+  closeSidebar();
   window.dispatchEvent(new Event('resize'));
 }
 
 function openSidebar() {
   document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden'; // Lock background scrolling
 }
 
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-  // Pastikan tidak merusak UI freeze jika sedang loading
-  if (!isLoading) document.body.style.overflow = '';
+  // Pastikan tidak membuka lock scroll jika sistem memang sedang loading total
+  if (!isLoading) {
+      document.body.style.overflow = '';
+  }
 }
 
 // ────────────────────────────────────────────
@@ -2706,9 +3167,13 @@ function closeModal(e) {
     document.getElementById('modalOverlay').classList.remove('open');
 }
 
-// Support keydown to close overlays
+// Support keydown to close overlays / sidebar / fullscreen prompt
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeSidebar(); }
+  if (e.key === 'Escape') { 
+      closeModal(); 
+      closeSidebar(); 
+      hideFsPrompt(true);
+  }
 });
 
 /**
@@ -2728,9 +3193,13 @@ document.addEventListener('keydown', e => {
       btn.title = isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode';
     }
 
+    const themeColorMeta = document.getElementById('themeColorMeta');
+    if(themeColorMeta) {
+      themeColorMeta.setAttribute('content', isDark ? '#0f172a' : '#ffffff');
+    }
+
     if (window.Chart) {
       const textColor = isDark ? '#94a3b8' : '#94a3b8';
-      const gridColor = isDark ? '#334155' : '#e2e8f0';
       Chart.defaults.color = textColor;
       Chart.defaults.scale = Chart.defaults.scale || {};
     }
