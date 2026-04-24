@@ -706,7 +706,8 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   .sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
   .nav-item { padding: 12px 20px; margin: 0 12px; width: calc(100% - 24px); }
   .nav-section-label { padding: 12px 20px 6px; }
-  .sidebar-filter { display: none; } 
+  .header-period-group { display: none; } /* Menyembunyikan filter dr header di HP agar tidak bertumpuk */
+  .sidebar-filter { display: block; } /* Menampilkan kembali filter di sidebar HP */
   .ham { display: flex; flex-direction: column; }
   .main { grid-column: 1; padding: 20px 16px 48px; }
   .header-brand-sub { display: none; }
@@ -744,10 +745,6 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   .btn-print .btn-text { display: none; }
   .btn-print { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: var(--r-md); }
   .btn-print svg { margin: 0; width: 18px; height: 18px; }
-
-  .header-period-group { order: 4; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-top: 12px; border-top: 1px dashed var(--border); }
-  .period-label { display: none; }
-  .header-period-group .sel { width: 100%; padding: 8px 24px 8px 10px; font-size: 11.5px; background-size: 12px; background-position: right 8px center; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
   
   .modal-box { width: 92%; height: auto; max-height: 88vh; border-radius: var(--r-xl); display: flex; flex-direction: column; margin: auto; }
   .modal-header { padding: 20px; border-top-left-radius: var(--r-xl); border-top-right-radius: var(--r-xl); }
@@ -830,7 +827,6 @@ body.dark .pct-pill.pill-low { background: rgba(220, 38, 38, 0.15); color: #f871
 @media (max-width: 768px) {
   body.dark .header { background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
   body.dark .ham span { background: #cbd5e1; }
-  body.dark .header-period-group { border-top: 1px dashed rgba(255, 255, 255, 0.08); }
   body.dark .btn-print { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; }
   body.dark .btn-print:hover { background: rgba(255, 255, 255, 0.1); }
   body.dark .btn-print[title="Keluar"] { background: rgba(220, 38, 38, 0.15); border-color: rgba(220, 38, 38, 0.3); color: #fca5a5; }
@@ -1128,22 +1124,6 @@ body.dark .loading-progress-value {
       </div>
 
       <div class="header-sep"></div>
-
-      <!-- FILTER DROPDOWNS -->
-      <div class="header-period-group">
-        <span class="period-label">Wilayah</span>
-        <select class="sel" id="selKecamatan">
-          <option value="all">Semua Kecamatan</option>
-          <option value="Langensari">Langensari</option>
-          <option value="Purwaharja">Purwaharja</option>
-          <option value="Pataruman">Pataruman</option>
-          <option value="Banjar">Banjar</option>
-        </select>
-        <span class="period-label">Tahun</span>
-        <select class="sel" id="selYear"></select>
-        <span class="period-label">Bulan</span>
-        <select class="sel" id="selMonth"></select>
-      </div>
 
       <!-- ACTION BUTTONS -->
       <div class="header-right">
