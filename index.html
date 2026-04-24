@@ -310,7 +310,7 @@ body {
   min-height: 100vh;
 }
 
-/* Base Structural Layout Elements (Maintained for integrity) */
+/* Base Structural Layout Elements */
 .charts-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
 @media(max-width: 1100px) { .charts-2col { grid-template-columns: 1fr; } }
 .chart-wrap { position: relative; }
@@ -372,7 +372,6 @@ body {
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease;
-  /* Icon chevron custom: presisi center vertikal, 14px dari kanan */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
@@ -389,7 +388,6 @@ body {
   background-color: #ffffff;
 }
 
-/* Fallback/Overrides untuk dark mode */
 body.dark .sel { 
   background-color: var(--surface-2);
   border-color: var(--border);
@@ -725,10 +723,11 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
 .sidebar-overlay.open { display: block; }
 
 /* ────────────────────────────────────────────
-   23. RESPONSIVE
+   23. RESPONSIVE — MOBILE UPGRADES
 ──────────────────────────────────────────── */
 @media(max-width:900px) {
-  .shell { grid-template-columns: 1fr; }
+  /* Pastikan auto row ter-set agar header mobile bisa terekspansi tinggi penuhnya */
+  .shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .sidebar { position: fixed; top: 0; left: 0; bottom: 0; z-index: 500; width: 280px; transform: translateX(-100%); transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1); height: 100vh; padding: 20px 0; }
   .sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
   body.dark .sidebar.open { box-shadow: 2px 0 20px rgba(0,0,0,.5); }
@@ -736,7 +735,7 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   .nav-section-label { padding: 12px 20px 6px; }
   .sidebar-filter { padding: 20px 16px; display: block; }
   .ham { display: flex; flex-direction: column; }
-  .main { grid-column: 1; padding: 20px 16px 48px; }
+  .main { grid-column: 1; grid-row: 2; padding: 20px 16px 48px; }
   .header-brand-sub { display: none; }
 }
 
@@ -754,15 +753,71 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   .hero-pct { font-size: 48px; }
   .kpi-value { font-size: 28px; }
   .page-header { margin-bottom: 20px; }
-  .sel, .search-input, .sort-btn, .btn-detail, .btn-print, .m-tab { min-height: 44px; }
+  .sel, .search-input, .sort-btn, .btn-detail, .m-tab { min-height: 44px; }
   .sort-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-left: 0; margin-top: 12px; }
   .sort-btn { padding: 0; display: flex; align-items: center; justify-content: center; font-size: 11.5px; }
   .search-input { width: 100%; }
   .table-toolbar { flex-direction: column; padding: 0 0 16px 0; gap: 0; align-items: stretch; }
   .table-filter-sel { max-width: 100%; margin-top: 12px; }
-  .header { height: 60px; padding: 0 16px; }
-  .header-period-group, .header-sep, .header-right { display: none; }
-  .header-brand-name { font-size: 16px; }
+  
+  /* ── HEADER MOBILE: SEMUA FITUR MUNCUL, RAPI, & GOOGLE-STYLE ── */
+  .header {
+    height: auto;
+    min-height: 60px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .ham { order: 1; margin: 0 10px 0 -4px; }
+  .header-brand { order: 2; flex: 1; }
+  .header-brand-name { font-size: 17px; }
+  .header-sep { display: none; }
+  
+  /* Row ke-2: Filter Group */
+  .header-period-group {
+    order: 3;
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .header-period-group::-webkit-scrollbar { display: none; }
+  .period-label { display: none; } /* Label teks dihilangkan, space saving */
+  .header-period-group .sel {
+    flex: 1;
+    min-width: 100px;
+    font-size: 12.5px;
+    padding: 8px 24px 8px 12px;
+  }
+
+  /* Row ke-3: Action Buttons (Dark, PDF, Keluar) */
+  .header-right {
+    order: 4;
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    margin-left: 0;
+  }
+  #darkToggleBtn {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+  }
+  .btn-print {
+    flex: 1;
+    justify-content: center;
+    height: 42px;
+    padding: 8px;
+    font-size: 13px;
+    margin-left: 0 !important; /* Override inline-style Keluar button */
+  }
+
+  /* Tables & Mobile Grid */
   table { border: none; width: 100%; }
   .table-surface { background: transparent; border: none; box-shadow: none; overflow: visible; margin-bottom: 0; }
   thead { display: none; }
