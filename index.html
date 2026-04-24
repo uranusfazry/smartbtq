@@ -357,18 +357,55 @@ body {
 #darkToggleBtn:hover { background: var(--primary-dim); border-color: var(--primary); color: var(--primary); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 
 /* ────────────────────────────────────────────
-   5. SELECTS — Modern
+   5. SELECTS — Modern Google Style
 ──────────────────────────────────────────── */
 .sel {
-  background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm);
-  padding: 6px 30px 6px 10px; font-size: 12.5px; font-weight: 500; color: var(--text-primary);
-  cursor: pointer; outline: none; transition: var(--transition-base);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 9px center;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px 40px 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  /* Icon chevron custom: presisi center vertikal, 14px dari kanan */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.02);
 }
-.sel:hover { border-color: var(--primary); }
-.sel:focus { border-color: var(--primary); box-shadow: var(--shadow-focus); background-color: var(--surface); }
-body.dark .sel { color-scheme: dark; }
+.sel:hover {
+  border-color: #cbd5e1;
+  background-color: #fafafa;
+}
+.sel:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+  background-color: #ffffff;
+}
+
+/* Fallback/Overrides untuk dark mode */
+body.dark .sel { 
+  background-color: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text-primary);
+  box-shadow: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+body.dark .sel:hover {
+  border-color: #475569;
+  background-color: var(--surface);
+}
+body.dark .sel:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
+  background-color: var(--surface);
+}
 
 /* ────────────────────────────────────────────
    6. BUTTONS
@@ -680,7 +717,9 @@ body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .mod
 body.dark .nav-item.active::before { background: var(--primary); }
 body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
 body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
-body.dark .btn-detail, body.dark .sel, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
+
+/* Overrides tambahan dark mode (mencegah conflict) */
+body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
 
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 400; }
 .sidebar-overlay.open { display: block; }
