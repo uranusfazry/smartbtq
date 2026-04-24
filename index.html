@@ -566,7 +566,8 @@ tfoot td.c { text-align: center; }
 
     <div class="header-period-group">
       <span class="period-label">Wilayah</span>
-      <select class="sel" id="selKecamatan" onchange="onPeriodChange()">
+      <!-- Dihapus onchange="..." inline dari select, diganti Event Listeners di JS -->
+      <select class="sel" id="selKecamatan">
         <option value="all">Semua Kecamatan</option>
         <option value="Langensari">Langensari</option>
         <option value="Purwaharja">Purwaharja</option>
@@ -574,9 +575,9 @@ tfoot td.c { text-align: center; }
         <option value="Banjar">Banjar</option>
       </select>
       <span class="period-label">Tahun</span>
-      <select class="sel" id="selYear" onchange="onPeriodChange()"></select>
+      <select class="sel" id="selYear"></select>
       <span class="period-label">Bulan</span>
-      <select class="sel" id="selMonth" onchange="onPeriodChange()"></select>
+      <select class="sel" id="selMonth"></select>
     </div>
 
     <div class="header-right">
@@ -608,15 +609,15 @@ tfoot td.c { text-align: center; }
 
     <div class="sidebar-filter">
       <span class="sidebar-filter-label">Filter Wilayah & Periode</span>
-      <select class="sel sidebar-filter select" id="sbKecamatan" onchange="onSidebarKec()">
+      <select class="sel sidebar-filter select" id="sbKecamatan">
         <option value="all">Semua Kecamatan</option>
         <option value="Langensari">Langensari</option>
         <option value="Purwaharja">Purwaharja</option>
         <option value="Pataruman">Pataruman</option>
         <option value="Banjar">Banjar</option>
       </select>
-      <select class="sel" id="sbYear" onchange="onSidebarPeriod()"></select>
-      <select class="sel" id="sbMonth" onchange="onSidebarPeriod()" style="margin-top:6px"></select>
+      <select class="sel" id="sbYear"></select>
+      <select class="sel" id="sbMonth" style="margin-top:6px"></select>
     </div>
   </aside>
 
@@ -897,14 +898,20 @@ tfoot td.c { text-align: center; }
   </div>
 </div>
 
-<!-- ═══════════════ SCRIPT ═══════════════ -->
+<!-- ═══════════════ SCRIPT YG SUDAH DIPERBAIKI (REFACTORED) ═══════════════ -->
 <script>
 // ────────────────────────────────────────────
-// GLOBAL STATE (100% FETCHED VIA API)
+// GLOBAL STATE & CONSTANTS
 // ────────────────────────────────────────────
-let DATABASE = {};
-const MONTH_ORDER = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const API_URL = "https://script.google.com/macros/s/AKfycbwud19YXXiOwLztp-IpoEWpZls_uy2yoegY_ZAcktO_Eda5LQqFYxsSyV-o0cUnlmXgPA/exec";
 
+// SOLUSI: Urutan bulan statis (Wajib)
+const MONTH_ORDER = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+];
+
+let DATABASE = {};
 let currentYear = null, currentMonth = null;
 let selectedKecamatan = 'all';
 let currentSchools = [], filteredSchools = [];
@@ -915,278 +922,208 @@ let barChartActiveData = [], stackChartActiveData = [];
 let currentModalSchool = null;
 
 // ────────────────────────────────────────────
-// HELPERS
+// INIT & EVENT LISTENERS
 // ────────────────────────────────────────────
-const n2 = n => parseFloat(n).toFixed(1);
-const fmt = n => n.toLocaleString('id-ID');
+document.addEventListener("DOMContentLoaded", async () => {
+  setupEventListeners(); // Mendaftarkan event dropdown secara bersih
+  await initDashboard(); // Setup awal data
+});
 
-function aggregateSchools(rawArr) {
-  return rawArr.map(s => {
-    let tot=0,lancar=0,belum=0,tidak=0;
-    let k4t=0,k4l=0,k4b=0,k4k=0,k5t=0,k5l=0,k5b=0,k5k=0;
-    let hadirArr=[],guruArr=[],warnings=[];
-    s.rows.forEach(r => {
-      const k4s=r.kls4.lancar+r.kls4.belum+r.kls4.tidak;
-      const k5s=r.kls5.lancar+r.kls5.belum+r.kls5.tidak;
-      if(Math.abs(k4s-r.kls4.total)>1) warnings.push(`Kls4 ${r.guru}`);
-      if(Math.abs(k5s-r.kls5.total)>1) warnings.push(`Kls5 ${r.guru}`);
-      tot+=r.kls4.total+r.kls5.total; lancar+=r.kls4.lancar+r.kls5.lancar;
-      belum+=r.kls4.belum+r.kls5.belum; tidak+=r.kls4.tidak+r.kls5.tidak;
-      k4t+=r.kls4.total;k4l+=r.kls4.lancar;k4b+=r.kls4.belum;k4k+=r.kls4.tidak;
-      k5t+=r.kls5.total;k5l+=r.kls5.lancar;k5b+=r.kls5.belum;k5k+=r.kls5.tidak;
-      hadirArr.push(r.hadir); guruArr.push(r.guru);
-    });
-    return {
-      idx:s.no,no:s.no,nama:s.nama,kecamatan:s.kecamatan,
-      tot,lancar,belum,tidak,pct:tot>0?(lancar/tot*100):0,
-      kls4:{tot:k4t,lancar:k4l,belum:k4b,tidak:k4k},
-      kls5:{tot:k5t,lancar:k5l,belum:k5b,tidak:k5k},
-      guru:guruArr,hadir:hadirArr,rows:s.rows,warnings
-    };
-  });
-}
-
-function computeTotals(schools) {
-  const hadirAll = schools.flatMap(s=>s.hadir);
-  return {
-    tot:  schools.reduce((a,s)=>a+s.tot,0),
-    lancar:schools.reduce((a,s)=>a+s.lancar,0),
-    belum: schools.reduce((a,s)=>a+s.belum,0),
-    tidak: schools.reduce((a,s)=>a+s.tidak,0),
-    avgHadir: hadirAll.length ? hadirAll.reduce((a,b)=>a+b,0)/hadirAll.length : 0
-  };
-}
-
-function getPrevPeriod(year,month) {
-  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const idx=months.indexOf(month);
-  if(idx<=0) {
-    const py=String(parseInt(year)-1);
-    if(!DATABASE[py]) return null;
-    const pym=Object.keys(DATABASE[py]);
-    return pym.length?{year:py,month:pym[pym.length-1]}:null;
-  }
-  for(let i=idx-1;i>=0;i--) {
-    if(DATABASE[year]&&DATABASE[year][months[i]]) return {year,month:months[i]};
-  }
-  return null;
-}
-
-function getAllPeriods() {
-  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const result=[];
-  Object.keys(DATABASE).sort().forEach(yr => {
-    months.forEach(mo => {
-      if(DATABASE[yr]&&DATABASE[yr][mo]) result.push({year:yr,month:mo});
-    });
-  });
-  return result;
-}
-
-function dataQuality(school) {
-  if (school.warnings.length > 0) return 'check';
-  const avgH = school.hadir.reduce((a,b)=>a+b,0)/school.hadir.length;
-  if (avgH < 70) return 'partial';
-  return 'valid';
-}
-
-// ────────────────────────────────────────────
-// FETCH API
-// ────────────────────────────────────────────
-const API_URL = "https://script.google.com/macros/s/AKfycbwud19YXXiOwLztp-IpoEWpZls_uy2yoegY_ZAcktO_Eda5LQqFYxsSyV-o0cUnlmXgPA/exec";
-
-async function loadData() {
+async function initDashboard() {
   try {
-    document.getElementById("r-title").textContent = "Memuat data dari server...";
-    document.getElementById("r-subtitle").textContent = "Mohon tunggu sebentar...";
+    showLoading();
+    const res = await fetch(API_URL);
+    DATABASE = await res.json();
 
-    const res = await fetch(API_URL + "?t=" + Date.now());
-    const data = await res.json();
-
-    console.log("DATA BACKEND:", data);
-
-    if (!data || Object.keys(data).length === 0) {
-      throw new Error("Data kosong dari backend");
-    }
-
-    DATABASE = data;
-
-    const years = Object.keys(DATABASE).sort((a,b)=>b-a);
-
-    if(years.length > 0) {
+    // Setup tahun default
+    const years = Object.keys(DATABASE).sort((a, b) => b - a);
+    if (years.length > 0) {
       currentYear = years[0];
-      const availableMonths = MONTH_ORDER.filter(m => DATABASE[currentYear] && DATABASE[currentYear][m]);
-      if(availableMonths.length > 0) {
+      
+      // Pilih bulan terakhir yang tersedia di tahun tersebut
+      const availableMonths = MONTH_ORDER.filter(m => DATABASE[currentYear][m]);
+      if (availableMonths.length > 0) {
         currentMonth = availableMonths[availableMonths.length - 1];
       }
     }
 
-    initDropdown();
-    renderAll();
+    initYearDropdown();
+    initMonthDropdown();
 
+    if (currentYear && currentMonth && DATABASE[currentYear][currentMonth]) {
+      console.log("Selected:", currentYear, currentMonth); // DEBUG LOG WAJIB
+      renderUI(DATABASE[currentYear][currentMonth]);
+    } else {
+      showEmpty();
+    }
   } catch (err) {
-    console.error("ERROR FETCH:", err);
-    document.getElementById('r-title').textContent = "Gagal mengambil data dari server";
-    document.getElementById('r-subtitle').textContent = "Tidak dapat mengambil data dari server";
+    console.error("Init Error:", err);
+    showError();
   }
 }
 
-document.addEventListener("DOMContentLoaded", loadData);
+// SOLUSI: Event Dropdown Bersih (addEventListener)
+function setupEventListeners() {
+  const selTahun = document.getElementById("selYear");
+  const sbTahun = document.getElementById("sbYear");
+  const selBulan = document.getElementById("selMonth");
+  const sbBulan = document.getElementById("sbMonth");
+  const selKec = document.getElementById("selKecamatan");
+  const sbKec = document.getElementById("sbKecamatan");
 
-// ────────────────────────────────────────────
-// DROPDOWNS & NAVIGATION
-// ────────────────────────────────────────────
-function initDropdown() {
-  const years = Object.keys(DATABASE).sort((a,b)=>b-a);
-
-  const selYear = document.getElementById("selYear");
-  const sbYear = document.getElementById("sbYear");
-
-  const opts = years.map(y => `<option value="${y}"${y==currentYear?' selected':''}>${y}</option>`).join("");
-  if(selYear) selYear.innerHTML = opts;
-  if(sbYear) sbYear.innerHTML = opts;
-
-  updateMonths();
-}
-
-function updateMonths() {
-  const year = document.getElementById("selYear").value || currentYear;
-  
-  // Pastikan urutan bulan selalu konsisten menggunakan konstanta
-  const availableMonths = MONTH_ORDER.filter(m => DATABASE[year] && DATABASE[year][m]);
-
-  // Validasi currentMonth jika menyeberang tahun dan bulan sebelumnya tidak ada
-  if (!availableMonths.includes(currentMonth)) {
-    currentMonth = availableMonths[0]; 
-  }
-
-  const selMonth = document.getElementById("selMonth");
-  const sbMonth = document.getElementById("sbMonth");
-  
-  const opts = availableMonths.map(m => `<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join("");
-  if(selMonth) selMonth.innerHTML = opts;
-  if(sbMonth) sbMonth.innerHTML = opts;
-
-  console.log("Selected:", year, currentMonth);
-}
-
-function syncSelects(kec, yr, mo) {
-  ['selKecamatan','sbKecamatan'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=kec;});
-  ['selYear','sbYear'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=yr;});
-  ['selMonth','sbMonth'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=mo;});
-}
-
-function onPeriodChange() {
-  const kec=(document.getElementById('selKecamatan')||{}).value||selectedKecamatan;
-  selectedKecamatan=kec;
-  if(selectedKecamatan==='all') stackDisplayMode='top20';
-  else stackDisplayMode='all';
-
-  updateMonths();
-
-  const yr=document.getElementById('selYear').value;
-  const mo=document.getElementById('selMonth').value;
-  syncSelects(kec,yr,mo);
-  
-  sortMode='default';
-  refreshSortButtons();
-  renderAll();
-}
-
-function onSidebarKec() {
-  selectedKecamatan=document.getElementById('sbKecamatan').value;
-  if(selectedKecamatan==='all') stackDisplayMode='top20'; else stackDisplayMode='all';
-  
-  const yr=document.getElementById('selYear').value;
-  const mo=document.getElementById('selMonth').value;
-  syncSelects(selectedKecamatan,yr,mo);
-  
-  sortMode='default'; refreshSortButtons(); renderAll();
-}
-
-function onSidebarPeriod() {
-  const yr=document.getElementById('sbYear').value;
-  document.getElementById('selYear').value = yr;
-  
-  updateMonths();
-  
-  const mo=document.getElementById('sbMonth').value;
-  document.getElementById('selMonth').value = mo;
-  
-  syncSelects(selectedKecamatan,yr,mo);
-  sortMode='default'; refreshSortButtons(); renderAll();
-}
-
-function refreshSortButtons() {
-  ['sortBest','sortWorst','sortDefault'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById('sortDefault').classList.add('active');
-}
-
-function setStackMode(mode) {
-  stackDisplayMode=mode;
-  document.getElementById('btnStackTop20').classList.toggle('active',mode==='top20');
-  document.getElementById('btnStackAll').classList.toggle('active',mode==='all');
-  renderAll();
-}
-
-function showSection(id) {
-  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(l=>{
-    l.classList.toggle('active', l.getAttribute('data-target')===id);
-  });
-  if(window.innerWidth<=900) closeSidebar();
-  window.dispatchEvent(new Event('resize'));
-}
-
-// ────────────────────────────────────────────
-// RENDER UTAMA
-// ────────────────────────────────────────────
-function renderAll() {
-  if (!DATABASE || Object.keys(DATABASE).length === 0) {
-    console.warn("Data belum tersedia");
-    document.getElementById('r-title').textContent = "Data belum tersedia";
-    document.getElementById('r-subtitle').textContent = "Silakan periksa koneksi atau sumber data";
-    return;
-  }
-
-  const year = document.getElementById("selYear").value || currentYear;
-  const month = document.getElementById("selMonth").value || currentMonth;
-
-  currentYear = year;
-  currentMonth = month;
-
-  const data = DATABASE[year]?.[month];
-  
-  if (!data || data.length === 0) {
-    console.warn("Data tidak ditemukan:", year, month);
-    document.getElementById('r-title').textContent = "Data belum tersedia pada periode ini";
-    document.getElementById('r-subtitle').textContent = `Periode ${month} ${year} kosong`;
+  const handleYearChange = (e) => {
+    currentYear = e.target.value;
+    // Sinkronisasi dropdown antar layout (Header & Sidebar)
+    if (selTahun) selTahun.value = currentYear;
+    if (sbTahun) sbTahun.value = currentYear;
     
-    // Tampilkan Empty State secara bersih jika data diblacklist/kosong
-    document.getElementById('hero-pct').innerHTML = `-<sup>%</sup>`;
-    document.getElementById('hero-desc').innerHTML = 'Tidak ada data untuk dianalisis.';
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--ink-3);">Data belum tersedia pada periode ini</td></tr>';
+    initMonthDropdown(); // Penting: update bulan sebelum load data
+    loadData(currentYear, currentMonth);
+  };
+
+  const handleMonthChange = (e) => {
+    currentMonth = e.target.value;
+    if (selBulan) selBulan.value = currentMonth;
+    if (sbBulan) sbBulan.value = currentMonth;
+    
+    loadData(currentYear, currentMonth);
+  };
+
+  const handleKecChange = (e) => {
+    selectedKecamatan = e.target.value;
+    if (selKec) selKec.value = selectedKecamatan;
+    if (sbKec) sbKec.value = selectedKecamatan;
+    
+    stackDisplayMode = selectedKecamatan === 'all' ? 'top20' : 'all';
+    
+    // Karena API sudah di-cache, perubahan region cukup melakukan re-render
+    if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+        renderUI(DATABASE[currentYear][currentMonth]);
+    }
+  };
+
+  if (selTahun) selTahun.addEventListener("change", handleYearChange);
+  if (sbTahun) sbTahun.addEventListener("change", handleYearChange);
+  if (selBulan) selBulan.addEventListener("change", handleMonthChange);
+  if (sbBulan) sbBulan.addEventListener("change", handleMonthChange);
+  if (selKec) selKec.addEventListener("change", handleKecChange);
+  if (sbKec) sbKec.addEventListener("change", handleKecChange);
+}
+
+
+// ────────────────────────────────────────────
+// FETCH & UI STATES (LOADING/ERROR/EMPTY)
+// ────────────────────────────────────────────
+// SOLUSI: Fungsi Fetch API yang Bersih
+async function loadData(year, month) {
+  try {
+    showLoading();
+    
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    
+    DATABASE = data; // Diperbarui agar chart histori bulanan tetap up-to-date
+
+    if (!data[year] || !data[year][month]) {
+      showEmpty();
+      return;
+    }
+
+    console.log("Selected:", year, month); // DEBUG LOG WAJIB
+    renderUI(data[year][month]);
+    
+  } catch (err) {
+    console.error("Fetch API Error:", err);
+    showError();
+  }
+}
+
+// STATE HANDLERS
+function showLoading() {
+  document.getElementById("r-title").textContent = "Loading data...";
+  document.getElementById("r-subtitle").textContent = "Sedang menyinkronkan dengan server...";
+  document.getElementById("hero-pct").innerHTML = `-<sup>%</sup>`;
+  document.getElementById("hero-desc").innerHTML = "Memproses metrik...";
+  document.getElementById("dqBanner").classList.add("hidden");
+  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--ink-3)">Loading data...</td></tr>`;
+}
+
+function showError() {
+  document.getElementById("r-title").textContent = "Tidak dapat mengambil data dari server";
+  document.getElementById("r-subtitle").textContent = "Terjadi masalah koneksi atau konfigurasi API.";
+  document.getElementById("hero-pct").innerHTML = `Err`;
+  document.getElementById("hero-desc").innerHTML = "Data gagal dimuat.";
+  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--red)">Gagal mengambil data</td></tr>`;
+}
+
+function showEmpty() {
+  document.getElementById("r-title").textContent = "Data belum tersedia pada periode ini";
+  document.getElementById("r-subtitle").textContent = `Data kosong untuk ${currentMonth} ${currentYear}`;
+  document.getElementById("hero-pct").innerHTML = `-<sup>%</sup>`;
+  document.getElementById("hero-desc").innerHTML = "Silakan pilih bulan atau tahun lain pada menu.";
+  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--ink-3)">Data tidak tersedia</td></tr>`;
+}
+
+// ────────────────────────────────────────────
+// DROPDOWN RENDERERS
+// ────────────────────────────────────────────
+function initYearDropdown() {
+  const years = Object.keys(DATABASE).sort((a, b) => b - a);
+  const opts = years.map(y => `<option value="${y}">${y}</option>`).join("");
+  
+  const selY = document.getElementById("selYear");
+  const sbY = document.getElementById("sbYear");
+  if (selY) { selY.innerHTML = opts; selY.value = currentYear; }
+  if (sbY) { sbY.innerHTML = opts; sbY.value = currentYear; }
+}
+
+function initMonthDropdown() {
+  // SOLUSI: Menggunakan statis array untuk urutan yang stabil
+  const availableMonths = DATABASE[currentYear] || {};
+  const months = MONTH_ORDER.filter(m => availableMonths[m]);
+
+  if (months.length === 0) {
+    const noOpt = '<option value="">- Kosong -</option>';
+    if (document.getElementById("selMonth")) document.getElementById("selMonth").innerHTML = noOpt;
+    if (document.getElementById("sbMonth")) document.getElementById("sbMonth").innerHTML = noOpt;
     return;
   }
+
+  // SOLUSI: Validasi currentMonth ketika berpindah tahun
+  if (!months.includes(currentMonth)) {
+    currentMonth = months[0];
+  }
+
+  const opts = months.map(m => `<option value="${m}">${m}</option>`).join("");
   
+  const selM = document.getElementById("selMonth");
+  const sbM = document.getElementById("sbMonth");
+  if (selM) { selM.innerHTML = opts; selM.value = currentMonth; }
+  if (sbM) { sbM.innerHTML = opts; sbM.value = currentMonth; }
+}
+
+// ────────────────────────────────────────────
+// RENDER UI (Pemisahan Logika)
+// ────────────────────────────────────────────
+function renderUI(data) {
+  // Membersihkan state sementara
+  document.getElementById('tableBody').innerHTML = '';
+
   const rawMaster = data;
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
   let rawArr = rawMaster;
-  if(selectedKecamatan!=='all') rawArr=rawArr.filter(s=>s.kecamatan===selectedKecamatan);
-  
-  // Mengurangi redudansi: Gunakan fungsi agregat satu kali saja
+  if(selectedKecamatan !== 'all') rawArr = rawArr.filter(s => s.kecamatan === selectedKecamatan);
   currentSchools = aggregateSchools(rawArr);
   filteredSchools = [...currentSchools];
 
   const T = computeTotals(currentSchools);
-  const pct = T.tot>0?(T.lancar/T.tot*100):0;
+  const pct = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
   const periodStr = `${currentMonth} ${currentYear}`;
-  const isAll = selectedKecamatan==='all';
-  const cakupan = isAll?'Kota Banjar':`Kec. ${selectedKecamatan}`;
+  const isAll = selectedKecamatan === 'all';
+  const cakupan = isAll ? 'Kota Banjar' : `Kec. ${selectedKecamatan}`;
 
-  // Page titles
+  // Update Teks Label
   document.getElementById('r-title').textContent = `Ringkasan — ${cakupan}`;
   document.getElementById('r-subtitle').textContent = `Periode ${periodStr} · ${currentSchools.length} Sekolah Dasar Negeri`;
   document.getElementById('g-title').textContent = `Grafik & Analisis — ${cakupan}`;
@@ -1196,67 +1133,68 @@ function renderAll() {
   document.getElementById('tabel-count-badge').textContent = `${currentSchools.length} sekolah`;
   document.getElementById('analysis-period-badge').textContent = periodStr;
 
-  // Trend chip
-  const prev=getPrevPeriod(currentYear,currentMonth);
-  let chipHTML='';
+  // Trend Chip Indicator
+  const prev = getPrevPeriod(currentYear, currentMonth);
+  let chipHTML = '';
   if(prev) {
-    let pRaw=DATABASE[prev.year][prev.month];
-    if(!isAll) pRaw=pRaw.filter(s=>s.kecamatan===selectedKecamatan);
-    const pT=computeTotals(aggregateSchools(pRaw));
-    const pPct=pT.tot>0?(pT.lancar/pT.tot*100):0;
-    const diff=pct-pPct;
-    if(diff>0.05) chipHTML=`<span class="trend-chip chip-up">▲ +${n2(diff)}% dari ${prev.month}</span>`;
-    else if(diff<-0.05) chipHTML=`<span class="trend-chip chip-down">▼ ${n2(diff)}% dari ${prev.month}</span>`;
-    else chipHTML=`<span class="trend-chip chip-flat">→ Stabil</span>`;
+    let pRaw = DATABASE[prev.year][prev.month];
+    if(!isAll) pRaw = pRaw.filter(s => s.kecamatan === selectedKecamatan);
+    const pT = computeTotals(aggregateSchools(pRaw));
+    const pPct = pT.tot > 0 ? (pT.lancar / pT.tot * 100) : 0;
+    const diff = pct - pPct;
+    if(diff > 0.05) chipHTML = `<span class="trend-chip chip-up">▲ +${n2(diff)}% dari ${prev.month}</span>`;
+    else if(diff < -0.05) chipHTML = `<span class="trend-chip chip-down">▼ ${n2(diff)}% dari ${prev.month}</span>`;
+    else chipHTML = `<span class="trend-chip chip-flat">→ Stabil</span>`;
   }
-  document.getElementById('r-trend-chip').innerHTML=chipHTML;
+  document.getElementById('r-trend-chip').innerHTML = chipHTML;
 
-  // DQ banner
-  const hasWarn=currentSchools.some(s=>s.warnings.length>0);
-  const dqBanner=document.getElementById('dqBanner');
-  dqBanner.classList.toggle('hidden',!hasWarn);
+  // Data Quality Banner
+  const hasWarn = currentSchools.some(s => s.warnings.length > 0);
+  const dqBanner = document.getElementById('dqBanner');
+  dqBanner.classList.toggle('hidden', !hasWarn);
 
-  // Hero metric
-  document.getElementById('hero-pct').innerHTML=`${n2(pct)}<sup>%</sup>`;
-  const pctL=T.tot>0?(T.lancar/T.tot*100):0;
-  const pctB=T.tot>0?(T.belum/T.tot*100):0;
-  const pctK=T.tot>0?(T.tidak/T.tot*100):0;
-  document.getElementById('hero-prog').innerHTML=`
+  // Hero Metrics & Progress Bar
+  document.getElementById('hero-pct').innerHTML = `${n2(pct)}<sup>%</sup>`;
+  const pctL = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
+  const pctB = T.tot > 0 ? (T.belum / T.tot * 100) : 0;
+  const pctK = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
+  document.getElementById('hero-prog').innerHTML = `
     <div class="prog-segment" style="width:${pctL}%;background:#16a34a"></div>
     <div class="prog-segment" style="width:${pctB}%;background:#d97706"></div>
     <div class="prog-segment" style="width:${pctK}%;background:#dc2626"></div>
   `;
-  const sorted=currentSchools.filter(s=>s.tot>0).sort((a,b)=>b.pct-a.pct);
-  const best=sorted[0], worst=sorted[sorted.length-1];
-  let desc='';
-  if(best&&worst&&best.no!==worst.no) {
-    desc=`<strong>${best.nama}</strong> terbaik (${n2(best.pct)}%) · <strong>${worst.nama}</strong> butuh perhatian (${n2(worst.pct)}%)`;
+  
+  const sorted = currentSchools.filter(s => s.tot > 0).sort((a,b) => b.pct - a.pct);
+  const best = sorted[0], worst = sorted[sorted.length-1];
+  let desc = '';
+  if(best && worst && best.no !== worst.no) {
+    desc = `<strong>${best.nama}</strong> terbaik (${n2(best.pct)}%) · <strong>${worst.nama}</strong> butuh perhatian (${n2(worst.pct)}%)`;
   }
-  document.getElementById('hero-desc').innerHTML=desc;
+  document.getElementById('hero-desc').innerHTML = desc;
 
-  document.getElementById('hs-sekolah').textContent=currentSchools.length;
-  document.getElementById('hs-siswa').textContent=fmt(T.tot);
-  document.getElementById('hs-lancar').textContent=fmt(T.lancar);
-  document.getElementById('hs-belum').textContent=fmt(T.belum);
-  document.getElementById('hs-tidak').textContent=fmt(T.tidak);
+  // Populate Small KPI Cards
+  document.getElementById('hs-sekolah').textContent = currentSchools.length;
+  document.getElementById('hs-siswa').textContent = fmt(T.tot);
+  document.getElementById('hs-lancar').textContent = fmt(T.lancar);
+  document.getElementById('hs-belum').textContent = fmt(T.belum);
+  document.getElementById('hs-tidak').textContent = fmt(T.tidak);
 
-  // KPIs
-  document.getElementById('kpi-sekolah').textContent=currentSchools.length;
-  document.getElementById('kpi-sekolah-sub').textContent=`SD Negeri di ${cakupan}`;
-  document.getElementById('kpi-lancar').textContent=fmt(T.lancar);
-  document.getElementById('kpi-pct-lancar').textContent=n2(pctL)+'% dari total';
-  document.getElementById('kpi-pct-lancar').className='kpi-badge '+(pctL>=60?'valid':'check');
-  document.getElementById('kpi-belum').textContent=fmt(T.belum);
-  document.getElementById('kpi-pct-belum').textContent=n2(pctB)+'% dari total';
-  document.getElementById('kpi-pct-belum').className='kpi-badge partial';
-  document.getElementById('kpi-tidak').textContent=fmt(T.tidak);
-  document.getElementById('kpi-pct-tidak').textContent=n2(pctK)+'% dari total';
-  document.getElementById('kpi-hadir').textContent=n2(T.avgHadir)+'%';
-  const qH = T.avgHadir>=90?'valid':T.avgHadir>=75?'partial':'check';
-  document.getElementById('kpi-q-hadir').textContent=T.avgHadir>=90?'● Baik':T.avgHadir>=75?'● Menengah':'● Perlu Perhatian';
-  document.getElementById('kpi-q-hadir').className='kpi-badge '+qH;
+  document.getElementById('kpi-sekolah').textContent = currentSchools.length;
+  document.getElementById('kpi-sekolah-sub').textContent = `SD Negeri di ${cakupan}`;
+  document.getElementById('kpi-lancar').textContent = fmt(T.lancar);
+  document.getElementById('kpi-pct-lancar').textContent = n2(pctL) + '% dari total';
+  document.getElementById('kpi-pct-lancar').className = 'kpi-badge ' + (pctL >= 60 ? 'valid' : 'check');
+  document.getElementById('kpi-belum').textContent = fmt(T.belum);
+  document.getElementById('kpi-pct-belum').textContent = n2(pctB) + '% dari total';
+  document.getElementById('kpi-pct-belum').className = 'kpi-badge partial';
+  document.getElementById('kpi-tidak').textContent = fmt(T.tidak);
+  document.getElementById('kpi-pct-tidak').textContent = n2(pctK) + '% dari total';
+  document.getElementById('kpi-hadir').textContent = n2(T.avgHadir) + '%';
+  const qH = T.avgHadir >= 90 ? 'valid' : T.avgHadir >= 75 ? 'partial' : 'check';
+  document.getElementById('kpi-q-hadir').textContent = T.avgHadir >= 90 ? '● Baik' : T.avgHadir >= 75 ? '● Menengah' : '● Perlu Perhatian';
+  document.getElementById('kpi-q-hadir').className = 'kpi-badge ' + qH;
 
-  // Render Section Terkait
+  // Render Sub-Sections
   renderTable();
   renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
   renderTrend(cakupan);
@@ -1264,38 +1202,143 @@ function renderAll() {
 }
 
 // ────────────────────────────────────────────
-// TABLE DENGAN STRUKTUR CARD MOBILE
+// HELPER FUNCTIONS (Preserved & Adjusted)
+// ────────────────────────────────────────────
+const n2 = n => parseFloat(n).toFixed(1);
+const fmt = n => n.toLocaleString('id-ID');
+
+function aggregateSchools(rawArr) {
+  return rawArr.map(s => {
+    let tot=0, lancar=0, belum=0, tidak=0;
+    let k4t=0,k4l=0,k4b=0,k4k=0, k5t=0,k5l=0,k5b=0,k5k=0;
+    let hadirArr=[], guruArr=[], warnings=[];
+    s.rows.forEach(r => {
+      const k4s = r.kls4.lancar + r.kls4.belum + r.kls4.tidak;
+      const k5s = r.kls5.lancar + r.kls5.belum + r.kls5.tidak;
+      if(Math.abs(k4s - r.kls4.total) > 1) warnings.push(`Kls4 ${r.guru}`);
+      if(Math.abs(k5s - r.kls5.total) > 1) warnings.push(`Kls5 ${r.guru}`);
+      
+      tot += r.kls4.total + r.kls5.total;
+      lancar += r.kls4.lancar + r.kls5.lancar;
+      belum += r.kls4.belum + r.kls5.belum;
+      tidak += r.kls4.tidak + r.kls5.tidak;
+      
+      k4t += r.kls4.total; k4l += r.kls4.lancar; k4b += r.kls4.belum; k4k += r.kls4.tidak;
+      k5t += r.kls5.total; k5l += r.kls5.lancar; k5b += r.kls5.belum; k5k += r.kls5.tidak;
+      
+      hadirArr.push(r.hadir); guruArr.push(r.guru);
+    });
+    return {
+      idx:s.no, no:s.no, nama:s.nama, kecamatan:s.kecamatan,
+      tot, lancar, belum, tidak, pct:tot > 0 ? (lancar / tot * 100) : 0,
+      kls4:{tot:k4t, lancar:k4l, belum:k4b, tidak:k4k},
+      kls5:{tot:k5t, lancar:k5l, belum:k5b, tidak:k5k},
+      guru:guruArr, hadir:hadirArr, rows:s.rows, warnings
+    };
+  });
+}
+
+function computeTotals(schools) {
+  const hadirAll = schools.flatMap(s=>s.hadir);
+  return {
+    tot: schools.reduce((a,s)=>a+s.tot,0),
+    lancar: schools.reduce((a,s)=>a+s.lancar,0),
+    belum: schools.reduce((a,s)=>a+s.belum,0),
+    tidak: schools.reduce((a,s)=>a+s.tidak,0),
+    avgHadir: hadirAll.length ? hadirAll.reduce((a,b)=>a+b,0) / hadirAll.length : 0
+  };
+}
+
+// Diperbaiki untuk memakai MONTH_ORDER yang absolut
+function getPrevPeriod(year, month) {
+  const idx = MONTH_ORDER.indexOf(month);
+  if(idx <= 0) {
+    const py = String(parseInt(year)-1);
+    if(!DATABASE[py]) return null;
+    const pym = MONTH_ORDER.filter(m => DATABASE[py][m]);
+    return pym.length ? { year: py, month: pym[pym.length-1] } : null;
+  }
+  for(let i = idx - 1; i >= 0; i--) {
+    if(DATABASE[year] && DATABASE[year][MONTH_ORDER[i]]) return { year, month: MONTH_ORDER[i] };
+  }
+  return null;
+}
+
+function getAllPeriods() {
+  const result = [];
+  Object.keys(DATABASE).sort().forEach(yr => {
+    MONTH_ORDER.forEach(mo => {
+      if(DATABASE[yr] && DATABASE[yr][mo]) result.push({ year: yr, month: mo });
+    });
+  });
+  return result;
+}
+
+function dataQuality(school) {
+  if (school.warnings.length > 0) return 'check';
+  const avgH = school.hadir.reduce((a,b)=>a+b,0) / school.hadir.length;
+  if (avgH < 70) return 'partial';
+  return 'valid';
+}
+
+// ────────────────────────────────────────────
+// NAVIGASI VIEW & SIDEBAR
+// ────────────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.view').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(l => {
+    l.classList.toggle('active', l.getAttribute('data-target') === id);
+  });
+  if(window.innerWidth <= 900) closeSidebar();
+  window.dispatchEvent(new Event('resize'));
+}
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ────────────────────────────────────────────
+// TABLE & SORTING LOGIC
 // ────────────────────────────────────────────
 function pctPill(pct) {
-  const cls=pct>=80?'pill-high':pct>=60?'pill-mid':'pill-low';
+  const cls = pct >= 80 ? 'pill-high' : pct >= 60 ? 'pill-mid' : 'pill-low';
   return `<span class="pct-pill ${cls}">${n2(pct)}%</span>`;
 }
 
 function renderTable() {
-  const tbody=document.getElementById('tableBody');
-  const tfoot=document.getElementById('tableFoot');
-  tbody.innerHTML='';
-  let display=[...filteredSchools];
-  if(sortMode==='best')  display.sort((a,b)=>b.pct-a.pct);
-  if(sortMode==='worst') display.sort((a,b)=>a.pct-b.pct);
+  const tbody = document.getElementById('tableBody');
+  const tfoot = document.getElementById('tableFoot');
+  tbody.innerHTML = '';
   
-  display.forEach((s,i)=>{
-    const q=dataQuality(s);
-    const qLabel=q==='valid'?'<span class="q-dot q-green" title="Data Valid"></span> Valid':
-                 q==='partial'?'<span class="q-dot q-amber" title="Perlu Periksa"></span> Partial':
-                 '<span class="q-dot q-red" title="Inkonsistensi"></span> Cek';
+  let display = [...filteredSchools];
+  if(sortMode === 'best')  display.sort((a,b) => b.pct - a.pct);
+  if(sortMode === 'worst') display.sort((a,b) => a.pct - b.pct);
+  
+  display.forEach((s, i) => {
+    const q = dataQuality(s);
+    const qLabel = q === 'valid' ? '<span class="q-dot q-green" title="Data Valid"></span> Valid' :
+                   q === 'partial' ? '<span class="q-dot q-amber" title="Perlu Periksa"></span> Partial' :
+                   '<span class="q-dot q-red" title="Inkonsistensi"></span> Cek';
     
-    // Menambahkan atribut data-label agar berfungsi pada tampilan Card (Mobile)
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
       <td data-label="#">${i+1}</td>
       <td data-label="Sekolah">
         <div class="td-name">${s.nama}</div>
         <div class="td-school-meta">Kec. ${s.kecamatan}</div>
       </td>
-      <td data-label="Siswa" class="c" style="font-variant-numeric:tabular-nums">${s.tot>0?fmt(s.tot):'<span style="color:var(--ink-4)">–</span>'}</td>
+      <td data-label="Siswa" class="c" style="font-variant-numeric:tabular-nums">${s.tot>0 ? fmt(s.tot) : '<span style="color:var(--ink-4)">–</span>'}</td>
       <td data-label="Lancar" class="c" style="font-variant-numeric:tabular-nums;color:var(--green);font-weight:600">${fmt(s.lancar)}</td>
-      <td data-label="% Lancar" class="c">${s.tot>0?pctPill(s.pct):'<span style="color:var(--ink-4)">–</span>'}</td>
+      <td data-label="% Lancar" class="c">${s.tot>0 ? pctPill(s.pct) : '<span style="color:var(--ink-4)">–</span>'}</td>
       <td data-label="Belum Lancar" class="c" style="color:var(--amber)">${fmt(s.belum)}</td>
       <td data-label="Tidak Bisa" class="c" style="color:var(--red)">${fmt(s.tidak)}</td>
       <td data-label="Kualitas" class="c" style="font-size:12px;white-space:nowrap">${qLabel}</td>
@@ -1306,11 +1349,10 @@ function renderTable() {
     tbody.appendChild(tr);
   });
   
-  const T=computeTotals(filteredSchools);
-  const p=T.tot>0?(T.lancar/T.tot*100):0;
+  const T = computeTotals(filteredSchools);
+  const p = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
   
-  // Footer tanpa colspan agar aman saat diubah jadi Card
-  tfoot.innerHTML=`<tr>
+  tfoot.innerHTML = `<tr>
     <td data-label="#"></td>
     <td data-label="Sekolah" class="c" style="font-weight:600;color:var(--ink-1)">Total (${display.length} sekolah)</td>
     <td data-label="Siswa" class="c">${fmt(T.tot)}</td>
@@ -1324,29 +1366,29 @@ function renderTable() {
 }
 
 function filterTable() {
-  const q=document.getElementById('searchInput').value.toLowerCase();
-  const fPct=document.getElementById('filterPct').value;
-  filteredSchools=currentSchools.filter(s=>{
-    const nameOk=s.nama.toLowerCase().includes(q);
-    let pOk=true;
-    if(fPct==='high') pOk=s.pct>=80;
-    else if(fPct==='mid') pOk=s.pct>=60&&s.pct<80;
-    else if(fPct==='low') pOk=s.pct<60;
-    return nameOk&&pOk;
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const fPct = document.getElementById('filterPct').value;
+  filteredSchools = currentSchools.filter(s => {
+    const nameOk = s.nama.toLowerCase().includes(q);
+    let pOk = true;
+    if(fPct === 'high') pOk = s.pct >= 80;
+    else if(fPct === 'mid') pOk = s.pct >= 60 && s.pct < 80;
+    else if(fPct === 'low') pOk = s.pct < 60;
+    return nameOk && pOk;
   });
   renderTable();
 }
 
 function sortTable(mode) {
-  sortMode=mode;
-  ['sortBest','sortWorst','sortDefault'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  const map={best:'sortBest',worst:'sortWorst',default:'sortDefault'};
+  sortMode = mode;
+  ['sortBest','sortWorst','sortDefault'].forEach(id => document.getElementById(id).classList.remove('active'));
+  const map = {best:'sortBest', worst:'sortWorst', default:'sortDefault'};
   document.getElementById(map[mode]).classList.add('active');
   renderTable();
 }
 
 // ────────────────────────────────────────────
-// CHARTS
+// CHARTS & ANALYTICS RENDERING
 // ────────────────────────────────────────────
 const C = {
   green:'rgba(22,163,74,1)', greenA:'rgba(22,163,74,.15)',
@@ -1357,7 +1399,16 @@ const C = {
   ink2:'#475569', ink3:'#94a3b8', border:'#e8eaee',
 };
 
-function destroyChart(k){if(charts[k]){charts[k].destroy();charts[k]=null;}}
+function destroyChart(k) { if(charts[k]) { charts[k].destroy(); charts[k] = null; } }
+
+function setStackMode(mode) {
+  stackDisplayMode = mode;
+  document.getElementById('btnStackTop20').classList.toggle('active', mode === 'top20');
+  document.getElementById('btnStackAll').classList.toggle('active', mode === 'all');
+  if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+      renderUI(DATABASE[currentYear][currentMonth]); // Re-render to update charts
+  }
+}
 
 function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
   Chart.defaults.font.family = 'Sora, system-ui, sans-serif';
@@ -1365,51 +1416,50 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 
   // ── 1. KECAMATAN OVERVIEW ──
   destroyChart('kec');
-  const kecNames=["Langensari","Purwaharja","Pataruman","Banjar"];
-  const kecStats=kecNames.map(k=>{
-    const ks=allSchoolsAggr.filter(s=>s.kecamatan===k);
-    const t=computeTotals(ks);
-    return {name:k,pct:t.tot>0?(t.lancar/t.tot*100):0};
+  const kecNames = ["Langensari","Purwaharja","Pataruman","Banjar"];
+  const kecStats = kecNames.map(k => {
+    const ks = allSchoolsAggr.filter(s => s.kecamatan === k);
+    const t = computeTotals(ks);
+    return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
   });
-  const kecSorted=[...kecStats].sort((a,b)=>b.pct-a.pct);
-  const bestKec=kecSorted[0], worstKec=kecSorted[kecSorted.length-1];
-  const kecGap=bestKec.pct-worstKec.pct;
+  const kecSorted = [...kecStats].sort((a,b) => b.pct - a.pct);
+  const bestKec = kecSorted[0], worstKec = kecSorted[kecSorted.length-1];
+  const kecGap = bestKec.pct - worstKec.pct;
 
-  charts['kec']=new Chart(document.getElementById('kecamatanChart'),{
-    type:'bar',
-    data:{
-      labels:kecStats.map(k=>k.name),
-      datasets:[{
-        data:kecStats.map(k=>parseFloat(n2(k.pct))),
-        backgroundColor:kecStats.map(k=>{
-          if(!isAll&&k.name===selectedKecamatan) return C.blue;
-          return k.pct>=80?C.green:k.pct>=60?C.amber:C.red;
+  charts['kec'] = new Chart(document.getElementById('kecamatanChart'), {
+    type: 'bar',
+    data: {
+      labels: kecStats.map(k => k.name),
+      datasets: [{
+        data: kecStats.map(k => parseFloat(n2(k.pct))),
+        backgroundColor: kecStats.map(k => {
+          if(!isAll && k.name === selectedKecamatan) return C.blue;
+          return k.pct >= 80 ? C.green : k.pct >= 60 ? C.amber : C.red;
         }),
-        borderRadius:6,
-        borderSkipped:false,
+        borderRadius: 6,
+        borderSkipped: false,
       }]
     },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      scales:{
-        y:{min:0,max:100,grid:{color:C.border},
-           ticks:{callback:v=>v+'%',font:{size:11}},border:{display:false}},
-        x:{grid:{display:false},ticks:{font:{size:12,weight:'600'}},border:{display:false}}
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        y: { min: 0, max: 100, grid: {color: C.border}, ticks: {callback: v=>v+'%', font:{size:11}}, border:{display:false} },
+        x: { grid: {display: false}, ticks: {font:{size:12, weight:'600'}}, border:{display:false} }
       },
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
-          padding:10,cornerRadius:8,
-          callbacks:{label:ctx=>` Capaian: ${ctx.raw}%`}
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+          padding: 10, cornerRadius: 8,
+          callbacks: { label: ctx => ` Capaian: ${ctx.raw}%` }
         }
       }
     }
   });
 
-  let kecInsightHTML='';
+  let kecInsightHTML = '';
   if(isAll){
-    kecInsightHTML=`
+    kecInsightHTML = `
       <div class="insight-item green">
         <div class="ii-label">Terbaik</div>
         <div class="ii-text"><strong>Kec. ${bestKec.name}</strong> unggul dengan rata-rata <strong>${n2(bestKec.pct)}%</strong>. Jadikan referensi.</div>
@@ -1424,52 +1474,50 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       </div>
     `;
   } else {
-    const self=kecStats.find(k=>k.name===selectedKecamatan);
-    const rank=kecSorted.findIndex(k=>k.name===selectedKecamatan)+1;
-    kecInsightHTML=`
+    const self = kecStats.find(k => k.name === selectedKecamatan);
+    const rank = kecSorted.findIndex(k => k.name === selectedKecamatan) + 1;
+    kecInsightHTML = `
       <div class="insight-item blue">
         <div class="ii-label">Peringkat Kota</div>
         <div class="ii-text"><strong>Kec. ${selectedKecamatan}</strong> berada di posisi ke-<strong>${rank}</strong> dari 4 kecamatan dengan capaian <strong>${n2(self.pct)}%</strong>.</div>
       </div>
       <div class="insight-item amber">
         <div class="ii-label">Gap ke Terbaik</div>
-        <div class="ii-text">Diperlukan peningkatan <strong>${n2(Math.abs(self.pct-bestKec.pct))}%</strong> untuk menyamai Kec. ${bestKec.name} (${n2(bestKec.pct)}%).</div>
+        <div class="ii-text">Diperlukan peningkatan <strong>${n2(Math.abs(self.pct - bestKec.pct))}%</strong> untuk menyamai Kec. ${bestKec.name} (${n2(bestKec.pct)}%).</div>
       </div>
     `;
   }
-  document.getElementById('kec-insight').innerHTML=kecInsightHTML;
+  document.getElementById('kec-insight').innerHTML = kecInsightHTML;
 
   // ── 2. PIE ──
   destroyChart('pie');
-  const pL=T.tot>0?(T.lancar/T.tot*100):0;
-  const pB=T.tot>0?(T.belum/T.tot*100):0;
-  const pK=T.tot>0?(T.tidak/T.tot*100):0;
-  charts['pie']=new Chart(document.getElementById('pieChart'),{
-    type:'doughnut',
-    data:{
-      labels:['Lancar','Belum Lancar','Tidak Bisa'],
-      datasets:[{
-        data:[T.lancar,T.belum,T.tidak],
-        backgroundColor:[C.green,C.amber,C.red],
-        borderWidth:0, hoverOffset:6,
+  const pL = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
+  const pB = T.tot > 0 ? (T.belum / T.tot * 100) : 0;
+  const pK = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
+  charts['pie'] = new Chart(document.getElementById('pieChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Lancar','Belum Lancar','Tidak Bisa'],
+      datasets: [{
+        data: [T.lancar, T.belum, T.tidak],
+        backgroundColor: [C.green, C.amber, C.red],
+        borderWidth: 0, hoverOffset: 6,
       }]
     },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      cutout:'68%',
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{
-          font:{size:11},padding:14, usePointStyle:true,pointStyle:'circle',
-        }},
-        tooltip:{
-          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
-          padding:10,cornerRadius:8,
-          callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.parsed)} (${T.tot>0?n2(ctx.parsed/T.tot*100):0}%)`}
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: true, position:'bottom', labels: { font:{size:11}, padding:14, usePointStyle:true, pointStyle:'circle' } },
+        tooltip: {
+          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+          padding: 10, cornerRadius: 8,
+          callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.parsed)} (${T.tot > 0 ? n2(ctx.parsed / T.tot * 100) : 0}%)` }
         }
       }
     }
   });
-  document.getElementById('pie-insight').innerHTML=`
+  document.getElementById('pie-insight').innerHTML = `
     <div class="insight-strip pie-insight-grid">
       <div class="insight-item green"><div class="ii-label">Lancar</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--green)">${n2(pL)}%</div><div class="ii-text">${fmt(T.lancar)} siswa</div></div>
       <div class="insight-item amber"><div class="ii-label">Belum</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--amber)">${n2(pB)}%</div><div class="ii-text">${fmt(T.belum)} siswa</div></div>
@@ -1479,45 +1527,46 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 
   // ── 3. BAR TOP 10 ──
   destroyChart('bar');
-  const valid=currentSchools.filter(s=>s.tot>0);
-  const top10=[...valid].sort((a,b)=>b.pct-a.pct).slice(0,10);
-  const bot1=[...valid].sort((a,b)=>a.pct-b.pct)[0];
-  barChartActiveData=top10;
-  charts['bar']=new Chart(document.getElementById('barChart'),{
-    type:'bar',
-    data:{
-      labels:top10.map(s=>s.nama.replace('SDN ','')),
-      datasets:[{
-        data:top10.map(s=>parseFloat(n2(s.pct))),
-        backgroundColor:top10.map(s=>s.pct>=80?C.green:s.pct>=60?C.amber:C.red),
-        borderRadius:4,borderSkipped:false,
+  const valid = currentSchools.filter(s => s.tot > 0);
+  const top10 = [...valid].sort((a,b) => b.pct - a.pct).slice(0,10);
+  const bot1 = [...valid].sort((a,b) => a.pct - b.pct)[0];
+  barChartActiveData = top10;
+  charts['bar'] = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: top10.map(s => s.nama.replace('SDN ','')),
+      datasets: [{
+        data: top10.map(s => parseFloat(n2(s.pct))),
+        backgroundColor: top10.map(s => s.pct >= 80 ? C.green : s.pct >= 60 ? C.amber : C.red),
+        borderRadius: 4, borderSkipped: false,
       }]
     },
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      onClick:(e,els)=>{if(els.length>0&&barChartActiveData[els[0].index])openModal(barChartActiveData[els[0].index].no);},
-      scales:{
-        x:{min:0,max:100,grid:{color:C.border},ticks:{callback:v=>v+'%',font:{size:10}},border:{display:false}},
-        y:{grid:{display:false},ticks:{font:{size:10.5}},border:{display:false}}
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].no); },
+      scales: {
+        x: { min: 0, max: 100, grid: {color: C.border}, ticks: {callback: v=>v+'%', font:{size:10}}, border:{display:false} },
+        y: { grid: {display: false}, ticks: {font:{size:10.5}}, border:{display:false} }
       },
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
-          padding:10,cornerRadius:8,
-          callbacks:{
-            title:ctx=>barChartActiveData[ctx[0].dataIndex].nama,
-            label:ctx=>{
-              const s=barChartActiveData[ctx.dataIndex];
-              return [` ${n2(s.pct)}% lancar`,` ${fmt(s.lancar)} dari ${fmt(s.tot)} siswa`];
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+          padding: 10, cornerRadius: 8,
+          callbacks: {
+            title: ctx => barChartActiveData[ctx[0].dataIndex].nama,
+            label: ctx => {
+              const s = barChartActiveData[ctx.dataIndex];
+              return [` ${n2(s.pct)}% lancar`, ` ${fmt(s.lancar)} dari ${fmt(s.tot)} siswa`];
             }
           }
         }
       }
     }
   });
-  if(top10.length>0&&bot1) {
-    document.getElementById('bar-insight').innerHTML=`
+  
+  if(top10.length > 0 && bot1) {
+    document.getElementById('bar-insight').innerHTML = `
       <div class="duo-grid">
         <div class="duo-card best" onclick="openModal(${top10[0].no})">
           <div class="duo-lbl">🏆 Terbaik</div>
@@ -1537,42 +1586,42 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 
   // ── 4. STACKED ──
   destroyChart('stack');
-  let stackData=[...valid];
-  if(stackDisplayMode==='top20') {
-    stackData=stackData.sort((a,b)=>b.pct-a.pct);
-    if(isAll&&stackData.length>20) stackData=stackData.slice(0,20);
+  let stackData = [...valid];
+  if(stackDisplayMode === 'top20') {
+    stackData = stackData.sort((a,b) => b.pct - a.pct);
+    if(isAll && stackData.length > 20) stackData = stackData.slice(0, 20);
   }
-  // Tidak perlu kalkulasi width fixed, biarkan 100% untuk menghindari horizontal scroll.
-  document.getElementById('stackCanvasContainer').style.width='100%';
   
-  stackChartActiveData=stackData;
-  charts['stack']=new Chart(document.getElementById('stackChart'),{
-    type:'bar',
-    data:{
-      labels:stackData.map(s=>s.nama.replace('SDN ','').split(' ').slice(0,2).join(' ')),
-      datasets:[
-        {label:'Lancar',data:stackData.map(s=>s.lancar),backgroundColor:C.green,borderRadius:2,borderSkipped:false},
-        {label:'Belum',data:stackData.map(s=>s.belum),backgroundColor:C.amber,borderRadius:0},
-        {label:'Tidak',data:stackData.map(s=>s.tidak),backgroundColor:C.red,borderRadius:0},
+  document.getElementById('stackCanvasContainer').style.width = '100%';
+  
+  stackChartActiveData = stackData;
+  charts['stack'] = new Chart(document.getElementById('stackChart'), {
+    type: 'bar',
+    data: {
+      labels: stackData.map(s => s.nama.replace('SDN ','').split(' ').slice(0,2).join(' ')),
+      datasets: [
+        {label:'Lancar', data: stackData.map(s=>s.lancar), backgroundColor: C.green, borderRadius: 2, borderSkipped: false},
+        {label:'Belum', data: stackData.map(s=>s.belum), backgroundColor: C.amber, borderRadius: 0},
+        {label:'Tidak', data: stackData.map(s=>s.tidak), backgroundColor: C.red, borderRadius: 0},
       ]
     },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      onClick:(e,els)=>{if(els.length>0&&stackChartActiveData[els[0].index])openModal(stackChartActiveData[els[0].index].no);},
-      scales:{
-        x:{stacked:true,grid:{display:false},ticks:{font:{size:9.5},maxRotation:45},border:{display:false}},
-        y:{stacked:true,grid:{color:C.border},border:{display:false}}
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no); },
+      scales: {
+        x: { stacked: true, grid: {display: false}, ticks: {font:{size:9.5}, maxRotation:45}, border:{display:false} },
+        y: { stacked: true, grid: {color: C.border}, border:{display:false} }
       },
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{font:{size:11},padding:14,usePointStyle:true,pointStyle:'circle'}},
-        tooltip:{
-          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
-          padding:10,cornerRadius:8,
-          callbacks:{
-            title:ctx=>stackChartActiveData[ctx[0].dataIndex].nama,
-            label:ctx=>{
-              const s=stackChartActiveData[ctx.dataIndex];
-              const p=s.tot>0?n2(ctx.raw/s.tot*100):0;
+      plugins: {
+        legend: { display: true, position:'bottom', labels: {font:{size:11}, padding:14, usePointStyle:true, pointStyle:'circle'} },
+        tooltip: {
+          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+          padding: 10, cornerRadius: 8,
+          callbacks: {
+            title: ctx => stackChartActiveData[ctx[0].dataIndex].nama,
+            label: ctx => {
+              const s = stackChartActiveData[ctx.dataIndex];
+              const p = s.tot > 0 ? n2(ctx.raw / s.tot * 100) : 0;
               return ` ${ctx.dataset.label}: ${ctx.raw} (${p}%)`;
             }
           }
@@ -1581,11 +1630,12 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     }
   });
 
-  const highC=valid.filter(s=>s.pct>=80).length;
-  const midC=valid.filter(s=>s.pct>=60&&s.pct<80).length;
-  const lowC=valid.filter(s=>s.pct<60).length;
-  document.getElementById('stackToggle').style.display=(valid.length>20&&isAll)?'flex':'none';
-  document.getElementById('stack-insight').innerHTML=`
+  const highC = valid.filter(s => s.pct >= 80).length;
+  const midC = valid.filter(s => s.pct >= 60 && s.pct < 80).length;
+  const lowC = valid.filter(s => s.pct < 60).length;
+  document.getElementById('stackToggle').style.display = (valid.length > 20 && isAll) ? 'flex' : 'none';
+  
+  document.getElementById('stack-insight').innerHTML = `
     <div class="insight-strip">
       <div class="insight-item green"><div class="ii-label">Tinggi ≥80%</div><div class="ii-text"><strong>${highC} sekolah</strong> sudah memenuhi standar kelancaran BTQ.</div></div>
       <div class="insight-item amber"><div class="ii-label">Sedang 60–79%</div><div class="ii-text"><strong>${midC} sekolah</strong> dalam zona perlu peningkatan.</div></div>
@@ -1594,20 +1644,20 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
   `;
 
   // ── Analysis Cards ──
-  const lowHadir=currentSchools.flatMap(s=>s.hadir).filter(h=>h<80).length;
-  const totalGuru=currentSchools.flatMap(s=>s.hadir).length;
-  const pKota=T.tot>0?(T.tidak/T.tot*100):0;
+  const lowHadir = currentSchools.flatMap(s => s.hadir).filter(h => h < 80).length;
+  const totalGuru = currentSchools.flatMap(s => s.hadir).length;
+  const pKota = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
 
-  document.getElementById('analysis-grid').innerHTML=`
+  document.getElementById('analysis-grid').innerHTML = `
     <div class="analysis-card ac-blue">
       <div class="ac-eyebrow">Capaian Utama</div>
       <div class="ac-title">Kelancaran ${cakupan}</div>
       <div class="ac-body">Rata-rata BTQ berada di <strong>${n2(pct)}%</strong>. ${highC} sekolah sudah di level tinggi, ${midC} sedang, dan ${lowC} masih rendah.</div>
     </div>
-    <div class="analysis-card ${isAll?'ac-blue':'ac-amber'}">
-      <div class="ac-eyebrow">${isAll?'Peta Wilayah':'Konteks Internal'}</div>
-      <div class="ac-title">${isAll?'Disparitas Antar Kecamatan':'Rentang Kualitas Sekolah'}</div>
-      <div class="ac-body">${isAll?`Gap <strong>${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} dan Kec. ${worstKec.name} menunjukkan ketidakmerataan.`:`Sekolah terbaik <strong>${top10[0]?top10[0].nama:'-'}</strong> vs terendah <strong>${bot1?bot1.nama:'-'}</strong>: gap <strong>${top10[0]&&bot1?n2(top10[0].pct-bot1.pct):0}%</strong>.`}</div>
+    <div class="analysis-card ${isAll ? 'ac-blue' : 'ac-amber'}">
+      <div class="ac-eyebrow">${isAll ? 'Peta Wilayah' : 'Konteks Internal'}</div>
+      <div class="ac-title">${isAll ? 'Disparitas Antar Kecamatan' : 'Rentang Kualitas Sekolah'}</div>
+      <div class="ac-body">${isAll ? `Gap <strong>${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} dan Kec. ${worstKec.name} menunjukkan ketidakmerataan.` : `Sekolah terbaik <strong>${top10[0] ? top10[0].nama : '-'}</strong> vs terendah <strong>${bot1 ? bot1.nama : '-'}</strong>: gap <strong>${top10[0] && bot1 ? n2(top10[0].pct - bot1.pct) : 0}%</strong>.`}</div>
     </div>
     <div class="analysis-card ac-red">
       <div class="ac-eyebrow">Isu Kritis</div>
@@ -1617,131 +1667,134 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     <div class="analysis-card ac-green">
       <div class="ac-eyebrow">Potensi Akselerasi</div>
       <div class="ac-title">Peluang Strategis</div>
-      <div class="ac-body">Fokuskan pendampingan ke <strong>${lowC} sekolah merah</strong>. Gunakan <strong>${top10[0]?top10[0].nama:'-'}</strong> sebagai sekolah percontohan metodologi BTQ.</div>
+      <div class="ac-body">Fokuskan pendampingan ke <strong>${lowC} sekolah merah</strong>. Gunakan <strong>${top10[0] ? top10[0].nama : '-'}</strong> sebagai sekolah percontohan metodologi BTQ.</div>
     </div>
   `;
-  document.getElementById('exec-banner').innerHTML=`
+  document.getElementById('exec-banner').innerHTML = `
     <strong>Konklusi Eksekutif —</strong> Dengan capaian saat ini <strong>${n2(pct)}%</strong>, kebijakan seragam tidak lagi cukup. Diperlukan pendekatan asimetris: <strong>penguatan intensif ke sekolah kategori rendah</strong> dan <strong>apresiasi serta peran model rujukan ke sekolah berprestasi</strong>.
   `;
 }
 
 // ────────────────────────────────────────────
-// TREND
+// TREND BULANAN
 // ────────────────────────────────────────────
 function renderTrend(cakupan) {
-  const allP=getAllPeriods();
-  const tEl=document.getElementById('trendContent');
-  const iEl=document.getElementById('trend-insight');
-  if(allP.length<2){
-    tEl.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data tren akan tersedia saat data bulan berikutnya dimasukkan.</div>`;
-    iEl.innerHTML='';return;
+  const allP = getAllPeriods();
+  const tEl = document.getElementById('trendContent');
+  const iEl = document.getElementById('trend-insight');
+  
+  if (allP.length < 2) {
+    tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data tren akan tersedia saat data bulan berikutnya dimasukkan.</div>`;
+    iEl.innerHTML = ''; return;
   }
-  const labels=allP.map(p=>`${p.month.substring(0,3)} ${p.year}`);
-  const pctData=allP.map(p=>{
-    let raw=DATABASE[p.year][p.month];
-    if(selectedKecamatan!=='all') raw=raw.filter(s=>s.kecamatan===selectedKecamatan);
-    const T=computeTotals(aggregateSchools(raw));
-    return T.tot>0?parseFloat(n2(T.lancar/T.tot*100)):0;
+  
+  const labels = allP.map(p => `${p.month.substring(0,3)} ${p.year}`);
+  const pctData = allP.map(p => {
+    let raw = DATABASE[p.year][p.month];
+    if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
+    const T = computeTotals(aggregateSchools(raw));
+    return T.tot > 0 ? parseFloat(n2(T.lancar / T.tot * 100)) : 0;
   });
-  tEl.innerHTML='<div style="height:260px"><canvas id="trendChart"></canvas></div>';
+  
+  tEl.innerHTML = '<div style="height:260px"><canvas id="trendChart"></canvas></div>';
   destroyChart('trend');
-  charts['trend']=new Chart(document.getElementById('trendChart'),{
-    type:'line',
-    data:{
+  
+  charts['trend'] = new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
       labels,
-      datasets:[{
-        label:'% Lancar',
-        data:pctData,
-        borderColor:C.blue,
-        backgroundColor:C.blueA,
-        pointBackgroundColor:C.blue,
-        pointRadius:6,pointHoverRadius:8,
-        borderWidth:2.5,fill:true,tension:.4
+      datasets: [{
+        label: '% Lancar', data: pctData,
+        borderColor: C.blue, backgroundColor: C.blueA, pointBackgroundColor: C.blue,
+        pointRadius: 6, pointHoverRadius: 8, borderWidth: 2.5, fill: true, tension: .4
       }]
     },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      scales:{
-        y:{min:0,max:100,grid:{color:C.border},ticks:{callback:v=>v+'%',font:{size:11}},border:{display:false}},
-        x:{grid:{display:false},ticks:{font:{size:11}},border:{display:false}}
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        y: { min: 0, max: 100, grid: {color: C.border}, ticks: {callback: v=>v+'%', font:{size:11}}, border:{display:false} },
+        x: { grid: {display: false}, ticks: {font:{size:11}}, border:{display:false} }
       },
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'rgba(15,23,42,.92)',titleColor:'#fff',bodyColor:'rgba(255,255,255,.75)',
-          padding:10,cornerRadius:8,
-          callbacks:{label:ctx=>` ${ctx.raw}% siswa lancar`}
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+          padding: 10, cornerRadius: 8,
+          callbacks: { label: ctx => ` ${ctx.raw}% siswa lancar` }
         }
       }
     }
   });
-  const diff=pctData[pctData.length-1]-pctData[0];
-  iEl.innerHTML=`
+  
+  const diff = pctData[pctData.length-1] - pctData[0];
+  iEl.innerHTML = `
     <div class="insight-strip">
-      <div class="insight-item ${diff>0?'green':diff<0?'red':'blue'}">
+      <div class="insight-item ${diff > 0 ? 'green' : diff < 0 ? 'red' : 'blue'}">
         <div class="ii-label">Tren Keseluruhan</div>
-        <div class="ii-text">Dari ${allP.length} periode, kelancaran BTQ di ${cakupan} <strong>${diff>0?'meningkat +'+n2(diff)+'%':diff<0?'menurun '+n2(diff)+'%':'stabil'}</strong> dibanding awal observasi.</div>
+        <div class="ii-text">Dari ${allP.length} periode, kelancaran BTQ di ${cakupan} <strong>${diff > 0 ? 'meningkat +'+n2(diff)+'%' : diff < 0 ? 'menurun '+n2(diff)+'%' : 'stabil'}</strong> dibanding awal observasi.</div>
       </div>
     </div>
   `;
 }
 
 // ────────────────────────────────────────────
-// KESIMPULAN
+// KESIMPULAN & REKOMENDASI
 // ────────────────────────────────────────────
 function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
-  const sorted=currentSchools.filter(s=>s.tot>0).sort((a,b)=>b.pct-a.pct);
-  const lowC=sorted.filter(s=>s.pct<60).length;
-  const pL=T.tot>0?n2(T.lancar/T.tot*100):0;
-  const pB=T.tot>0?n2(T.belum/T.tot*100):0;
-  const pK=T.tot>0?n2(T.tidak/T.tot*100):0;
+  const sorted = currentSchools.filter(s => s.tot > 0).sort((a,b) => b.pct - a.pct);
+  const lowC = sorted.filter(s => s.pct < 60).length;
+  const pL = T.tot > 0 ? n2(T.lancar / T.tot * 100) : 0;
+  const pB = T.tot > 0 ? n2(T.belum / T.tot * 100) : 0;
+  const pK = T.tot > 0 ? n2(T.tidak / T.tot * 100) : 0;
 
-  let callout='';
-  if(isAll){
-    const kr=["Langensari","Purwaharja","Pataruman","Banjar"].map(k=>{
-      const ks=allSchoolsAggr.filter(s=>s.kecamatan===k);
-      const t=computeTotals(ks);
-      return {name:k,pct:t.tot>0?(t.lancar/t.tot*100):0};
-    }).sort((a,b)=>b.pct-a.pct);
-    callout=`Kec. <strong>${kr[0].name}</strong> memegang posisi terbaik (${n2(kr[0].pct)}%). Kebijakan afirmatif harus segera diarahkan ke Kec. <strong>${kr[kr.length-1].name}</strong> (${n2(kr[kr.length-1].pct)}%).`;
+  let callout = '';
+  if (isAll) {
+    const kr = ["Langensari","Purwaharja","Pataruman","Banjar"].map(k => {
+      const ks = allSchoolsAggr.filter(s => s.kecamatan === k);
+      const t = computeTotals(ks);
+      return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
+    }).sort((a,b) => b.pct - a.pct);
+    callout = `Kec. <strong>${kr[0].name}</strong> memegang posisi terbaik (${n2(kr[0].pct)}%). Kebijakan afirmatif harus segera diarahkan ke Kec. <strong>${kr[kr.length-1].name}</strong> (${n2(kr[kr.length-1].pct)}%).`;
   } else {
-    callout=`Fokus <strong>${cakupan}</strong> — <strong>${best?best.nama:'-'}</strong> adalah percontohan terbaik (${n2(best?best.pct:0)}%). Masih ada <strong>${lowC} sekolah</strong> di bawah ambang 60% yang butuh pendampingan.`;
+    callout = `Fokus <strong>${cakupan}</strong> — <strong>${best ? best.nama : '-'}</strong> adalah percontohan terbaik (${n2(best ? best.pct : 0)}%). Masih ada <strong>${lowC} sekolah</strong> di bawah ambang 60% yang butuh pendampingan.`;
   }
-  document.getElementById('k-callout').innerHTML=callout;
-  document.getElementById('k-body').innerHTML=`
+  
+  document.getElementById('k-callout').innerHTML = callout;
+  document.getElementById('k-body').innerHTML = `
     Evaluasi data BTQ <strong>${cakupan}</strong> periode <strong>${currentMonth} ${currentYear}</strong> mencakup <strong>${fmt(T.tot)} siswa</strong> dari ${currentSchools.length} sekolah. Capaian kelancaran saat ini <strong>${n2(pct)}%</strong> — dengan komposisi <strong>${pL}%</strong> sudah lancar, <strong>${pB}%</strong> belum lancar, dan <strong>${pK}%</strong> belum mengenal huruf hijaiyah.
   `;
-  document.getElementById('k-reco').innerHTML=[
+  document.getElementById('k-reco').innerHTML = [
     `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
     `Investigasi guru dengan kehadiran di bawah 80% oleh Dinas Pendidikan untuk memastikan hak siswa atas pembelajaran agama terpenuhi.`,
     `Kembangkan program "Tutor Sebaya Al-Qur'an" secara struktural di kelas IV–V untuk mempercepat penurunan angka ketidaklancaran.`,
     `Gunakan dashboard ini sebagai instrumen wajib rapat koordinasi kepala sekolah bulanan, membudayakan akuntabilitas berbasis data.`
-  ].map((r,i)=>`<li><span class="reco-num">${i+1}</span><span>${r}</span></li>`).join('');
+  ].map((r, i) => `<li><span class="reco-num">${i+1}</span><span>${r}</span></li>`).join('');
 }
 
 // ────────────────────────────────────────────
-// MODAL DENGAN STRUKTUR CARD MOBILE
+// MODAL DETAIL SEKOLAH
 // ────────────────────────────────────────────
 function openModal(no) {
-  currentModalSchool=currentSchools.find(s=>s.no===no);
+  currentModalSchool = currentSchools.find(s => s.no === no);
   if(!currentModalSchool) return;
-  document.getElementById('modalTitle').textContent=currentModalSchool.nama;
-  document.querySelectorAll('.m-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.getElementById('modalTitle').textContent = currentModalSchool.nama;
+  document.querySelectorAll('.m-tab').forEach((t,i) => t.classList.toggle('active', i === 0));
   renderModalTab(0);
   document.getElementById('modalOverlay').classList.add('open');
 }
 
 function switchTab(idx) {
-  document.querySelectorAll('.m-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.m-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   renderModalTab(idx);
 }
 
 function renderModalTab(idx) {
-  const s=currentModalSchool;
-  if(!s) return;
-  const el=document.getElementById('modalContent');
-  if(idx===0){
-    el.innerHTML=`
+  const s = currentModalSchool;
+  if (!s) return;
+  const el = document.getElementById('modalContent');
+  
+  if (idx === 0) {
+    el.innerHTML = `
       <table class="modal-table">
         <thead><tr><th>Kelas</th><th>Total</th><th>Lancar</th><th>Belum</th><th>Tidak Bisa</th><th>% Lancar</th></tr></thead>
         <tbody>
@@ -1750,14 +1803,14 @@ function renderModalTab(idx) {
           <tr style="font-weight:700;background:var(--bg)"><td data-label="Kelas">Total</td><td data-label="Total Siswa">${s.tot}</td><td data-label="Lancar" style="color:var(--green)">${s.lancar}</td><td data-label="Belum Lancar">${s.belum}</td><td data-label="Tidak Bisa">${s.tidak}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>
         </tbody>
       </table>
-      ${s.warnings.length?`<div style="margin-top:12px;padding:10px 14px;background:var(--amber-dim);border-radius:8px;font-size:12.5px;color:var(--amber)">⚠ Inkonsistensi terdeteksi: ${s.warnings.join(', ')}</div>`:''}
+      ${s.warnings.length ? `<div style="margin-top:12px;padding:10px 14px;background:var(--amber-dim);border-radius:8px;font-size:12.5px;color:var(--amber)">⚠ Inkonsistensi terdeteksi: ${s.warnings.join(', ')}</div>` : ''}
     `;
-  } else if(idx===1) {
-    el.innerHTML=`
+  } else if (idx === 1) {
+    el.innerHTML = `
       <table class="modal-table">
         <thead><tr><th>Guru Pembimbing BTQ</th><th>Kehadiran</th><th>Status</th></tr></thead>
         <tbody>
-          ${s.guru.map((g,i)=>`<tr>
+          ${s.guru.map((g, i) => `<tr>
             <td data-label="Guru">${g}</td>
             <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
             <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--green);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--amber);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--red);font-weight:600">✕ Defisit</span>'}</td>
@@ -1767,23 +1820,26 @@ function renderModalTab(idx) {
       <div style="margin-top:10px;font-size:12px;color:var(--ink-3)">Rata-rata kehadiran: <strong style="color:var(--ink-1)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
     `;
   } else {
-    const allP=getAllPeriods();
-    const rows=allP.map(p=>{
-      const raw=DATABASE[p.year][p.month];
-      const found=raw.find(r=>r.no===s.no);
+    const allP = getAllPeriods();
+    const rows = allP.map(p => {
+      const raw = DATABASE[p.year][p.month];
+      const found = raw.find(r => r.no === s.no);
       if(!found) return null;
-      const agg=aggregateSchools([found])[0];
-      return {period:`${p.month} ${p.year}`,pct:agg.pct,lancar:agg.lancar,tot:agg.tot};
+      const agg = aggregateSchools([found])[0];
+      return { period: `${p.month} ${p.year}`, pct: agg.pct, lancar: agg.lancar, tot: agg.tot };
     }).filter(Boolean);
-    if(rows.length<2){
-      el.innerHTML=`<div class="trend-empty"><div class="trend-empty-icon">📅</div>Butuh minimal 2 periode untuk menampilkan riwayat.</div>`;
+    
+    if (rows.length < 2) {
+      el.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📅</div>Butuh minimal 2 periode untuk menampilkan riwayat.</div>`;
     } else {
-      el.innerHTML=`<div>${rows.map((h,i)=>{
-        let diff='';
-        if(i>0){const d=h.pct-rows[i-1].pct;
-          diff=d>0.05?`<span style="color:var(--green);font-size:11.5px;font-weight:600">▲ +${n2(d)}%</span>`:
-               d<-0.05?`<span style="color:var(--red);font-size:11.5px;font-weight:600">▼ ${n2(d)}%</span>`:
-               `<span style="color:var(--ink-4);font-size:11.5px">–</span>`;}
+      el.innerHTML = `<div>${rows.map((h, i) => {
+        let diff = '';
+        if (i > 0) {
+          const d = h.pct - rows[i-1].pct;
+          diff = d > 0.05 ? `<span style="color:var(--green);font-size:11.5px;font-weight:600">▲ +${n2(d)}%</span>` :
+                 d < -0.05 ? `<span style="color:var(--red);font-size:11.5px;font-weight:600">▼ ${n2(d)}%</span>` :
+                 `<span style="color:var(--ink-4);font-size:11.5px">–</span>`;
+        }
         return `<div class="hist-row">
           <span class="hist-period">${h.period}</span>
           <span style="font-size:12px;color:var(--ink-2)">${fmt(h.lancar)} / ${fmt(h.tot)} siswa</span>
@@ -1796,27 +1852,14 @@ function renderModalTab(idx) {
 }
 
 function closeModal(e) {
-  if(!e||e.target===document.getElementById('modalOverlay')||!e.target)
+  if (!e || e.target === document.getElementById('modalOverlay') || !e.target)
     document.getElementById('modalOverlay').classList.remove('open');
 }
 
-// ────────────────────────────────────────────
-// SIDEBAR TOGGLE
-// ────────────────────────────────────────────
-function openSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-  document.body.style.overflow='';
-}
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();closeSidebar();}
+// Support keydown to close overlays
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeSidebar(); }
 });
-
 </script>
 </body>
 </html>
