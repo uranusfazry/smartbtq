@@ -544,8 +544,15 @@ body.dark .sel:focus {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+  /* Updated transitions for stability */
+  transition: opacity 0.25s ease, visibility 0.25s;
   overflow-y: auto;
+  
+  /* Global Font Stabilizer for Sidebar */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 body.dark .sidebar {
@@ -576,16 +583,21 @@ body.dark .sidebar {
   display: flex;
   flex-direction: column;
   gap: 36px;
-  transform: translateY(24px) scale(0.97);
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* HAPUS TRANSFORM & DELAY UNTUK STABILITAS */
+  transform: none;
   opacity: 0;
   margin: auto;
+  transition: opacity 0.25s ease;
+  
+  /* FONT RENDERING STABILIZER 3D */
+  transform-style: preserve-3d;
 }
 
 .sidebar.open .sidebar-inner {
-  transform: translateY(0) scale(1);
+  transform: none;
   opacity: 1;
-  transition-delay: 0.1s;
+  transition-delay: 0s;
 }
 
 /* Close Button Premium */
@@ -605,21 +617,27 @@ body.dark .sidebar {
   cursor: pointer;
   z-index: 2010;
   box-shadow: var(--shadow-sm);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* HAPUS TRANSFORM (ROTATE/SCALE) UNTUK STABILITAS */
   opacity: 0;
-  transform: rotate(-90deg) scale(0.8);
+  transform: none;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.25s ease;
+  backface-visibility: hidden;
 }
+
 .sidebar.open .btn-close-fs {
   opacity: 1;
-  transform: rotate(0) scale(1);
-  transition-delay: 0.2s;
+  transform: none;
+  transition-delay: 0s;
 }
+
 .btn-close-fs:hover {
   background: var(--danger-dim);
   color: var(--danger);
   border-color: rgba(220, 38, 38, 0.3);
-  transform: scale(1.08) rotate(90deg);
+  transform: none; /* NO ROTATE/SCALE ON HOVER */
 }
+
 body.dark .btn-close-fs {
   background: var(--surface-2);
 }
@@ -669,7 +687,7 @@ body.dark .btn-close-fs {
   background: transparent;
   width: 100%;
   text-align: left;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
@@ -677,7 +695,7 @@ body.dark .btn-close-fs {
   background: var(--surface);
   border-color: var(--border);
   color: var(--text-primary);
-  transform: translateY(-2px);
+  transform: none; /* HAPUS TRANSLATE Y */
   box-shadow: var(--shadow-sm);
 }
 body.dark .nav-item:hover {
@@ -703,7 +721,7 @@ body.dark .nav-item.active {
   font-size: 20px;
   background: var(--surface-2);
   color: inherit;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   flex-shrink: 0;
 }
 body.dark .nav-icon { background: rgba(0,0,0,0.2); }
@@ -714,7 +732,7 @@ body.dark .nav-icon { background: rgba(0,0,0,0.2); }
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 .nav-item:hover .nav-icon {
-  transform: scale(1.1) rotate(5deg);
+  transform: none; /* HAPUS ROTATE/SCALE */
 }
 
 /* Premium Filter Area in Menu */
@@ -1215,6 +1233,18 @@ body.dark .fs-btn-dismiss:hover { background: rgba(255,255,255,0.05); color: var
   .chart-wrap { height: 260px !important; }
   .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
   .chart-scroll-inner { width: 100% !important; height: 320px; } 
+  
+  /* Disable all reopen animations and transforms on mobile for absolute stability */
+  .sidebar,
+  .sidebar-inner,
+  .nav-item,
+  .nav-icon,
+  .btn-close-fs,
+  .fs-brand {
+      animation: none !important;
+      transition-delay: 0s !important;
+      transform: none !important;
+  }
 }
 
 
@@ -2029,13 +2059,26 @@ function unlockOverlayBackground(force = false) {
   if (overlayLockCount === 0 || force) {
     overlayLockCount = 0;
     
+    // 1. Ambil posisi presisi langsung dari inline style top sebelum di-reset
+    const exactScrollY = Math.abs(parseInt(document.body.style.top || "0")) || scrollPosition;
+    
+    // 2. Matikan smooth scrolling global secara sementara untuk mencegah efek "flash/jump" dari atas
+    document.documentElement.style.scrollBehavior = 'auto';
+    
+    // 3. Unlock overlay
     document.body.classList.remove("overlay-lock");
     document.documentElement.classList.remove("overlay-lock");
     
     document.body.style.paddingRight = "";
     document.body.style.top = "";
     
-    window.scrollTo(0, scrollPosition);
+    // 4. Restore scroll secara instan di frame yang sama
+    window.scrollTo(0, exactScrollY);
+    
+    // 5. Kembalikan perilaku smooth scrolling CSS setelah posisi sudah stabil (tanpa disadari mata)
+    setTimeout(() => {
+      document.documentElement.style.scrollBehavior = '';
+    }, 10);
   }
 }
 
@@ -3260,14 +3303,16 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
 // MODAL DETAIL SEKOLAH
 // ────────────────────────────────────────────
 function openModal(no) {
+  lastSchoolCardId = `school-row-${no}`; // Simpan target spesifik sekolah
   currentModalSchool = currentSchools.find(s => s.no === no);
   if(!currentModalSchool) return;
   document.getElementById('modalTitle').textContent = currentModalSchool.nama;
   document.querySelectorAll('.m-tab').forEach((t,i) => t.classList.toggle('active', i === 0));
   renderModalTab(0);
   
-  document.getElementById('modalOverlay').classList.add('open');
+  // Lock overlay DULU untuk menyimpan posisi scroll yang akurat
   lockOverlayBackground();
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
 function switchTab(idx) {
