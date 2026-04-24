@@ -65,18 +65,17 @@
   --ink-2: var(--text-secondary);
   --ink-3: var(--text-tertiary);
   --ink-4: var(--text-muted);
-  --blue:       var(--primary);
-  --blue-dim:   var(--primary-dim);
-  --blue-mid:   var(--primary-mid);
-  --green:      var(--success);
-  --green-dim:  var(--success-dim);
-  --amber:      var(--warning);
-  --amber-dim:  var(--warning-dim);
-  --red:        var(--danger);
-  --red-dim:    var(--danger-dim);
+  --blue:        var(--primary);
+  --blue-dim:    var(--primary-dim);
+  --blue-mid:    var(--primary-mid);
+  --green:       var(--success);
+  --green-dim:   var(--success-dim);
+  --amber:       var(--warning);
+  --amber-dim:   var(--warning-dim);
+  --red:         var(--danger);
+  --red-dim:     var(--danger-dim);
 
   /* Sidebar & Header */
-  --sidebar-w:  228px;
   --header-h:   64px;
 
   /* Transitions */
@@ -292,12 +291,11 @@ body {
 }
 
 /* ────────────────────────────────────────────
-   LAYOUT SHELL (DASHBOARD GRID)
+   LAYOUT SHELL (DASHBOARD GRID -> FLEX)
 ──────────────────────────────────────────── */
 .shell {
-  display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
-  grid-template-rows: var(--header-h) 1fr;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
@@ -313,7 +311,7 @@ body {
    4. HEADER — Clean & Elevated
 ──────────────────────────────────────────── */
 .header {
-  grid-column: 1 / -1; grid-row: 1;
+  width: 100%;
   height: var(--header-h);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -398,7 +396,7 @@ body.dark .sel:focus {
 }
 
 /* ────────────────────────────────────────────
-   6. BUTTONS
+   6. BUTTONS & HAMBURGER
 ──────────────────────────────────────────── */
 .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .btn-print {
@@ -412,48 +410,247 @@ body.dark .sel:focus {
 .btn-print:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(37,99,235,.2); }
 .btn-print svg { width: 14px; height: 14px; }
 
-/* Hamburger */
-.ham { display: none; background: none; border: none; cursor: pointer; padding: 8px; border-radius: var(--r-sm); margin-left: -4px; transition: var(--transition-fast); }
+/* Hamburger (Sama Desktop & Mobile) */
+.ham {
+  display: flex; 
+  flex-direction: column; 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  padding: 8px; 
+  border-radius: var(--r-sm); 
+  margin-left: -4px; 
+  transition: var(--transition-fast);
+}
 .ham:hover { background: var(--surface-2); }
 .ham span { display: block; width: 18px; height: 2px; background: var(--text-secondary); border-radius: 2px; margin: 3.5px 0; transition: var(--transition-base); }
 
+
 /* ────────────────────────────────────────────
-   7. SIDEBAR — Material-style navigation
+   7. FULLSCREEN MENU (ENTERPRISE UPGRADE)
 ──────────────────────────────────────────── */
 .sidebar {
-  grid-column: 1; grid-row: 2;
-  background: var(--surface); border-right: 1px solid var(--border);
-  padding: 16px 10px; gap: 2px; display: flex; flex-direction: column;
-  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h));
-  overflow-y: auto; transition: background 0.3s ease, border-color 0.3s ease;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+  overflow-y: auto;
 }
-.nav-section-label { font-size: 10px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1.4px; padding: 12px 12px 8px; }
+
+body.dark .sidebar {
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.sidebar.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Outer click target for overlay close */
+.fs-overlay-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Content Container */
+.sidebar-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 640px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  margin: auto;
+}
+
+.sidebar.open .sidebar-inner {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+
+/* Close Button Premium */
+.btn-close-fs {
+  position: absolute;
+  top: 32px;
+  right: 40px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2010;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.8);
+}
+.sidebar.open .btn-close-fs {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+  transition-delay: 0.2s;
+}
+.btn-close-fs:hover {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border-color: rgba(220, 38, 38, 0.3);
+  transform: scale(1.08) rotate(90deg);
+}
+body.dark .btn-close-fs {
+  background: var(--surface-2);
+}
+
+/* Menu Brand Header */
+.fs-brand {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.fs-brand h2 {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.fs-brand h2 span { color: var(--primary); }
+.fs-brand p {
+  font-size: 15px;
+  color: var(--text-tertiary);
+  margin-top: 6px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* Nav Wrapper */
+.fs-nav-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Premium Nav Item */
 .nav-item {
-  display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--r-md);
-  font-size: 13px; font-weight: 500; color: var(--text-secondary);
-  text-decoration: none; cursor: pointer; transition: var(--transition-fast);
-  border: none; background: none; width: 100%; text-align: left; position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 24px;
+  border-radius: var(--r-xl);
+  font-size: 16.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
 }
-.nav-item:hover { background: var(--surface-2); color: var(--text-primary); transform: translateX(2px); }
-.nav-item.active { background: var(--primary-dim); color: var(--primary); font-weight: 600; }
-.nav-item.active::before {
-  content: ''; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
-  width: 3px; height: 60%; background: var(--primary); border-radius: 0 3px 3px 0;
+.nav-item:hover {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
+body.dark .nav-item:hover {
+  background: var(--surface-2);
+}
+.nav-item.active {
+  background: var(--primary-dim);
+  border-color: rgba(37, 99, 235, 0.2);
+  color: var(--primary);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+}
+body.dark .nav-item.active {
+  background: rgba(37,99,235,0.15);
+}
+
 .nav-icon {
-  width: 32px; height: 32px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center;
-  font-size: 15px; background: var(--surface-2); flex-shrink: 0; transition: var(--transition-fast);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: var(--surface-2);
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
 }
-.nav-item.active .nav-icon { background: rgba(37,99,235,.15); }
-.nav-item:hover .nav-icon { background: var(--border); }
-.sidebar-filter { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-2); }
-.sidebar-filter-label { font-size: 10.5px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; display: block; }
-.sidebar-filter select { width: 100%; margin-bottom: 8px; }
+body.dark .nav-icon { background: rgba(0,0,0,0.2); }
+
+.nav-item.active .nav-icon {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+.nav-item:hover .nav-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Premium Filter Area in Menu */
+.sidebar-filter {
+  margin-top: 16px;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+body.dark .sidebar-filter {
+  background: var(--surface-2);
+}
+.sidebar-filter-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 16px;
+  display: block;
+  text-align: center;
+}
+.sidebar-filter select {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  font-size: 14.5px;
+  height: auto;
+  border-radius: var(--r-md);
+}
 
 /* ────────────────────────────────────────────
    8. MAIN CONTENT AREA
 ──────────────────────────────────────────── */
-.main { grid-column: 2; grid-row: 2; padding: 28px 32px 64px; min-width: 0; }
+.main { width: 100%; max-width: 1500px; margin: 0 auto; padding: 32px 36px 64px; min-width: 0; }
 .view { display: none; animation: viewEnter 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
 .view.active { display: block; }
 @keyframes viewEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -693,24 +890,15 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 400; }
-.sidebar-overlay.open { display: block; }
-
 
 /* ────────────────────────────────────────────
    20. RESPONSIVE BASE & MOBILE LAYOUT
 ──────────────────────────────────────────── */
 @media(max-width:900px) {
-  .shell { grid-template-columns: 1fr; }
-  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; z-index: 500; width: 280px; transform: translateX(-100%); transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1); height: 100vh; padding: 20px 0; }
-  .sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-  .nav-item { padding: 12px 20px; margin: 0 12px; width: calc(100% - 24px); }
-  .nav-section-label { padding: 12px 20px 6px; }
   .header-period-group { display: none; } /* Menyembunyikan filter dr header di HP agar tidak bertumpuk */
-  .sidebar-filter { display: block; } /* Menampilkan kembali filter di sidebar HP */
-  .ham { display: flex; flex-direction: column; }
-  .main { grid-column: 1; padding: 20px 16px 48px; }
   .header-brand-sub { display: none; }
+  .btn-close-fs { top: 20px; right: 20px; }
+  .sidebar-inner { padding: 24px; margin-top: 24px; gap: 24px; }
 }
 
 @media(max-width:768px) {
@@ -727,6 +915,7 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   .hero-pct { font-size: 48px; }
   .kpi-value { font-size: 28px; }
   .page-header { margin-bottom: 20px; }
+  .main { padding: 20px 16px 48px; }
   
   .sel, .search-input, .sort-btn, .btn-detail, .m-tab { min-height: 44px; }
   .sort-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-left: 0; margin-top: 12px; }
@@ -792,7 +981,6 @@ body.dark tbody tr:hover { background: rgba(255,255,255,.03); }
 body.dark .exec-banner { color: var(--text-secondary); }
 body.dark .chart-card, body.dark .kpi-card, body.dark .hero-metric, body.dark .table-surface, body.dark .conclusion-card, body.dark .analysis-card { border-color: var(--border); }
 body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .hero-stat { background: var(--surface-2); }
-body.dark .nav-item.active::before { background: var(--primary); }
 body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
 body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
 body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
@@ -815,14 +1003,6 @@ body.dark .pct-pill.pill-high { background: rgba(22, 163, 74, 0.15); color: #4ad
 body.dark .pct-pill.pill-mid { background: rgba(217, 119, 6, 0.15); color: #fbbf24; box-shadow: 0 0 10px rgba(217, 119, 6, 0.25); border: 1px solid rgba(251, 191, 36, 0.2); }
 body.dark .pct-pill.pill-low { background: rgba(220, 38, 38, 0.15); color: #f87171; box-shadow: 0 0 10px rgba(220, 38, 38, 0.25); border: 1px solid rgba(248, 113, 113, 0.2); }
 
-@media (max-width: 900px) {
-  body.dark .sidebar { background: #162032; border-right: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5); }
-  body.dark .nav-item { color: #94a3b8; }
-  body.dark .nav-item:hover { background: rgba(255, 255, 255, 0.03); color: #e2e8f0; }
-  body.dark .nav-item.active { background: rgba(37, 99, 235, 0.15); color: #60a5fa; box-shadow: inset 3px 0 0 #3b82f6; }
-  body.dark .nav-icon { background: rgba(0,0,0,0.2); }
-  body.dark .nav-item.active .nav-icon { background: rgba(37, 99, 235, 0.25); color: #60a5fa; }
-}
 
 @media (max-width: 768px) {
   body.dark .header { background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
@@ -1015,7 +1195,7 @@ body.dark .loading-progress-value {
 @media print {
   .shell { display: block; }
   .header { position: relative; }
-  .sidebar, .sidebar-overlay, .ham, .table-toolbar .sort-group, .btn-print, .modal-overlay { display: none !important; }
+  .sidebar, .ham, .table-toolbar .sort-group, .btn-print, .modal-overlay { display: none !important; }
   .view { display: block !important; margin-bottom: 24px; }
   .chart-card, .kpi-card, .table-surface { break-inside: avoid; }
   body { background: white !important; }
@@ -1108,8 +1288,7 @@ body.dark .loading-progress-value {
 
 <!-- ═══════════════ VIEW: DASHBOARD ═══════════════ -->
 <div id="dashboardView" style="display: none;">
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
+  
   <div class="shell">
 
     <!-- ═══════════════ HEADER ═══════════════ -->
@@ -1143,40 +1322,57 @@ body.dark .loading-progress-value {
       </div>
     </header>
 
-    <!-- ═══════════════ SIDEBAR ═══════════════ -->
-    <aside class="sidebar" id="sidebar">
-      <span class="nav-section-label">Navigasi</span>
-      <button class="nav-item active" data-target="view-ringkasan" onclick="showSection('view-ringkasan')">
-        <span class="nav-icon">◫</span> Ringkasan
-      </button>
-      <button class="nav-item" data-target="view-tabel" onclick="showSection('view-tabel')">
-        <span class="nav-icon">≡</span> Data Sekolah
-      </button>
-      <button class="nav-item" data-target="view-grafik" onclick="showSection('view-grafik')">
-        <span class="nav-icon">↗</span> Grafik & Insight
-      </button>
-      <button class="nav-item" data-target="view-trend" onclick="showSection('view-trend')">
-        <span class="nav-icon">∿</span> Tren Bulanan
-      </button>
-      <button class="nav-item" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan')">
-        <span class="nav-icon">◎</span> Kesimpulan
-      </button>
+    <!-- ═══════════════ FULLSCREEN SIDEBAR MENU ═══════════════ -->
+    <aside class="sidebar" id="sidebar" onclick="if(event.target === this) closeSidebar()">
+      <div class="fs-overlay-bg" onclick="closeSidebar()"></div>
+      
+      <div class="sidebar-inner">
+        <!-- Close Button -->
+        <button class="btn-close-fs" onclick="closeSidebar()" title="Tutup Menu (ESC)">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
 
-      <div class="sidebar-filter">
-        <span class="sidebar-filter-label">Filter Wilayah & Periode</span>
-        <select class="sel sidebar-filter select" id="sbKecamatan">
-          <option value="all">Semua Kecamatan</option>
-          <option value="Langensari">Langensari</option>
-          <option value="Purwaharja">Purwaharja</option>
-          <option value="Pataruman">Pataruman</option>
-          <option value="Banjar">Banjar</option>
-        </select>
-        <select class="sel" id="sbYear"></select>
-        <select class="sel" id="sbMonth" style="margin-top:6px"></select>
+        <div class="fs-brand">
+          <h2>SMART <span>BTQ</span></h2>
+          <p>Dashboard Navigasi Enterprise</p>
+        </div>
+
+        <nav class="fs-nav-wrapper">
+          <button class="nav-item active" data-target="view-ringkasan" onclick="showSection('view-ringkasan')">
+            <span class="nav-icon">◫</span> <span class="nav-text">Ringkasan Eksekutif</span>
+          </button>
+          <button class="nav-item" data-target="view-tabel" onclick="showSection('view-tabel')">
+            <span class="nav-icon">≡</span> <span class="nav-text">Data & Direktori Sekolah</span>
+          </button>
+          <button class="nav-item" data-target="view-grafik" onclick="showSection('view-grafik')">
+            <span class="nav-icon">↗</span> <span class="nav-text">Grafik & Insight Analitik</span>
+          </button>
+          <button class="nav-item" data-target="view-trend" onclick="showSection('view-trend')">
+            <span class="nav-icon">∿</span> <span class="nav-text">Tren Perkembangan Bulanan</span>
+          </button>
+          <button class="nav-item" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan')">
+            <span class="nav-icon">◎</span> <span class="nav-text">Kesimpulan & Rekomendasi</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-filter">
+          <span class="sidebar-filter-label">Filter Wilayah & Periode</span>
+          <select class="sel select" id="sbKecamatan">
+            <option value="all">Semua Kecamatan</option>
+            <option value="Langensari">Langensari</option>
+            <option value="Purwaharja">Purwaharja</option>
+            <option value="Pataruman">Pataruman</option>
+            <option value="Banjar">Banjar</option>
+          </select>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+            <select class="sel" id="sbYear"></select>
+            <select class="sel" id="sbMonth"></select>
+          </div>
+        </div>
       </div>
     </aside>
 
-    <!-- ═══════════════ MAIN ═══════════════ -->
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
     <main class="main">
 
       <!-- DQ Banner -->
@@ -1680,17 +1876,13 @@ async function initDashboard() {
 
 // Event Dropdown Bersih (addEventListener)
 function setupEventListeners() {
-  const selTahun = document.getElementById("selYear");
   const sbTahun = document.getElementById("sbYear");
-  const selBulan = document.getElementById("selMonth");
   const sbBulan = document.getElementById("sbMonth");
-  const selKec = document.getElementById("selKecamatan");
   const sbKec = document.getElementById("sbKecamatan");
 
   const handleYearChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     currentYear = e.target.value;
-    if (selTahun) selTahun.value = currentYear;
     if (sbTahun) sbTahun.value = currentYear;
     
     initMonthDropdown(); 
@@ -1700,7 +1892,6 @@ function setupEventListeners() {
   const handleMonthChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     currentMonth = e.target.value;
-    if (selBulan) selBulan.value = currentMonth;
     if (sbBulan) sbBulan.value = currentMonth;
     
     loadData(currentYear, currentMonth);
@@ -1709,7 +1900,6 @@ function setupEventListeners() {
   const handleKecChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     selectedKecamatan = e.target.value;
-    if (selKec) selKec.value = selectedKecamatan;
     if (sbKec) sbKec.value = selectedKecamatan;
     
     stackDisplayMode = selectedKecamatan === 'all' ? 'top20' : 'all';
@@ -1725,11 +1915,8 @@ function setupEventListeners() {
     }
   };
 
-  if (selTahun) selTahun.onchange = handleYearChange;
   if (sbTahun) sbTahun.onchange = handleYearChange;
-  if (selBulan) selBulan.onchange = handleMonthChange;
   if (sbBulan) sbBulan.onchange = handleMonthChange;
-  if (selKec) selKec.onchange = handleKecChange;
   if (sbKec) sbKec.onchange = handleKecChange;
 }
 
@@ -1859,9 +2046,7 @@ function initYearDropdown() {
   const years = Object.keys(DATABASE).sort((a, b) => b - a);
   const opts = years.map(y => `<option value="${y}">${y}</option>`).join("");
   
-  const selY = document.getElementById("selYear");
   const sbY = document.getElementById("sbYear");
-  if (selY) { selY.innerHTML = opts; selY.value = currentYear; }
   if (sbY) { sbY.innerHTML = opts; sbY.value = currentYear; }
 }
 
@@ -1871,7 +2056,6 @@ function initMonthDropdown() {
 
   if (months.length === 0) {
     const noOpt = '<option value="">- Kosong -</option>';
-    if (document.getElementById("selMonth")) document.getElementById("selMonth").innerHTML = noOpt;
     if (document.getElementById("sbMonth")) document.getElementById("sbMonth").innerHTML = noOpt;
     return;
   }
@@ -1882,9 +2066,7 @@ function initMonthDropdown() {
 
   const opts = months.map(m => `<option value="${m}">${m}</option>`).join("");
   
-  const selM = document.getElementById("selMonth");
   const sbM = document.getElementById("sbMonth");
-  if (selM) { selM.innerHTML = opts; selM.value = currentMonth; }
   if (sbM) { sbM.innerHTML = opts; sbM.value = currentMonth; }
 }
 
@@ -2005,21 +2187,22 @@ function showSection(id) {
   document.querySelectorAll('.nav-item').forEach(l => {
     l.classList.toggle('active', l.getAttribute('data-target') === id);
   });
-  if(window.innerWidth <= 900) closeSidebar();
+  // ALWAYS close sidebar immediately after navigating
+  closeSidebar();
   window.dispatchEvent(new Event('resize'));
 }
 
 function openSidebar() {
   document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden'; // Lock background scrolling
 }
 
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-  // Pastikan tidak merusak UI freeze jika sedang loading
-  if (!isLoading) document.body.style.overflow = '';
+  // Pastikan tidak membuka lock scroll jika sistem memang sedang loading total
+  if (!isLoading) {
+      document.body.style.overflow = '';
+  }
 }
 
 // ────────────────────────────────────────────
@@ -2706,9 +2889,12 @@ function closeModal(e) {
     document.getElementById('modalOverlay').classList.remove('open');
 }
 
-// Support keydown to close overlays
+// Support keydown to close overlays / sidebar
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeSidebar(); }
+  if (e.key === 'Escape') { 
+      closeModal(); 
+      closeSidebar(); 
+  }
 });
 
 /**
