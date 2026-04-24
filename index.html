@@ -110,15 +110,6 @@ body.dark {
   --shadow-md:  0 4px 20px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2);
   --shadow-lg:  0 8px 32px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25);
   --shadow-focus: 0 0 0 3px rgba(37,99,235,.4);
-
-  --ink-1: var(--text-primary);
-  --ink-2: var(--text-secondary);
-  --ink-3: var(--text-tertiary);
-  --ink-4: var(--text-muted);
-  --blue-dim:   var(--primary-dim);
-  --green-dim:  var(--success-dim);
-  --amber-dim:  var(--warning-dim);
-  --red-dim:    var(--danger-dim);
 }
 
 /* ────────────────────────────────────────────
@@ -388,6 +379,7 @@ body {
   background-color: #ffffff;
 }
 
+/* Fallback/Overrides untuk dark mode */
 body.dark .sel { 
   background-color: var(--surface-2);
   border-color: var(--border);
@@ -478,7 +470,7 @@ body.dark .sel:focus {
 .chip-flat  { background: var(--bg);        color: var(--text-tertiary); }
 
 /* ────────────────────────────────────────────
-   10. HERO METRIC — Dominant & Clean
+   10. HERO METRIC
 ──────────────────────────────────────────── */
 .hero-metric {
   background: var(--surface); border-radius: var(--r-xl); padding: 32px 36px; margin-bottom: 16px;
@@ -513,7 +505,7 @@ body.dark .hero-metric::before { background: radial-gradient(ellipse at top righ
 .prog-segment { height: 100%; transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
 
 /* ────────────────────────────────────────────
-   11. KPI CARDS — Premium Elevated
+   11. KPI CARDS
 ──────────────────────────────────────────── */
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
 .kpi-card {
@@ -544,7 +536,7 @@ body.dark .hero-metric::before { background: radial-gradient(ellipse at top righ
 .kpi-badge.check   { background: var(--danger-dim);  color: var(--danger);  border-color: rgba(220,38,38,.2); }
 
 /* ────────────────────────────────────────────
-   12. CHART CARDS
+   12. CHART CARDS & INSIGHTS
 ──────────────────────────────────────────── */
 .chart-card {
   background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm);
@@ -554,10 +546,6 @@ body.dark .hero-metric::before { background: radial-gradient(ellipse at top righ
 .chart-card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.2px; }
 .chart-card-sub   { font-size: 12px; color: var(--text-tertiary); margin-top: 3px; }
 .chart-card-body  { padding: 20px 24px; }
-
-/* ────────────────────────────────────────────
-   13. SECTION HEADINGS
-──────────────────────────────────────────── */
 .section-heading { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .section-heading-badge { font-size: 11px; font-weight: 500; color: var(--text-tertiary); background: var(--surface-2); padding: 4px 12px; border-radius: 20px; text-transform: none; letter-spacing: 0; border: 1px solid var(--border); }
 
@@ -605,9 +593,7 @@ tfoot td.c { text-align: center; }
 .btn-detail { padding: 5px 12px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); font-size: 11.5px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: var(--transition-fast); }
 .btn-detail:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
 
-/* ────────────────────────────────────────────
-   15. INSIGHT & ANALYSIS PANELS
-──────────────────────────────────────────── */
+/* INSIGHT PANELS */
 .insight-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
 .insight-item { background: var(--surface-2); border-radius: var(--r-md); padding: 14px 16px; border: 1px solid var(--border); border-left: 3px solid transparent; transition: var(--transition-fast); }
 .insight-item:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
@@ -715,31 +701,29 @@ body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .mod
 body.dark .nav-item.active::before { background: var(--primary); }
 body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
 body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
-
-/* Overrides tambahan dark mode (mencegah conflict) */
 body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
 
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 400; }
 .sidebar-overlay.open { display: block; }
 
 /* ────────────────────────────────────────────
-   23. RESPONSIVE — MOBILE UPGRADES
+   23. RESPONSIVE
 ──────────────────────────────────────────── */
 @media(max-width:900px) {
-  /* Pastikan auto row ter-set agar header mobile bisa terekspansi tinggi penuhnya */
-  .shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .shell { grid-template-columns: 1fr; }
   .sidebar { position: fixed; top: 0; left: 0; bottom: 0; z-index: 500; width: 280px; transform: translateX(-100%); transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1); height: 100vh; padding: 20px 0; }
   .sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
   body.dark .sidebar.open { box-shadow: 2px 0 20px rgba(0,0,0,.5); }
   .nav-item { padding: 12px 20px; margin: 0 12px; width: calc(100% - 24px); }
   .nav-section-label { padding: 12px 20px 6px; }
-  .sidebar-filter { padding: 20px 16px; display: block; }
+  .sidebar-filter { display: none; } /* Disembunyikan di sidebar krn filter mobile diletakkan di header */
   .ham { display: flex; flex-direction: column; }
-  .main { grid-column: 1; grid-row: 2; padding: 20px 16px 48px; }
+  .main { grid-column: 1; padding: 20px 16px 48px; }
   .header-brand-sub { display: none; }
 }
 
 @media(max-width:768px) {
+  /* Komponen Umum Grid Mobile */
   .kpi-grid, .charts-2col, .analysis-grid, .duo-grid, .insight-strip { display: flex !important; flex-direction: column !important; gap: 12px !important; }
   .pie-insight-grid { grid-template-columns: 1fr !important; }
   .hero-metric { flex-direction: column; padding: 20px 16px; align-items: stretch; gap: 16px; }
@@ -753,6 +737,8 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   .hero-pct { font-size: 48px; }
   .kpi-value { font-size: 28px; }
   .page-header { margin-bottom: 20px; }
+  
+  /* Form Element & Filter Toolbar */
   .sel, .search-input, .sort-btn, .btn-detail, .m-tab { min-height: 44px; }
   .sort-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-left: 0; margin-top: 12px; }
   .sort-btn { padding: 0; display: flex; align-items: center; justify-content: center; font-size: 11.5px; }
@@ -760,64 +746,63 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   .table-toolbar { flex-direction: column; padding: 0 0 16px 0; gap: 0; align-items: stretch; }
   .table-filter-sel { max-width: 100%; margin-top: 12px; }
   
-  /* ── HEADER MOBILE: SEMUA FITUR MUNCUL, RAPI, & GOOGLE-STYLE ── */
+  /* HEADER MOBILE LAYOUT
+   * Solusi: Menggunakan Flex Wrap agar semua fitur Desktop tetap tampil
+   */
   .header {
     height: auto;
     min-height: 60px;
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: row;
+    padding: 12px 16px;
     flex-wrap: wrap;
-    align-items: center;
     gap: 12px;
+    align-items: center;
   }
-  .ham { order: 1; margin: 0 10px 0 -4px; }
+  .ham { order: 1; margin-left: 0; }
   .header-brand { order: 2; flex: 1; }
-  .header-brand-name { font-size: 17px; }
-  .header-sep { display: none; }
+  .header-brand-name { font-size: 16px; }
+  .header-sep { display: none; } /* Hanya sembunyikan separator visual */
   
-  /* Row ke-2: Filter Group */
-  .header-period-group {
+  /* Bagian Tombol Kanan (Print, Keluar, Dark Mode) */
+  .header-right {
     order: 3;
     display: flex;
-    width: 100%;
-    gap: 8px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .header-period-group::-webkit-scrollbar { display: none; }
-  .period-label { display: none; } /* Label teks dihilangkan, space saving */
-  .header-period-group .sel {
-    flex: 1;
-    min-width: 100px;
-    font-size: 12.5px;
-    padding: 8px 24px 8px 12px;
-  }
-
-  /* Row ke-3: Action Buttons (Dark, PDF, Keluar) */
-  .header-right {
-    order: 4;
-    display: flex;
-    width: 100%;
-    gap: 8px;
     margin-left: 0;
+    gap: 8px;
   }
-  #darkToggleBtn {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
-  }
+  /* Mengubah tombol teks menjadi Compact Icon Buttons */
+  .btn-print .btn-text { display: none; }
   .btn-print {
-    flex: 1;
+    width: 36px;
+    height: 36px;
+    padding: 0;
     justify-content: center;
-    height: 42px;
-    padding: 8px;
-    font-size: 13px;
-    margin-left: 0 !important; /* Override inline-style Keluar button */
+    border-radius: var(--r-md);
   }
+  .btn-print svg { margin: 0; width: 18px; height: 18px; }
 
-  /* Tables & Mobile Grid */
+  /* Bagian Filter Wilayah, Tahun, Bulan di Mobile (Grid Sticky) */
+  .header-period-group {
+    order: 4;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+  }
+  .period-label { display: none; } /* Sembunyikan label, cukup form select */
+  .header-period-group .sel {
+    width: 100%;
+    padding: 8px 24px 8px 10px;
+    font-size: 11.5px;
+    background-size: 12px;
+    background-position: right 8px center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  /* Custom Table Mobile Card View */
   table { border: none; width: 100%; }
   .table-surface { background: transparent; border: none; box-shadow: none; overflow: visible; margin-bottom: 0; }
   thead { display: none; }
@@ -836,6 +821,8 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   tfoot td[data-label="#"], tfoot td[data-label="Aksi"], tfoot td[data-label="Kualitas"] { display: none; }
   tfoot td[data-label="Sekolah"] { flex-direction: row; border-bottom: 2px solid rgba(37,99,235,.2); padding-bottom: 12px; margin-bottom: 4px; color: var(--primary); font-size: 14px; justify-content: center; text-align: center !important; }
   tfoot td[data-label="Sekolah"]::before { display: none; }
+  
+  /* Modal Overrides */
   .modal-box { width: 100%; height: 100%; max-height: 100vh; border-radius: 0; display: flex; flex-direction: column; }
   .modal-header, .modal-body { padding: 16px 18px; }
   .modal-tabs { padding: 0 18px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
@@ -844,6 +831,8 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   .modal-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border-2); text-align: right !important; background: transparent !important; }
   .modal-table td:last-child { border-bottom: none; }
   .modal-table td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; }
+  
+  /* Chart adjustments */
   .hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px; }
   .hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px dashed var(--border-2); padding-bottom: 6px; }
   .hist-pct { font-size: 16px; text-align: right; }
@@ -964,6 +953,7 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
 
       <div class="header-sep"></div>
 
+      <!-- FILTER DROPDOWNS -->
       <div class="header-period-group">
         <span class="period-label">Wilayah</span>
         <select class="sel" id="selKecamatan">
@@ -979,19 +969,20 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
         <select class="sel" id="selMonth"></select>
       </div>
 
+      <!-- ACTION BUTTONS -->
       <div class="header-right">
         <!-- Dark mode toggle is dynamically injected here via JS -->
-        <button class="btn-print" onclick="window.print()">
+        <button class="btn-print" onclick="window.print()" title="Cetak PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Cetak PDF
+          <span class="btn-text">Cetak PDF</span>
         </button>
-        <button class="btn-print" onclick="doLogout()" style="background: var(--danger); margin-left: 8px;">
+        <button class="btn-print" onclick="doLogout()" style="background: var(--danger);" title="Keluar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
           </svg>
-          Keluar
+          <span class="btn-text">Keluar</span>
         </button>
       </div>
     </header>
