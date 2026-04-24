@@ -649,7 +649,7 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 .reco-num { width: 24px; height: 24px; flex-shrink: 0; background: var(--primary); color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; box-shadow: 0 2px 6px rgba(37,99,235,.3); }
 
 /* ────────────────────────────────────────────
-   17. TREND & MODAL
+   17. TREND & MODAL (BASE)
 ──────────────────────────────────────────── */
 .trend-empty { text-align: center; padding: 48px 24px; color: var(--text-tertiary); font-size: 13px; }
 .trend-empty-icon { font-size: 32px; margin-bottom: 10px; }
@@ -695,9 +695,8 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 
 body.dark tbody tr:hover { background: rgba(255,255,255,.03); }
 body.dark .exec-banner { color: var(--text-secondary); }
-body.dark .modal-header, body.dark .modal-box { background: var(--surface); }
 body.dark .chart-card, body.dark .kpi-card, body.dark .hero-metric, body.dark .table-surface, body.dark .conclusion-card, body.dark .analysis-card { border-color: var(--border); }
-body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .modal-tabs, body.dark .hero-stat { background: var(--surface-2); }
+body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .hero-stat { background: var(--surface-2); }
 body.dark .nav-item.active::before { background: var(--primary); }
 body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
 body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
@@ -705,6 +704,78 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
 
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 400; }
 .sidebar-overlay.open { display: block; }
+
+
+/* ────────────────────────────────────────────
+   20. PREMIUM DARK MODE ENHANCEMENTS
+──────────────────────────────────────────── */
+/* Style ini memastikan Dark Mode Modal sama persis & premium baik di desktop maupun diserap oleh mobile */
+
+body.dark .modal-overlay { 
+  background: rgba(2, 6, 23, 0.75); 
+  backdrop-filter: blur(8px); 
+}
+body.dark .modal-box {
+  background: #0f172a; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+body.dark .modal-header {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.dark .modal-title { color: #f8fafc; font-weight: 700; }
+body.dark .modal-close {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+body.dark .modal-close:hover {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(220, 38, 38, 0.5);
+  color: #fca5a5;
+}
+body.dark .modal-tabs {
+  background: #162032;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.dark .m-tab { color: #94a3b8; }
+body.dark .m-tab:hover { color: #e2e8f0; }
+body.dark .m-tab.active {
+  color: #60a5fa;
+  border-bottom-color: #60a5fa;
+}
+body.dark .modal-table th {
+  background: #1e293b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+body.dark .modal-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+body.dark .hist-row {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+/* Premium Glow Badges for Dark Mode */
+body.dark .pct-pill.pill-high { 
+  background: rgba(22, 163, 74, 0.15); 
+  color: #4ade80; 
+  box-shadow: 0 0 10px rgba(22, 163, 74, 0.25); 
+  border: 1px solid rgba(74, 222, 128, 0.2); 
+}
+body.dark .pct-pill.pill-mid { 
+  background: rgba(217, 119, 6, 0.15); 
+  color: #fbbf24; 
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.25); 
+  border: 1px solid rgba(251, 191, 36, 0.2); 
+}
+body.dark .pct-pill.pill-low { 
+  background: rgba(220, 38, 38, 0.15); 
+  color: #f87171; 
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.25); 
+  border: 1px solid rgba(248, 113, 113, 0.2); 
+}
 
 /* ────────────────────────────────────────────
    23. RESPONSIVE
@@ -746,9 +817,7 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   .table-toolbar { flex-direction: column; padding: 0 0 16px 0; gap: 0; align-items: stretch; }
   .table-filter-sel { max-width: 100%; margin-top: 12px; }
   
-  /* HEADER MOBILE LAYOUT
-   * Solusi: Menggunakan Flex Wrap agar semua fitur Desktop tetap tampil
-   */
+  /* HEADER MOBILE LAYOUT */
   .header {
     height: auto;
     min-height: 60px;
@@ -760,16 +829,14 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   .ham { order: 1; margin-left: 0; }
   .header-brand { order: 2; flex: 1; }
   .header-brand-name { font-size: 16px; }
-  .header-sep { display: none; } /* Hanya sembunyikan separator visual */
+  .header-sep { display: none; } 
   
-  /* Bagian Tombol Kanan (Print, Keluar, Dark Mode) */
   .header-right {
     order: 3;
     display: flex;
     margin-left: 0;
     gap: 8px;
   }
-  /* Mengubah tombol teks menjadi Compact Icon Buttons */
   .btn-print .btn-text { display: none; }
   .btn-print {
     width: 36px;
@@ -780,7 +847,6 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
   }
   .btn-print svg { margin: 0; width: 18px; height: 18px; }
 
-  /* Bagian Filter Wilayah, Tahun, Bulan di Mobile (Grid Sticky) */
   .header-period-group {
     order: 4;
     width: 100%;
@@ -790,7 +856,7 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
     padding-top: 12px;
     border-top: 1px dashed var(--border);
   }
-  .period-label { display: none; } /* Sembunyikan label, cukup form select */
+  .period-label { display: none; }
   .header-period-group .sel {
     width: 100%;
     padding: 8px 24px 8px 10px;
@@ -802,39 +868,117 @@ body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); b
     overflow: hidden;
   }
   
-  /* Custom Table Mobile Card View */
+  /* Modal Overrides Mobile Floating Card Fix */
+  .modal-box { 
+    width: 92%; 
+    height: auto; 
+    max-height: 88vh; 
+    border-radius: var(--r-xl); 
+    display: flex; 
+    flex-direction: column; 
+    margin: auto; 
+  }
+  .modal-header { padding: 20px; border-top-left-radius: var(--r-xl); border-top-right-radius: var(--r-xl); }
+  .modal-body { padding: 16px 20px; }
+  .modal-tabs { padding: 0 20px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  .modal-table thead { display: none; }
+  
+  /* Modal Tables Cards Mobile */
+  .modal-table tr { 
+    display: flex; 
+    flex-direction: column; 
+    background: var(--surface); 
+    border: 1px solid var(--border-2); 
+    border-radius: var(--r-md); 
+    margin-bottom: 12px; 
+    padding: 14px; 
+    box-shadow: var(--shadow-xs);
+  }
+  body.dark .modal-table tr {
+    background: rgba(255, 255, 255, 0.03); 
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+  .modal-table td { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 8px 0; 
+    border-bottom: 1px dashed var(--border-2); 
+    text-align: right !important; 
+    background: transparent !important; 
+  }
+  body.dark .modal-table td {
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+  }
+  .modal-table td:last-child { border-bottom: none; padding-bottom: 0; }
+  .modal-table td::before { 
+    content: attr(data-label); 
+    font-weight: 600; 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    color: var(--text-tertiary); 
+    text-align: left; 
+  }
+  body.dark .modal-table td::before {
+    color: #94a3b8;
+  }
+
+  /* Main Table Data Sekolah Mobile Overrides */
   table { border: none; width: 100%; }
   .table-surface { background: transparent; border: none; box-shadow: none; overflow: visible; margin-bottom: 0; }
   thead { display: none; }
   tbody tr { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-md); margin: 0 0 16px 0; padding: 16px; box-shadow: var(--shadow-xs); }
+  body.dark tbody tr {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
   tbody td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-2); text-align: right !important; font-size: 13.5px; }
+  body.dark tbody td {
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+  }
   tbody td:last-child { border-bottom: none; padding-bottom: 0; padding-top: 12px; }
   tbody td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; margin-right: 12px; }
   tbody td[data-label="#"], tbody td[data-label="Kualitas"] { display: none; }
   tbody td[data-label="Sekolah"] { flex-direction: column; align-items: flex-start; text-align: left !important; border-bottom: 2px solid var(--border-2); padding-bottom: 12px; margin-bottom: 4px; }
+  body.dark tbody td[data-label="Sekolah"] {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+  }
   tbody td[data-label="Sekolah"]::before { display: none; }
   .td-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
   .btn-detail { width: 100%; justify-content: center; font-size: 13px; font-weight: 600; }
   tfoot tr { display: flex; flex-direction: column; background: var(--primary-dim); border: 1px solid rgba(37,99,235,.2); border-radius: var(--r-md); padding: 16px; margin: 0 0 16px 0; }
+  body.dark tfoot tr {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
   tfoot td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(37,99,235,.2); text-align: right !important; font-size: 14px; background: transparent !important; }
+  body.dark tfoot td {
+    border-bottom: 1px dashed rgba(59, 130, 246, 0.15);
+  }
   tfoot td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-secondary); text-align: left; }
   tfoot td[data-label="#"], tfoot td[data-label="Aksi"], tfoot td[data-label="Kualitas"] { display: none; }
   tfoot td[data-label="Sekolah"] { flex-direction: row; border-bottom: 2px solid rgba(37,99,235,.2); padding-bottom: 12px; margin-bottom: 4px; color: var(--primary); font-size: 14px; justify-content: center; text-align: center !important; }
+  body.dark tfoot td[data-label="Sekolah"] {
+    border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
   tfoot td[data-label="Sekolah"]::before { display: none; }
   
-  /* Modal Overrides */
-  .modal-box { width: 100%; height: 100%; max-height: 100vh; border-radius: 0; display: flex; flex-direction: column; }
-  .modal-header, .modal-body { padding: 16px 18px; }
-  .modal-tabs { padding: 0 18px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-  .modal-table thead { display: none; }
-  .modal-table tr { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-md); margin-bottom: 12px; padding: 12px; }
-  .modal-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border-2); text-align: right !important; background: transparent !important; }
-  .modal-table td:last-child { border-bottom: none; }
-  .modal-table td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; }
-  
   /* Chart adjustments */
-  .hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px; }
+  .hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px; border-radius: var(--r-md); }
+  body.dark .hist-row {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
   .hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px dashed var(--border-2); padding-bottom: 6px; }
+  body.dark .hist-period {
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+    color: #f8fafc;
+  }
   .hist-pct { font-size: 16px; text-align: right; }
   .chart-wrap { height: 260px !important; }
   .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
