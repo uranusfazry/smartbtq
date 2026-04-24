@@ -60,7 +60,7 @@
   --shadow-lg:  0 8px 32px rgba(15,23,42,.10), 0 4px 12px rgba(15,23,42,.06);
   --shadow-focus: 0 0 0 3px rgba(37,99,235,.18);
 
-  /* Tokens untuk backward compat (dari versi sebelumnya) */
+  /* Tokens untuk backward compat */
   --ink-1: var(--text-primary);
   --ink-2: var(--text-secondary);
   --ink-3: var(--text-tertiary);
@@ -86,7 +86,7 @@
 }
 
 /* ────────────────────────────────────────────
-   2. DARK MODE — body.dark
+   2. DARK MODE — DESKTOP BASE (body.dark)
 ──────────────────────────────────────────── */
 body.dark {
   --bg:             #0f172a;
@@ -379,7 +379,7 @@ body {
   background-color: #ffffff;
 }
 
-/* Fallback/Overrides untuk dark mode */
+/* Fallback/Overrides untuk dark mode Desktop (Mobile di section terpisah) */
 body.dark .sel { 
   background-color: var(--surface-2);
   border-color: var(--border);
@@ -693,98 +693,17 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-body.dark tbody tr:hover { background: rgba(255,255,255,.03); }
-body.dark .exec-banner { color: var(--text-secondary); }
-body.dark .chart-card, body.dark .kpi-card, body.dark .hero-metric, body.dark .table-surface, body.dark .conclusion-card, body.dark .analysis-card { border-color: var(--border); }
-body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .hero-stat { background: var(--surface-2); }
-body.dark .nav-item.active::before { background: var(--primary); }
-body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
-body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
-body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
-
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); z-index: 400; }
 .sidebar-overlay.open { display: block; }
 
 
 /* ────────────────────────────────────────────
-   20. PREMIUM DARK MODE ENHANCEMENTS
-──────────────────────────────────────────── */
-/* Style ini memastikan Dark Mode Modal sama persis & premium baik di desktop maupun diserap oleh mobile */
-
-body.dark .modal-overlay { 
-  background: rgba(2, 6, 23, 0.75); 
-  backdrop-filter: blur(8px); 
-}
-body.dark .modal-box {
-  background: #0f172a; 
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-body.dark .modal-header {
-  background: #0f172a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-body.dark .modal-title { color: #f8fafc; font-weight: 700; }
-body.dark .modal-close {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-}
-body.dark .modal-close:hover {
-  background: rgba(220, 38, 38, 0.2);
-  border-color: rgba(220, 38, 38, 0.5);
-  color: #fca5a5;
-}
-body.dark .modal-tabs {
-  background: #162032;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-body.dark .m-tab { color: #94a3b8; }
-body.dark .m-tab:hover { color: #e2e8f0; }
-body.dark .m-tab.active {
-  color: #60a5fa;
-  border-bottom-color: #60a5fa;
-}
-body.dark .modal-table th {
-  background: #1e293b;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
-}
-body.dark .modal-table td {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-body.dark .hist-row {
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-/* Premium Glow Badges for Dark Mode */
-body.dark .pct-pill.pill-high { 
-  background: rgba(22, 163, 74, 0.15); 
-  color: #4ade80; 
-  box-shadow: 0 0 10px rgba(22, 163, 74, 0.25); 
-  border: 1px solid rgba(74, 222, 128, 0.2); 
-}
-body.dark .pct-pill.pill-mid { 
-  background: rgba(217, 119, 6, 0.15); 
-  color: #fbbf24; 
-  box-shadow: 0 0 10px rgba(217, 119, 6, 0.25); 
-  border: 1px solid rgba(251, 191, 36, 0.2); 
-}
-body.dark .pct-pill.pill-low { 
-  background: rgba(220, 38, 38, 0.15); 
-  color: #f87171; 
-  box-shadow: 0 0 10px rgba(220, 38, 38, 0.25); 
-  border: 1px solid rgba(248, 113, 113, 0.2); 
-}
-
-/* ────────────────────────────────────────────
-   23. RESPONSIVE
+   20. RESPONSIVE BASE & MOBILE LAYOUT
 ──────────────────────────────────────────── */
 @media(max-width:900px) {
   .shell { grid-template-columns: 1fr; }
   .sidebar { position: fixed; top: 0; left: 0; bottom: 0; z-index: 500; width: 280px; transform: translateX(-100%); transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1); height: 100vh; padding: 20px 0; }
   .sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-  body.dark .sidebar.open { box-shadow: 2px 0 20px rgba(0,0,0,.5); }
   .nav-item { padding: 12px 20px; margin: 0 12px; width: calc(100% - 24px); }
   .nav-section-label { padding: 12px 20px 6px; }
   .sidebar-filter { display: none; } /* Disembunyikan di sidebar krn filter mobile diletakkan di header */
@@ -894,11 +813,6 @@ body.dark .pct-pill.pill-low {
     padding: 14px; 
     box-shadow: var(--shadow-xs);
   }
-  body.dark .modal-table tr {
-    background: rgba(255, 255, 255, 0.03); 
-    border: 1px solid rgba(255, 255, 255, 0.08); 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  }
   .modal-table td { 
     display: flex; 
     justify-content: space-between; 
@@ -907,10 +821,6 @@ body.dark .pct-pill.pill-low {
     border-bottom: 1px dashed var(--border-2); 
     text-align: right !important; 
     background: transparent !important; 
-  }
-  body.dark .modal-table td {
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
-    color: #e2e8f0;
   }
   .modal-table td:last-child { border-bottom: none; padding-bottom: 0; }
   .modal-table td::before { 
@@ -921,68 +831,201 @@ body.dark .pct-pill.pill-low {
     color: var(--text-tertiary); 
     text-align: left; 
   }
-  body.dark .modal-table td::before {
-    color: #94a3b8;
-  }
 
   /* Main Table Data Sekolah Mobile Overrides */
   table { border: none; width: 100%; }
   .table-surface { background: transparent; border: none; box-shadow: none; overflow: visible; margin-bottom: 0; }
   thead { display: none; }
   tbody tr { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-md); margin: 0 0 16px 0; padding: 16px; box-shadow: var(--shadow-xs); }
-  body.dark tbody tr {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
   tbody td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-2); text-align: right !important; font-size: 13.5px; }
-  body.dark tbody td {
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
-  }
   tbody td:last-child { border-bottom: none; padding-bottom: 0; padding-top: 12px; }
   tbody td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; margin-right: 12px; }
   tbody td[data-label="#"], tbody td[data-label="Kualitas"] { display: none; }
   tbody td[data-label="Sekolah"] { flex-direction: column; align-items: flex-start; text-align: left !important; border-bottom: 2px solid var(--border-2); padding-bottom: 12px; margin-bottom: 4px; }
-  body.dark tbody td[data-label="Sekolah"] {
-    border-bottom: 2px solid rgba(255, 255, 255, 0.08);
-  }
   tbody td[data-label="Sekolah"]::before { display: none; }
   .td-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
   .btn-detail { width: 100%; justify-content: center; font-size: 13px; font-weight: 600; }
   tfoot tr { display: flex; flex-direction: column; background: var(--primary-dim); border: 1px solid rgba(37,99,235,.2); border-radius: var(--r-md); padding: 16px; margin: 0 0 16px 0; }
-  body.dark tfoot tr {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-  }
   tfoot td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(37,99,235,.2); text-align: right !important; font-size: 14px; background: transparent !important; }
-  body.dark tfoot td {
-    border-bottom: 1px dashed rgba(59, 130, 246, 0.15);
-  }
   tfoot td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-secondary); text-align: left; }
   tfoot td[data-label="#"], tfoot td[data-label="Aksi"], tfoot td[data-label="Kualitas"] { display: none; }
   tfoot td[data-label="Sekolah"] { flex-direction: row; border-bottom: 2px solid rgba(37,99,235,.2); padding-bottom: 12px; margin-bottom: 4px; color: var(--primary); font-size: 14px; justify-content: center; text-align: center !important; }
-  body.dark tfoot td[data-label="Sekolah"] {
-    border-bottom: 2px solid rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-  }
   tfoot td[data-label="Sekolah"]::before { display: none; }
   
   /* Chart adjustments */
   .hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px; border-radius: var(--r-md); }
+  .hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px dashed var(--border-2); padding-bottom: 6px; }
+  .hist-pct { font-size: 16px; text-align: right; }
+  .chart-wrap { height: 260px !important; }
+  .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
+  .chart-scroll-inner { width: 100% !important; height: 320px; } 
+}
+
+/* ────────────────────────────────────────────
+   21. ENTERPRISE DARK MODE: MOBILE + DESKTOP
+──────────────────────────────────────────── */
+
+/* 1. Base Overrides untuk Desktop & Common Elements */
+body.dark tbody tr:hover { background: rgba(255,255,255,.03); }
+body.dark .exec-banner { color: var(--text-secondary); }
+body.dark .chart-card, body.dark .kpi-card, body.dark .hero-metric, body.dark .table-surface, body.dark .conclusion-card, body.dark .analysis-card { border-color: var(--border); }
+body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .hero-stat { background: var(--surface-2); }
+body.dark .nav-item.active::before { background: var(--primary); }
+body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
+body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
+body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
+
+/* Premium Modal Overrides (Berlaku Desktop & Mobile secara Inheren) */
+body.dark .modal-overlay { 
+  background: rgba(2, 6, 23, 0.75); 
+  backdrop-filter: blur(8px); 
+}
+body.dark .modal-box {
+  background: #0f172a; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+body.dark .modal-header {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.dark .modal-title { color: #f8fafc; font-weight: 700; }
+body.dark .modal-close {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+body.dark .modal-close:hover {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(220, 38, 38, 0.5);
+  color: #fca5a5;
+}
+body.dark .modal-tabs {
+  background: #162032;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.dark .m-tab { color: #94a3b8; }
+body.dark .m-tab:hover { color: #e2e8f0; }
+body.dark .m-tab.active {
+  color: #60a5fa;
+  border-bottom-color: #60a5fa;
+}
+body.dark .modal-table th {
+  background: #1e293b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+body.dark .modal-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+body.dark .hist-row {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Premium Glow Badges for Dark Mode */
+body.dark .pct-pill.pill-high { 
+  background: rgba(22, 163, 74, 0.15); 
+  color: #4ade80; 
+  box-shadow: 0 0 10px rgba(22, 163, 74, 0.25); 
+  border: 1px solid rgba(74, 222, 128, 0.2); 
+}
+body.dark .pct-pill.pill-mid { 
+  background: rgba(217, 119, 6, 0.15); 
+  color: #fbbf24; 
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.25); 
+  border: 1px solid rgba(251, 191, 36, 0.2); 
+}
+body.dark .pct-pill.pill-low { 
+  background: rgba(220, 38, 38, 0.15); 
+  color: #f87171; 
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.25); 
+  border: 1px solid rgba(248, 113, 113, 0.2); 
+}
+
+/* 2. OVERRIDES SPESIFIK MOBILE DARK MODE (<900px & <768px) */
+@media (max-width: 900px) {
+  body.dark .sidebar {
+    background: #162032; /* Deep navy */
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+  body.dark .nav-item { color: #94a3b8; }
+  body.dark .nav-item:hover { background: rgba(255, 255, 255, 0.03); color: #e2e8f0; }
+  body.dark .nav-item.active { background: rgba(37, 99, 235, 0.15); color: #60a5fa; box-shadow: inset 3px 0 0 #3b82f6; }
+  body.dark .nav-icon { background: rgba(0,0,0,0.2); }
+  body.dark .nav-item.active .nav-icon { background: rgba(37, 99, 235, 0.25); color: #60a5fa; }
+}
+
+@media (max-width: 768px) {
+  /* Header & Topbar Mobile Dark Mode */
+  body.dark .header {
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  body.dark .ham span { background: #cbd5e1; }
+  body.dark .header-period-group {
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  }
+  
+  /* Buttons Mobile Dark Mode */
+  body.dark .btn-print { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; }
+  body.dark .btn-print:hover { background: rgba(255, 255, 255, 0.1); }
+  body.dark .btn-print[title="Keluar"] { background: rgba(220, 38, 38, 0.15); border-color: rgba(220, 38, 38, 0.3); color: #fca5a5; }
+  
+  /* Cards General Mobile Dark Mode */
+  body.dark .hero-metric, body.dark .kpi-card, body.dark .chart-card, body.dark .analysis-card, body.dark .conclusion-card {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  body.dark .hero-stat { background: #162032; border: 1px solid rgba(255, 255, 255, 0.05); }
+  
+  /* Main Table (Mobile Cards) Dark Mode */
+  body.dark tbody tr {
+    background: #162032;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+  body.dark tbody td { border-bottom: 1px dashed rgba(255, 255, 255, 0.04); color: #f8fafc; }
+  body.dark tbody td[data-label="Sekolah"] { border-bottom: 2px solid rgba(255, 255, 255, 0.08); }
+  body.dark tfoot tr {
+    background: rgba(37, 99, 235, 0.1);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  body.dark tfoot td { border-bottom: 1px dashed rgba(37, 99, 235, 0.15); }
+  body.dark tfoot td[data-label="Sekolah"] { border-bottom: 2px solid rgba(37, 99, 235, 0.3); color: #60a5fa; }
+  
+  /* Modal Table Mobile Overrides Dark Mode */
+  body.dark .modal-table tr { 
+    background: rgba(255, 255, 255, 0.03); 
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+  body.dark .modal-table td {
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+  }
+  body.dark .modal-table td::before { color: #94a3b8; }
+  
+  /* Hist Row Mobile Dark Mode */
   body.dark .hist-row {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
-  .hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px dashed var(--border-2); padding-bottom: 6px; }
-  body.dark .hist-period {
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
-    color: #f8fafc;
-  }
-  .hist-pct { font-size: 16px; text-align: right; }
-  .chart-wrap { height: 260px !important; }
-  .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
-  .chart-scroll-inner { width: 100% !important; height: 320px; } 
+  body.dark .hist-period { border-bottom: 1px dashed rgba(255, 255, 255, 0.06); color: #f8fafc; }
+
+  /* Badges & Insight Cards Mobile Dark Mode */
+  body.dark .insight-item { background: #162032; border: 1px solid rgba(255, 255, 255, 0.05); }
+  body.dark .duo-card { background: #162032; border: 1px solid rgba(255, 255, 255, 0.06); }
+  body.dark .duo-card.best { background: rgba(22, 163, 74, 0.1); border-color: rgba(22, 163, 74, 0.2); }
+  body.dark .duo-card.worst { background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.2); }
+  
+  /* Sort & Toolbar buttons Mobile Dark Mode */
+  body.dark .sort-btn { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; }
+  body.dark .sort-btn.active { background: #2563eb; border-color: #3b82f6; color: #fff; }
 }
 
 @media print {
