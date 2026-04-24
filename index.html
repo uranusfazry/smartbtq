@@ -2029,26 +2029,13 @@ function unlockOverlayBackground(force = false) {
   if (overlayLockCount === 0 || force) {
     overlayLockCount = 0;
     
-    // 1. Ambil posisi presisi langsung dari inline style top sebelum di-reset
-    const exactScrollY = Math.abs(parseInt(document.body.style.top || "0")) || scrollPosition;
-    
-    // 2. Matikan smooth scrolling global secara sementara untuk mencegah efek "flash/jump" dari atas
-    document.documentElement.style.scrollBehavior = 'auto';
-    
-    // 3. Unlock overlay
     document.body.classList.remove("overlay-lock");
     document.documentElement.classList.remove("overlay-lock");
     
     document.body.style.paddingRight = "";
     document.body.style.top = "";
     
-    // 4. Restore scroll secara instan di frame yang sama
-    window.scrollTo(0, exactScrollY);
-    
-    // 5. Kembalikan perilaku smooth scrolling CSS setelah posisi sudah stabil (tanpa disadari mata)
-    setTimeout(() => {
-      document.documentElement.style.scrollBehavior = '';
-    }, 10);
+    window.scrollTo(0, scrollPosition);
   }
 }
 
