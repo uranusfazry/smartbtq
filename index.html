@@ -903,6 +903,7 @@ tfoot td.c { text-align: center; }
 // GLOBAL STATE (100% FETCHED VIA API)
 // ────────────────────────────────────────────
 let DATABASE = {};
+const MONTH_ORDER = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 
 let currentYear = null, currentMonth = null;
 let selectedKecamatan = 'all';
@@ -996,10 +997,17 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwud19YXXiOwLztp-IpoEWp
 
 async function loadData() {
   try {
-    const res = await fetch(API_URL);
+    document.getElementById("r-title").textContent = "Memuat data dari server...";
+    document.getElementById("r-subtitle").textContent = "Mohon tunggu sebentar...";
+
+    const res = await fetch(API_URL + "?t=" + Date.now());
     const data = await res.json();
 
-    console.log("DATA API:", data);
+    console.log("DATA BACKEND:", data);
+
+    if (!data || Object.keys(data).length === 0) {
+      throw new Error("Data kosong dari backend");
+    }
 
     DATABASE = data;
 
@@ -1007,8 +1015,10 @@ async function loadData() {
 
     if(years.length > 0) {
       currentYear = years[0];
-      const months = Object.keys(DATABASE[currentYear]);
-      if(months.length > 0) currentMonth = months[months.length-1];
+      const availableMonths = MONTH_ORDER.filter(m => DATABASE[currentYear] && DATABASE[currentYear][m]);
+      if(availableMonths.length > 0) {
+        currentMonth = availableMonths[availableMonths.length - 1];
+      }
     }
 
     initDropdown();
@@ -1016,8 +1026,8 @@ async function loadData() {
 
   } catch (err) {
     console.error("ERROR FETCH:", err);
-    document.getElementById('r-title').textContent = "Gagal Memuat Data";
-    document.getElementById('r-subtitle').textContent = "Periksa koneksi internet atau ketersediaan Server Google Apps Script.";
+    document.getElementById('r-title').textContent = "Gagal mengambil data dari server";
+    document.getElementById('r-subtitle').textContent = "Tidak dapat mengambil data dari server";
   }
 }
 
@@ -1041,14 +1051,23 @@ function initDropdown() {
 
 function updateMonths() {
   const year = document.getElementById("selYear").value || currentYear;
-  const months = Object.keys(DATABASE[year] || {});
+  
+  // Pastikan urutan bulan selalu konsisten menggunakan konstanta
+  const availableMonths = MONTH_ORDER.filter(m => DATABASE[year] && DATABASE[year][m]);
+
+  // Validasi currentMonth jika menyeberang tahun dan bulan sebelumnya tidak ada
+  if (!availableMonths.includes(currentMonth)) {
+    currentMonth = availableMonths[0]; 
+  }
 
   const selMonth = document.getElementById("selMonth");
   const sbMonth = document.getElementById("sbMonth");
   
-  const opts = months.map(m => `<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join("");
+  const opts = availableMonths.map(m => `<option value="${m}"${m==currentMonth?' selected':''}>${m}</option>`).join("");
   if(selMonth) selMonth.innerHTML = opts;
   if(sbMonth) sbMonth.innerHTML = opts;
+
+  console.log("Selected:", year, currentMonth);
 }
 
 function syncSelects(kec, yr, mo) {
@@ -1124,24 +1143,40 @@ function showSection(id) {
 // RENDER UTAMA
 // ────────────────────────────────────────────
 function renderAll() {
+  if (!DATABASE || Object.keys(DATABASE).length === 0) {
+    console.warn("Data belum tersedia");
+    document.getElementById('r-title').textContent = "Data belum tersedia";
+    document.getElementById('r-subtitle').textContent = "Silakan periksa koneksi atau sumber data";
+    return;
+  }
+
   const year = document.getElementById("selYear").value || currentYear;
   const month = document.getElementById("selMonth").value || currentMonth;
 
   currentYear = year;
   currentMonth = month;
 
-  if (!DATABASE[year] || !DATABASE[year][month]) {
+  const data = DATABASE[year]?.[month];
+  
+  if (!data || data.length === 0) {
     console.warn("Data tidak ditemukan:", year, month);
+    document.getElementById('r-title').textContent = "Data belum tersedia pada periode ini";
+    document.getElementById('r-subtitle').textContent = `Periode ${month} ${year} kosong`;
+    
+    // Tampilkan Empty State secara bersih jika data diblacklist/kosong
+    document.getElementById('hero-pct').innerHTML = `-<sup>%</sup>`;
+    document.getElementById('hero-desc').innerHTML = 'Tidak ada data untuk dianalisis.';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--ink-3);">Data belum tersedia pada periode ini</td></tr>';
     return;
   }
-
-  const data = DATABASE[year][month];
   
   const rawMaster = data;
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
   let rawArr = rawMaster;
   if(selectedKecamatan!=='all') rawArr=rawArr.filter(s=>s.kecamatan===selectedKecamatan);
+  
+  // Mengurangi redudansi: Gunakan fungsi agregat satu kali saja
   currentSchools = aggregateSchools(rawArr);
   filteredSchools = [...currentSchools];
 
