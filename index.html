@@ -133,7 +133,7 @@ body:fullscreen { overflow-y: auto; }
   -webkit-touch-callout: none;
 }
 
-html { overflow-x: hidden; width: 100%; scroll-behavior: auto; font-size: 14px; }
+html { overflow-x: hidden; width: 100%; scroll-behavior: smooth; font-size: 14px; }
 body {
   font-family: 'Sora', system-ui, sans-serif;
   background: var(--bg);
@@ -812,7 +812,7 @@ body.dark .sidebar-filter {
       box-shadow: 0 12px 32px rgba(15,23,42,0.08);
   }
   body.dark .btn-close-fs {
-      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
   }
   .sidebar-filter {
       padding: 32px;
@@ -2003,7 +2003,7 @@ body.dark .loading-progress-value {
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title" id="modalTitle">Detail Sekolah</div>
-        <button class="modal-close" onclick="closeModal(event, true)">✕</button>
+        <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
       <div class="modal-tabs">
         <button class="m-tab active" onclick="switchTab(0)">Rekap Kelas</button>
@@ -2081,7 +2081,6 @@ let isLoading = false;
 // ────────────────────────────────────────────
 let scrollPosition = 0;
 let overlayLockCount = 0;
-let lastFocusedElement = null; // Menyimpan elemen yang terakhir ditekan
 
 function lockOverlayBackground() {
   if (overlayLockCount === 0) {
@@ -2112,7 +2111,6 @@ function unlockOverlayBackground(force = false) {
     document.body.style.paddingRight = "";
     document.body.style.top = "";
     
-    // Logika restore scroll position bawaan, modal akan override ini nanti jika lastFocusedElement aktif
     window.scrollTo(0, scrollPosition);
   }
 }
@@ -2899,7 +2897,7 @@ function renderTable() {
       <td data-label="Tidak Bisa" class="c" style="color:var(--danger)">${fmt(s.tidak)}</td>
       <td data-label="Kualitas" class="c" style="font-size:12px;white-space:nowrap">${qLabel}</td>
       <td data-label="Aksi" class="c" style="padding-top:12px;">
-        <button class="btn-detail" onclick="openModal(${s.no}, this)">Detail Sekolah</button>
+        <button class="btn-detail" onclick="openModal(${s.no})">Detail Sekolah</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -3092,7 +3090,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].no, null); },
+      onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].no); },
       scales: {
         x: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:10}}, border:{display:false} },
         y: { grid: {display: false}, ticks: {font:{size:10.5}}, border:{display:false} }
@@ -3117,13 +3115,13 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
   if(top10.length > 0 && bot1) {
     document.getElementById('bar-insight').innerHTML = `
       <div class="duo-grid">
-        <div class="duo-card best" onclick="openModal(${top10[0].no}, this)">
+        <div class="duo-card best" onclick="openModal(${top10[0].no})">
           <div class="duo-lbl">🏆 Terbaik</div>
           <div class="duo-name">${top10[0].nama}</div>
           <div class="duo-pct">${n2(top10[0].pct)}%</div>
           <div class="duo-meta">Kec. ${top10[0].kecamatan} · ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)} siswa</div>
         </div>
-        <div class="duo-card worst" onclick="openModal(${bot1.no}, this)">
+        <div class="duo-card worst" onclick="openModal(${bot1.no})">
           <div class="duo-lbl">⚠ Perhatian</div>
           <div class="duo-name">${bot1.nama}</div>
           <div class="duo-pct">${n2(bot1.pct)}%</div>
@@ -3156,7 +3154,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no, null); },
+      onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no); },
       scales: {
         x: { stacked: true, grid: {display: false}, ticks: {font:{size:9.5}, maxRotation:45}, border:{display:false} },
         y: { stacked: true, grid: {color: gridColorConfig}, border:{display:false} }
@@ -3335,11 +3333,9 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
 }
 
 // ────────────────────────────────────────────
-// MODAL DETAIL SEKOLAH (WITH POSITION RESTORE)
+// MODAL DETAIL SEKOLAH
 // ────────────────────────────────────────────
-function openModal(no, buttonElement = null) {
-  lastFocusedElement = buttonElement;
-  
+function openModal(no) {
   currentModalSchool = currentSchools.find(s => s.no === no);
   if(!currentModalSchool) return;
   document.getElementById('modalTitle').textContent = currentModalSchool.nama;
@@ -3428,22 +3424,6 @@ function closeModal(e) {
     if(overlay.classList.contains('open')) {
       overlay.classList.remove('open');
       unlockOverlayBackground();
-      
-      // Position Restore Precision Logic
-      setTimeout(() => {
-        if (lastFocusedElement) {
-           lastFocusedElement.scrollIntoView({
-               behavior: "instant",
-               block: "center"
-           });
-        } else {
-           window.scrollTo({
-               top: scrollPosition,
-               behavior: "instant"
-           });
-        }
-        lastFocusedElement = null; // Clean up
-      }, 50);
     }
   }
 }
