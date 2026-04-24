@@ -133,7 +133,7 @@ body:fullscreen { overflow-y: auto; }
   -webkit-touch-callout: none;
 }
 
-html { overflow-x: hidden; width: 100%; scroll-behavior: smooth; font-size: 14px; }
+html { overflow-x: hidden; width: 100%; scroll-behavior: auto; font-size: 14px; }
 body {
   font-family: 'Sora', system-ui, sans-serif;
   background: var(--bg);
@@ -749,6 +749,101 @@ body.dark .sidebar-filter {
 }
 
 /* ────────────────────────────────────────────
+   7.B EXECUTIVE DESKTOP HAMBURGER MENU
+──────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .sidebar {
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top left, rgba(37,99,235,0.05), transparent 35%),
+                  radial-gradient(circle at bottom right, rgba(59,130,246,0.04), transparent 40%),
+                  rgba(255,255,255,0.88);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+  }
+  .sidebar::-webkit-scrollbar {
+      width: 4px;
+  }
+  .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(148,163,184,0.25);
+      border-radius: 20px;
+  }
+  body.dark .sidebar {
+      background: radial-gradient(circle at top left, rgba(59,130,246,0.08), transparent 35%),
+                  radial-gradient(circle at bottom right, rgba(37,99,235,0.06), transparent 40%),
+                  rgba(15,23,42,0.88);
+  }
+  .sidebar-inner {
+      max-width: 820px;
+      padding: 52px 56px;
+      gap: 26px;
+      margin: 0 auto;
+      justify-content: flex-start;
+  }
+  .fs-brand {
+      margin-bottom: 12px;
+  }
+  .fs-brand h2 {
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+  }
+  .fs-brand p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-top: 10px;
+      font-weight: 500;
+  }
+  .nav-item {
+      min-height: 78px;
+      padding: 18px 24px;
+      border-radius: 20px;
+      font-size: 18px;
+      font-weight: 600;
+      gap: 18px;
+  }
+  .nav-item.active {
+      background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(37,99,235,0.03));
+      border: 1px solid rgba(37,99,235,0.12);
+      box-shadow: 0 8px 24px rgba(37,99,235,0.06);
+      transform: none;
+  }
+  body.dark .nav-item.active {
+      background: linear-gradient(135deg, rgba(96,165,250,0.12), rgba(96,165,250,0.04));
+      border-color: rgba(96,165,250,0.2);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transform: none;
+  }
+  .nav-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      font-size: 20px;
+  }
+  .btn-close-fs {
+      top: 34px;
+      right: 40px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      box-shadow: 0 12px 32px rgba(15,23,42,0.08);
+  }
+  body.dark .btn-close-fs {
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  }
+  .sidebar-filter {
+      margin-top: 10px;
+      padding: 30px;
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(15,23,42,0.04);
+  }
+  body.dark .sidebar-filter {
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  }
+}
+
+/* ────────────────────────────────────────────
    8. MAIN CONTENT AREA
 ──────────────────────────────────────────── */
 .main { width: 100%; max-width: 1500px; margin: 0 auto; padding: 32px 36px 64px; min-width: 0; }
@@ -1000,10 +1095,84 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 .modal-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-2); color: var(--text-primary); }
 .modal-table tr:last-child td { border-bottom: none; }
 .modal-table tr:nth-child(even) td { background: var(--bg); }
-.hist-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: var(--r-sm); margin-bottom: 6px; background: var(--surface-2); border: 1px solid var(--border-2); }
-.hist-period { font-weight: 500; font-size: 13px; color: var(--text-primary); }
-.hist-pct { font-size: 13px; font-weight: 700; }
-.hist-diff { font-size: 11.5px; font-weight: 500; }
+.hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px; border-radius: var(--r-md); }
+.hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px dashed var(--border-2); padding-bottom: 6px; }
+.hist-pct { font-size: 16px; text-align: right; }
+.chart-wrap { height: 260px !important; }
+.chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
+.chart-scroll-inner { width: 100% !important; height: 320px; } 
+
+  /* ────────────────────────────────────────────
+     MOBILE FULLSCREEN MENU UPGRADE (ENTERPRISE)
+  ──────────────────────────────────────────── */
+  @media (max-width: 768px) {
+  .sidebar {
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  .sidebar-inner {
+    width: 100%;
+    max-width: 100%;
+    padding: 28px 24px 32px;
+    margin: 0;
+    gap: 28px;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+  .btn-close-fs {
+    top: 18px;
+    right: 18px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(148,163,184,0.18);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.08);
+    z-index: 9999;
+  }
+  .fs-brand {
+    text-align: left;
+    padding-top: 32px;
+    padding-right: 56px;
+  }
+  .fs-brand h2 {
+    font-size: 42px;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+  }
+  .fs-brand p {
+    font-size: 15px;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .nav-item {
+    padding: 18px 20px;
+    border-radius: 22px;
+    gap: 18px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .nav-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    font-size: 20px;
+  }
+  .sidebar-filter {
+    margin-top: 8px;
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+}
+
 
 /* ────────────────────────────────────────────
    18. DQ BANNER
@@ -1215,76 +1384,8 @@ body.dark .fs-btn-dismiss:hover { background: rgba(255,255,255,0.05); color: var
   .chart-wrap { height: 260px !important; }
   .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
   .chart-scroll-inner { width: 100% !important; height: 320px; } 
-
-  /* ────────────────────────────────────────────
-     MOBILE FULLSCREEN MENU UPGRADE (ENTERPRISE)
-  ──────────────────────────────────────────── */
-  .sidebar {
-    align-items: flex-start;
-    justify-content: flex-start;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .sidebar::-webkit-scrollbar {
-    display: none;
-  }
-  .sidebar-inner {
-    width: 100%;
-    max-width: 100%;
-    padding: 28px 24px 32px;
-    margin: 0;
-    gap: 28px;
-    justify-content: flex-start;
-    align-items: stretch;
-  }
-  .btn-close-fs {
-    top: 18px;
-    right: 18px;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(148,163,184,0.18);
-    box-shadow: 0 8px 24px rgba(15,23,42,0.08);
-    z-index: 9999;
-  }
-  .fs-brand {
-    text-align: left;
-    padding-top: 32px;
-    padding-right: 56px;
-  }
-  .fs-brand h2 {
-    font-size: 42px;
-    line-height: 1.05;
-    letter-spacing: -1.5px;
-  }
-  .fs-brand p {
-    font-size: 15px;
-    margin-top: 10px;
-    line-height: 1.5;
-  }
-  .nav-item {
-    padding: 18px 20px;
-    border-radius: 22px;
-    gap: 18px;
-    font-size: 17px;
-    font-weight: 600;
-  }
-  .nav-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 16px;
-    font-size: 20px;
-  }
-  .sidebar-filter {
-    margin-top: 8px;
-    padding: 22px 18px;
-    border-radius: 22px;
-  }
 }
+
 
 /* ────────────────────────────────────────────
    21. ENTERPRISE DARK MODE: MOBILE + DESKTOP
@@ -2001,7 +2102,7 @@ body.dark .loading-progress-value {
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title" id="modalTitle">Detail Sekolah</div>
-        <button class="modal-close" onclick="closeModal()">✕</button>
+        <button class="modal-close" onclick="closeModal(event)">✕</button>
       </div>
       <div class="modal-tabs">
         <button class="m-tab active" onclick="switchTab(0)">Rekap Kelas</button>
@@ -2079,6 +2180,7 @@ let isLoading = false;
 // ────────────────────────────────────────────
 let scrollPosition = 0;
 let overlayLockCount = 0;
+let lastFocusedElement = null; // Menyimpan elemen yang terakhir ditekan
 
 function lockOverlayBackground() {
   if (overlayLockCount === 0) {
@@ -2109,7 +2211,11 @@ function unlockOverlayBackground(force = false) {
     document.body.style.paddingRight = "";
     document.body.style.top = "";
     
-    window.scrollTo(0, scrollPosition);
+    // Logika restore scroll position bawaan secara instant
+    window.scrollTo({
+        top: scrollPosition,
+        behavior: "auto"
+    });
   }
 }
 
@@ -2895,7 +3001,7 @@ function renderTable() {
       <td data-label="Tidak Bisa" class="c" style="color:var(--danger)">${fmt(s.tidak)}</td>
       <td data-label="Kualitas" class="c" style="font-size:12px;white-space:nowrap">${qLabel}</td>
       <td data-label="Aksi" class="c" style="padding-top:12px;">
-        <button class="btn-detail" onclick="openModal(${s.no})">Detail Sekolah</button>
+        <button class="btn-detail" onclick="openModal(${s.no}, this)">Detail Sekolah</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -3088,7 +3194,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].no); },
+      onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].no, null); },
       scales: {
         x: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:10}}, border:{display:false} },
         y: { grid: {display: false}, ticks: {font:{size:10.5}}, border:{display:false} }
@@ -3113,13 +3219,13 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
   if(top10.length > 0 && bot1) {
     document.getElementById('bar-insight').innerHTML = `
       <div class="duo-grid">
-        <div class="duo-card best" onclick="openModal(${top10[0].no})">
+        <div class="duo-card best" onclick="openModal(${top10[0].no}, this)">
           <div class="duo-lbl">🏆 Terbaik</div>
           <div class="duo-name">${top10[0].nama}</div>
           <div class="duo-pct">${n2(top10[0].pct)}%</div>
           <div class="duo-meta">Kec. ${top10[0].kecamatan} · ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)} siswa</div>
         </div>
-        <div class="duo-card worst" onclick="openModal(${bot1.no})">
+        <div class="duo-card worst" onclick="openModal(${bot1.no}, this)">
           <div class="duo-lbl">⚠ Perhatian</div>
           <div class="duo-name">${bot1.nama}</div>
           <div class="duo-pct">${n2(bot1.pct)}%</div>
@@ -3152,7 +3258,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no); },
+      onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no, null); },
       scales: {
         x: { stacked: true, grid: {display: false}, ticks: {font:{size:9.5}, maxRotation:45}, border:{display:false} },
         y: { stacked: true, grid: {color: gridColorConfig}, border:{display:false} }
@@ -3331,9 +3437,11 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
 }
 
 // ────────────────────────────────────────────
-// MODAL DETAIL SEKOLAH
+// MODAL DETAIL SEKOLAH (WITH POSITION RESTORE)
 // ────────────────────────────────────────────
-function openModal(no) {
+function openModal(no, buttonElement = null) {
+  lastFocusedElement = buttonElement;
+  
   currentModalSchool = currentSchools.find(s => s.no === no);
   if(!currentModalSchool) return;
   document.getElementById('modalTitle').textContent = currentModalSchool.nama;
@@ -3417,11 +3525,28 @@ function renderModalTab(idx) {
 }
 
 function closeModal(e) {
-  if (!e || e.target === document.getElementById('modalOverlay') || !e.target) {
+  // Hanya tutup jika klik overlay transparan, tekan ESC (!e), atau klik tepat tombol silang (X)
+  if (!e || e.target === document.getElementById('modalOverlay') || e.target.closest('.modal-close')) {
     const overlay = document.getElementById('modalOverlay');
     if(overlay.classList.contains('open')) {
       overlay.classList.remove('open');
       unlockOverlayBackground();
+      
+      // Position Restore Precision Logic (Premium Snap)
+      setTimeout(() => {
+        if (lastFocusedElement) {
+           lastFocusedElement.scrollIntoView({
+               behavior: "auto",
+               block: "center"
+           });
+           lastFocusedElement = null; // Clean up state
+        } else {
+           window.scrollTo({
+               top: scrollPosition,
+               behavior: "auto"
+           });
+        }
+      }, 10);
     }
   }
 }
