@@ -379,7 +379,7 @@ body {
   background-color: #ffffff;
 }
 
-/* Fallback/Overrides untuk dark mode Desktop (Mobile di section terpisah) */
+/* Fallback/Overrides untuk dark mode Desktop */
 body.dark .sel { 
   background-color: var(--surface-2);
   border-color: var(--border);
@@ -861,11 +861,11 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   .chart-scroll-inner { width: 100% !important; height: 320px; } 
 }
 
+
 /* ────────────────────────────────────────────
    21. ENTERPRISE DARK MODE: MOBILE + DESKTOP
 ──────────────────────────────────────────── */
-
-/* 1. Base Overrides untuk Desktop & Common Elements */
+/* Base Overrides untuk Desktop & Common Elements */
 body.dark tbody tr:hover { background: rgba(255,255,255,.03); }
 body.dark .exec-banner { color: var(--text-secondary); }
 body.dark .chart-card, body.dark .kpi-card, body.dark .hero-metric, body.dark .table-surface, body.dark .conclusion-card, body.dark .analysis-card { border-color: var(--border); }
@@ -943,7 +943,7 @@ body.dark .pct-pill.pill-low {
   border: 1px solid rgba(248, 113, 113, 0.2); 
 }
 
-/* 2. OVERRIDES SPESIFIK MOBILE DARK MODE (<900px & <768px) */
+/* OVERRIDES SPESIFIK MOBILE DARK MODE (<900px & <768px) */
 @media (max-width: 900px) {
   body.dark .sidebar {
     background: #162032; /* Deep navy */
@@ -1028,6 +1028,143 @@ body.dark .pct-pill.pill-low {
   body.dark .sort-btn.active { background: #2563eb; border-color: #3b82f6; color: #fff; }
 }
 
+
+/* ────────────────────────────────────────────
+   22. PREMIUM LOADING OVERLAY & FREEZE
+──────────────────────────────────────────── */
+body.ui-frozen {
+  overflow: hidden !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+.global-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(248, 250, 252, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body.dark .global-loading {
+  background: rgba(2, 6, 23, 0.6);
+}
+
+.global-loading.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 32px 40px;
+  box-shadow: 0 24px 48px rgba(15,23,42,0.08), 0 8px 16px rgba(15,23,42,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transform: scale(0.95) translateY(10px);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  max-width: 340px;
+  width: 90%;
+}
+
+body.dark .loading-card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 32px 64px rgba(0,0,0,0.5), 0 12px 24px rgba(0,0,0,0.3);
+  /* Glass effect */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.global-loading.active .loading-card {
+  transform: scale(1) translateY(0);
+}
+
+.loading-spinner-box {
+  margin-bottom: 24px;
+}
+
+.premium-spinner {
+  animation: rotate 2s linear infinite;
+  width: 48px;
+  height: 48px;
+}
+
+.premium-spinner .path {
+  stroke: var(--primary);
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes dash {
+  0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+}
+
+.loading-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  margin-bottom: 8px;
+}
+
+.loading-subtitle {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+.loading-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+body.dark .loading-progress-bar {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.loading-progress-value {
+  width: 40%;
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  position: absolute;
+  animation: progressIndeterminate 1.5s ease-in-out infinite;
+}
+
+body.dark .loading-progress-value {
+  background: #60a5fa;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.4);
+}
+
+@keyframes progressIndeterminate {
+  0% { left: -40%; width: 40%; }
+  50% { left: 30%; width: 60%; }
+  100% { left: 100%; width: 40%; }
+}
+
 @media print {
   .shell { display: block; }
   .header { position: relative; }
@@ -1038,6 +1175,7 @@ body.dark .pct-pill.pill-low {
   body.dark { background: white !important; color: #000 !important; }
   #darkToggleBtn { display: none !important; }
   #loginView { display: none !important; }
+  .global-loading { display: none !important; }
 }
 </style>
 </head>
@@ -1485,6 +1623,24 @@ body.dark .pct-pill.pill-low {
   </div>
 </div>
 
+<!-- ═══════════════ GLOBAL LOADING OVERLAY ═══════════════ -->
+<div id="globalLoadingOverlay" class="global-loading">
+  <div class="loading-card">
+    <div class="loading-spinner-box">
+      <svg class="premium-spinner" viewBox="0 0 50 50">
+        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+      </svg>
+    </div>
+    <div class="loading-text-content">
+      <div class="loading-title">Memperbarui Data...</div>
+      <div class="loading-subtitle">Sedang menyinkronkan data terbaru</div>
+    </div>
+    <div class="loading-progress-bar">
+      <div class="loading-progress-value"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ SCRIPT YG SUDAH DIPERBAIKI (REFACTORED) ═══════════════ -->
 <script>
 // ────────────────────────────────────────────
@@ -1507,6 +1663,9 @@ let stackDisplayMode = 'top20';
 let charts = {};
 let barChartActiveData = [], stackChartActiveData = [];
 let currentModalSchool = null;
+
+// Premium Loading Lock State
+let isLoading = false;
 
 // ────────────────────────────────────────────
 // INIT & APP ROUTING (LOGIN / DASHBOARD)
@@ -1537,7 +1696,7 @@ function showLoginView() {
 
 function doLogout() {
   localStorage.removeItem('isLogin');
-  window.location.reload(); // Reload untuk mereset seluruh state memori dashboard
+  window.location.reload(); 
 }
 
 // ────────────────────────────────────────────
@@ -1618,7 +1777,7 @@ function setupLoginLogic() {
           // Switch view
           showDashboardView();
           
-          // Clear password input untuk keamanan di background
+          // Clear password input
           passwordEl.value = '';
           btnText.textContent = 'Masuk';
           btnSubmit.disabled = false;
@@ -1649,9 +1808,15 @@ function setupLoginLogic() {
 // DASHBOARD DATA INIT & EVENT LISTENERS
 // ────────────────────────────────────────────
 async function initDashboard() {
+  if (isLoading) return;
   try {
     showLoading();
-    const res = await fetch(API_URL);
+    // Menggunakan Promise.all agar UI loading setidaknya bertahan 800ms
+    // untuk menghindari flash (kedipan) jika internet sangat cepat.
+    const [res] = await Promise.all([
+        fetch(API_URL),
+        new Promise(resolve => setTimeout(resolve, 800))
+    ]);
     DATABASE = await res.json();
 
     // Setup tahun default
@@ -1659,7 +1824,6 @@ async function initDashboard() {
     if (years.length > 0) {
       currentYear = years[0];
       
-      // Pilih bulan terakhir yang tersedia di tahun tersebut
       const availableMonths = MONTH_ORDER.filter(m => DATABASE[currentYear][m]);
       if (availableMonths.length > 0) {
         currentMonth = availableMonths[availableMonths.length - 1];
@@ -1678,6 +1842,8 @@ async function initDashboard() {
   } catch (err) {
     console.error("Init Error:", err);
     showError();
+  } finally {
+    hideLoading();
   }
 }
 
@@ -1691,6 +1857,7 @@ function setupEventListeners() {
   const sbKec = document.getElementById("sbKecamatan");
 
   const handleYearChange = (e) => {
+    if (isLoading) { e.preventDefault(); return; }
     currentYear = e.target.value;
     if (selTahun) selTahun.value = currentYear;
     if (sbTahun) sbTahun.value = currentYear;
@@ -1700,6 +1867,7 @@ function setupEventListeners() {
   };
 
   const handleMonthChange = (e) => {
+    if (isLoading) { e.preventDefault(); return; }
     currentMonth = e.target.value;
     if (selBulan) selBulan.value = currentMonth;
     if (sbBulan) sbBulan.value = currentMonth;
@@ -1708,6 +1876,7 @@ function setupEventListeners() {
   };
 
   const handleKecChange = (e) => {
+    if (isLoading) { e.preventDefault(); return; }
     selectedKecamatan = e.target.value;
     if (selKec) selKec.value = selectedKecamatan;
     if (sbKec) sbKec.value = selectedKecamatan;
@@ -1715,11 +1884,14 @@ function setupEventListeners() {
     stackDisplayMode = selectedKecamatan === 'all' ? 'top20' : 'all';
     
     if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-        renderUI(DATABASE[currentYear][currentMonth]);
+        // Simulasi network delay khusus untuk interaksi lokal 
+        // sehingga user merasakan feedback enterprise yg smooth
+        triggerLocalLoading(() => {
+            renderUI(DATABASE[currentYear][currentMonth]);
+        });
     }
   };
 
-  // Bersihkan event listener lama jika dipanggil lagi
   if (selTahun) selTahun.onchange = handleYearChange;
   if (sbTahun) sbTahun.onchange = handleYearChange;
   if (selBulan) selBulan.onchange = handleMonthChange;
@@ -1728,41 +1900,63 @@ function setupEventListeners() {
   if (sbKec) sbKec.onchange = handleKecChange;
 }
 
-
 // ────────────────────────────────────────────
 // FETCH & UI STATES (LOADING/ERROR/EMPTY)
 // ────────────────────────────────────────────
+
+// Premium Global UI Freeze Loading
+function showLoading() {
+  isLoading = true;
+  document.body.classList.add('ui-frozen');
+  const overlay = document.getElementById('globalLoadingOverlay');
+  if(overlay) overlay.classList.add('active');
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('globalLoadingOverlay');
+  if(overlay) overlay.classList.remove('active');
+  
+  // Wait untuk menyelesaikan animasi CSS fade out overlay
+  setTimeout(() => {
+     document.body.classList.remove('ui-frozen');
+     isLoading = false;
+  }, 400); 
+}
+
+function triggerLocalLoading(callback) {
+  if (isLoading) return;
+  showLoading();
+  setTimeout(() => {
+      callback();
+      hideLoading();
+  }, 700); // Waktu yang pas agar blur background sempat dirender penuh
+}
+
 async function loadData(year, month) {
+  if (isLoading) return;
   try {
     showLoading();
     
-    const res = await fetch(API_URL);
+    const [res] = await Promise.all([
+        fetch(API_URL),
+        new Promise(resolve => setTimeout(resolve, 800))
+    ]);
     const data = await res.json();
     
     DATABASE = data; 
 
     if (!data[year] || !data[year][month]) {
       showEmpty();
-      return;
+    } else {
+      console.log("Selected:", year, month); 
+      renderUI(data[year][month]);
     }
-
-    console.log("Selected:", year, month); 
-    renderUI(data[year][month]);
-    
   } catch (err) {
     console.error("Fetch API Error:", err);
     showError();
+  } finally {
+    hideLoading();
   }
-}
-
-// STATE HANDLERS
-function showLoading() {
-  document.getElementById("r-title").textContent = "Loading data...";
-  document.getElementById("r-subtitle").textContent = "Sedang menyinkronkan dengan server...";
-  document.getElementById("hero-pct").innerHTML = `-<sup>%</sup>`;
-  document.getElementById("hero-desc").innerHTML = "Memproses metrik...";
-  document.getElementById("dqBanner").classList.add("hidden");
-  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Loading data...</td></tr>`;
 }
 
 function showError() {
@@ -1770,7 +1964,7 @@ function showError() {
   document.getElementById("r-subtitle").textContent = "Terjadi masalah koneksi atau konfigurasi API.";
   document.getElementById("hero-pct").innerHTML = `Err`;
   document.getElementById("hero-desc").innerHTML = "Data gagal dimuat.";
-  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--danger)">Gagal mengambil data</td></tr>`;
+  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--danger)">Gagal mengambil data dari server. Pastikan API responsif.</td></tr>`;
 }
 
 function showEmpty() {
@@ -1778,7 +1972,7 @@ function showEmpty() {
   document.getElementById("r-subtitle").textContent = `Data kosong untuk ${currentMonth} ${currentYear}`;
   document.getElementById("hero-pct").innerHTML = `-<sup>%</sup>`;
   document.getElementById("hero-desc").innerHTML = "Silakan pilih bulan atau tahun lain pada menu.";
-  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia</td></tr>`;
+  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di periode tersebut</td></tr>`;
 }
 
 // ────────────────────────────────────────────
@@ -2646,9 +2840,6 @@ document.addEventListener('keydown', e => {
 (function() {
   'use strict';
 
-  // ─────────────────────────────────────────
-  // 1. DARK MODE SYSTEM
-  // ─────────────────────────────────────────
   const DARK_KEY = 'smartbtq_darkmode';
 
   function applyDark(isDark) {
@@ -2659,7 +2850,6 @@ document.addEventListener('keydown', e => {
       btn.title = isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode';
     }
 
-    // Update Chart.js defaults jika chart sudah dirender
     if (window.Chart) {
       const textColor = isDark ? '#94a3b8' : '#94a3b8';
       const gridColor = isDark ? '#334155' : '#e2e8f0';
@@ -2673,11 +2863,8 @@ document.addEventListener('keydown', e => {
     localStorage.setItem(DARK_KEY, isDark ? '1' : '0');
     applyDark(isDark);
 
-    // Re-render charts dengan warna yang benar setelah mode berubah
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
-      
-      // Paksa render ulang UI agar grid ChartJS ikut mengambil warna dark mode terbaru
       if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
         renderUI(DATABASE[currentYear][currentMonth]);
       }
@@ -2686,15 +2873,11 @@ document.addEventListener('keydown', e => {
 
   function initDarkMode() {
     const stored = localStorage.getItem(DARK_KEY);
-    // Cek system preference jika belum ada pilihan
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const isDark = stored !== null ? stored === '1' : prefersDark;
     applyDark(isDark);
   }
 
-  // ─────────────────────────────────────────
-  // 2. INJECT DARK TOGGLE BUTTON KE HEADER
-  // ─────────────────────────────────────────
   function injectDarkToggle() {
     const headerRight = document.querySelector('.header-right');
     if (!headerRight || document.getElementById('darkToggleBtn')) return;
@@ -2706,7 +2889,6 @@ document.addEventListener('keydown', e => {
     btn.textContent = '🌙';
     btn.onclick = toggleDark;
 
-    // Insert sebelum btn-print pertama
     const firstBtn = headerRight.querySelector('.btn-print');
     if (firstBtn) {
       headerRight.insertBefore(btn, firstBtn);
@@ -2715,9 +2897,6 @@ document.addEventListener('keydown', e => {
     }
   }
 
-  // ─────────────────────────────────────────
-  // 3. KEYBOARD SHORTCUT: Ctrl+D = toggle dark
-  // ─────────────────────────────────────────
   document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
       e.preventDefault();
@@ -2725,20 +2904,13 @@ document.addEventListener('keydown', e => {
     }
   });
 
-  // ─────────────────────────────────────────
-  // 4. WATCH SYSTEM DARK MODE CHANGE
-  // ─────────────────────────────────────────
   const mq = window.matchMedia('(prefers-color-scheme: dark)');
   mq.addEventListener('change', function(e) {
-    // Hanya ikuti system jika user belum memilih
     if (localStorage.getItem(DARK_KEY) === null) {
       applyDark(e.matches);
     }
   });
 
-  // ─────────────────────────────────────────
-  // 5. INIT — tunggu DOM siap
-  // ─────────────────────────────────────────
   function init() {
     initDarkMode();
     injectDarkToggle();
@@ -2750,8 +2922,6 @@ document.addEventListener('keydown', e => {
     init();
   }
 
-  // Karena dashboard muncul setelah login (display toggled),
-  // kita observe perubahan visibility pada dashboardView
   const observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(m) {
       if (m.attributeName === 'style' && m.target.id === 'dashboardView') {
@@ -2767,7 +2937,6 @@ document.addEventListener('keydown', e => {
   if (dashEl) {
     observer.observe(dashEl, { attributes: true });
   } else {
-    // Fallback: observe body untuk dashboardView
     const bodyObserver = new MutationObserver(function() {
       const d = document.getElementById('dashboardView');
       if (d) {
@@ -2778,7 +2947,6 @@ document.addEventListener('keydown', e => {
     });
     bodyObserver.observe(document.body, { childList: true, subtree: true });
   }
-
 })();
 </script>
 </body>
