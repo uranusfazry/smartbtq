@@ -248,7 +248,7 @@ a {
 }
 
 #loginView .login-wrapper {
-  position: relative; z-index: 1; width: 100%; max-width: 420px;
+  position: relative; z-index: 1; width: 100%; max-width: 440px;
   animation: loginEntranceAnim 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -260,40 +260,40 @@ a {
 #loginView .login-card {
   position: relative;
   background: var(--log-surface);
-  border-radius: 28px;
+  border-radius: 24px;
   box-shadow: var(--log-shadow-card);
-  padding: 44px 40px 40px;
+  padding: 32px 36px 28px;
   border: 1px solid var(--log-card-border, rgba(255,255,255,0.8));
   transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, border-radius 0.35s ease;
 }
 
-#loginView .brand { text-align: center; margin-bottom: 36px; }
+#loginView .brand { text-align: center; margin-bottom: 24px; }
 #loginView .brand-logo {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 52px; height: 52px; background: var(--log-blue-dim);
-  border-radius: 14px; margin-bottom: 18px;
+  width: 48px; height: 48px; background: var(--log-blue-dim);
+  border-radius: 12px; margin-bottom: 14px;
   transition: background 0.35s ease, box-shadow 0.35s ease, border 0.35s ease;
 }
-#loginView .brand-logo svg { width: 26px; height: 26px; }
-#loginView .brand-name { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; line-height: 1; margin-bottom: 8px; }
+#loginView .brand-logo svg { width: 24px; height: 24px; }
+#loginView .brand-name { font-size: 24px; font-weight: 700; letter-spacing: -0.6px; line-height: 1; margin-bottom: 6px; }
 #loginView .brand-name .dark { color: var(--log-ink-1); }
 #loginView .brand-name .blue { color: var(--log-blue); }
-#loginView .brand-sub { font-size: 13px; color: var(--log-ink-3); font-weight: 400; line-height: 1.5; }
-#loginView .department-text { margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--log-dept, #64748b); letter-spacing: 0.2px; transition: color 0.35s ease; }
-#loginView .divider { height: 1px; background: var(--log-border); margin-bottom: 28px; opacity: 0.6; }
-#loginView .form-group { margin-bottom: 18px; }
-#loginView label { display: block; font-size: 13px; font-weight: 600; color: var(--log-ink-2); margin-bottom: 7px; letter-spacing: 0.1px; }
+#loginView .brand-sub { font-size: 13px; color: var(--log-ink-3); font-weight: 400; line-height: 1.4; }
+#loginView .department-text { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--log-dept, #64748b); letter-spacing: 0.2px; transition: color 0.35s ease; }
+#loginView .divider { height: 1px; background: var(--log-border); margin-bottom: 20px; opacity: 0.6; }
+#loginView .form-group { margin-bottom: 14px; }
+#loginView label { display: block; font-size: 12.5px; font-weight: 600; color: var(--log-ink-2); margin-bottom: 6px; letter-spacing: 0.1px; }
 #loginView .input-wrap { position: relative; }
 #loginView .input-icon {
-  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
   color: var(--log-ink-4); display: flex; align-items: center; pointer-events: none; transition: color .2s;
 }
 #loginView .input-wrap:focus-within .input-icon { color: var(--log-blue); }
 
 #loginView input[type="text"],
 #loginView input[type="password"] {
-  width: 100%; padding: 12px 14px 12px 42px; font-family: var(--log-font);
-  font-size: 14px; font-weight: 500; color: var(--log-ink-1);
+  width: 100%; padding: 10px 14px 10px 40px; font-family: var(--log-font);
+  font-size: 13.5px; font-weight: 500; color: var(--log-ink-1);
   background: var(--log-input-bg, #fafbfc); border: 1.5px solid var(--log-border);
   border-radius: 10px; outline: none; transition: var(--log-transition), background 0.35s ease, border-color 0.35s ease, color 0.35s ease; -webkit-appearance: none;
 }
@@ -305,10 +305,10 @@ a {
 
 #loginView input[type="text"]::placeholder,
 #loginView input[type="password"]::placeholder { color: var(--log-ink-4); font-weight: 400; }
-#loginView input.has-toggle { padding-right: 46px; }
+#loginView input.has-toggle { padding-right: 42px; }
 
 #loginView .toggle-pw {
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
   background: none; border: none; cursor: pointer; color: var(--log-ink-4);
   padding: 4px; display: flex; align-items: center; justify-content: center;
   border-radius: 6px; transition: color .15s, background .15s;
@@ -327,8 +327,8 @@ a {
 @keyframes fadeInMsg { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
 #loginView .btn-submit {
-  width: 100%; margin-top: 22px; padding: 13px 20px; background: var(--log-blue);
-  color: #fff; font-family: var(--log-font); font-size: 14.5px; font-weight: 600;
+  width: 100%; margin-top: 16px; padding: 11px 20px; background: var(--log-blue);
+  color: #fff; font-family: var(--log-font); font-size: 14px; font-weight: 600;
   border: none; border-radius: 10px; cursor: pointer; letter-spacing: 0.1px;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   transition: background .18s, transform .15s, box-shadow .18s;
@@ -361,37 +361,30 @@ a {
 
 /* Premium Legal Footer */
 #loginView .login-footer { 
-  margin-top: 32px; 
-  padding-top: 24px;
+  margin-top: 20px; 
+  padding-top: 16px;
   border-top: 1px solid var(--log-border);
   text-align: center; 
   transition: color 0.35s ease, border-color 0.35s ease;
 }
 #loginView .login-footer .owner-name {
-  font-size: 15.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--log-footer-name, #1e293b);
-  margin-bottom: 6px;
-  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
   transition: color 0.35s ease;
 }
 #loginView .login-footer .owner-role {
-  font-size: 13.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--log-footer-role, #475569);
   margin-bottom: 2px;
   transition: color 0.35s ease;
 }
 #loginView .login-footer .school-name {
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: var(--log-footer-school, #64748b);
-  transition: color 0.35s ease;
-}
-#loginView .login-footer .system-desc {
-  margin-top: 14px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--log-footer-desc, #94a3b8);
   transition: color 0.35s ease;
 }
 
@@ -400,27 +393,27 @@ a {
 ──────────────────────────────────────────── */
 .log-theme-toggle {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 18px;
+  right: 18px;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 9px 14px;
-  border-radius: 16px;
+  padding: 8px 12px;
+  border-radius: 14px;
   background: rgba(15, 23, 42, 0.04);
   border: 1px solid rgba(15, 23, 42, 0.06);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   z-index: 10;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #475569;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 .log-theme-toggle svg { 
-  width: 15px; 
-  height: 15px; 
+  width: 14px; 
+  height: 14px; 
   flex-shrink: 0; 
 }
 .log-theme-toggle:hover {
@@ -452,7 +445,6 @@ body.dark #loginView {
   --log-footer-name: #ffffff;
   --log-footer-role: #cbd5e1;
   --log-footer-school: #94a3b8;
-  --log-footer-desc: #64748b;
   
   background: radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 30%),
               radial-gradient(circle at bottom right, rgba(59,130,246,0.06), transparent 35%),
@@ -461,7 +453,7 @@ body.dark #loginView {
 }
 
 body.dark #loginView .login-card {
-  border-radius: 28px;
+  border-radius: 24px;
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
 }
@@ -515,20 +507,20 @@ body.dark .log-theme-toggle:hover {
 }
 
 @media (max-width: 480px) {
-  #loginView .login-card { padding: 32px 24px 28px; border-radius: 24px; }
-  body.dark #loginView .login-card { border-radius: 24px; }
-  #loginView .brand-name { font-size: 23px; }
+  #loginView .login-card { padding: 28px 24px 24px; border-radius: 20px; }
+  body.dark #loginView .login-card { border-radius: 20px; }
+  #loginView .brand-name { font-size: 22px; }
   
   .log-theme-toggle {
-    top: 16px;
-    right: 16px;
-    padding: 7px 12px;
-    font-size: 12px;
+    top: 14px;
+    right: 14px;
+    padding: 6px 10px;
+    font-size: 11.5px;
   }
   .log-theme-toggle svg { width: 13px; height: 13px; }
 }
 @media (max-width: 360px) {
-  #loginView .login-card { padding: 28px 18px; }
+  #loginView .login-card { padding: 24px 18px; }
 }
 
 /* ────────────────────────────────────────────
