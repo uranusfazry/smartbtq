@@ -1836,13 +1836,13 @@ body.dark .loading-progress-value {
             <span class="kpi-badge" id="kpi-pct-lancar"></span>
           </div>
           <div class="kpi-card accent-amber">
-            <div class="kpi-label">Perlu Pendampingan</div>
+            <div class="kpi-label">Memerlukan Penguatan Pembelajaran</div>
             <div class="kpi-value" id="kpi-belum">–</div>
             <div class="kpi-sub">siswa belum lancar membaca</div>
             <span class="kpi-badge" id="kpi-pct-belum"></span>
           </div>
           <div class="kpi-card accent-red">
-            <div class="kpi-label">Intervensi Darurat</div>
+            <div class="kpi-label">Prioritas Pembinaan Intensif</div>
             <div class="kpi-value" id="kpi-tidak">–</div>
             <div class="kpi-sub">siswa belum kenal huruf hijaiyah</div>
             <span class="kpi-badge check" id="kpi-pct-tidak"></span>
@@ -2913,7 +2913,7 @@ function renderUI(data) {
   document.getElementById('kpi-pct-tidak').textContent = n2(pctK) + '% dari total';
   document.getElementById('kpi-hadir').textContent = n2(T.avgHadir) + '%';
   const qH = T.avgHadir >= 90 ? 'valid' : T.avgHadir >= 75 ? 'partial' : 'check';
-  document.getElementById('kpi-q-hadir').textContent = T.avgHadir >= 90 ? '● Baik' : T.avgHadir >= 75 ? '● Menengah' : '● Perlu Perhatian';
+  document.getElementById('kpi-q-hadir').textContent = T.avgHadir >= 90 ? '● Baik' : T.avgHadir >= 75 ? '● Menengah' : '● Memerlukan Penguatan Kehadiran';
   document.getElementById('kpi-q-hadir').className = 'kpi-badge ' + qH;
 
   // Render Sub-Sections
@@ -3378,9 +3378,9 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
       const t = computeTotals(ks);
       return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
     }).sort((a,b) => b.pct - a.pct);
-    callout = `Pusat orbit prestasi saat ini ada pada Kec. <strong>${kr[0].name}</strong> dengan realisasi ideal (${n2(kr[0].pct)}%). Red flag diarahkan secara institusional ke Kec. <strong>${kr[kr.length-1].name}</strong> sebagai sektor defisit (${n2(kr[kr.length-1].pct)}%).`;
+    callout = `Pusat orbit prestasi saat ini ada pada Kec. <strong>${kr[0].name}</strong> dengan realisasi ideal (${n2(kr[0].pct)}%). Fokus intervensi diarahkan secara institusional ke Kec. <strong>${kr[kr.length-1].name}</strong> sebagai sektor prioritas pembinaan (${n2(kr[kr.length-1].pct)}%).`;
   } else {
-    callout = `Sorotan Regional <strong>${cakupan}</strong> — Ekosistem belajar <strong>${best ? best.nama : '-'}</strong> diposisikan sebagai prototipe rujukan (${n2(best ? best.pct : 0)}%). Peringatan: <strong>${lowC} sekolah dasar</strong> dilaporkan anjlok di bawah margin keamanan (60%).`;
+    callout = `Sorotan Regional <strong>${cakupan}</strong> — Ekosistem belajar <strong>${best ? best.nama : '-'}</strong> diposisikan sebagai prototipe rujukan (${n2(best ? best.pct : 0)}%). Peringatan: <strong>${lowC} sekolah dasar</strong> dilaporkan berada di bawah standar kelayakan (60%).`;
   }
   
   document.getElementById('k-callout').innerHTML = callout;
@@ -3425,26 +3425,26 @@ function renderModalTab(idx) {
   
   if (idx === 0) {
     const k4Html = s.kls4.tersedia 
-      ? `<tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls4.lancar}</td><td data-label="Belum">${s.kls4.belum}</td><td data-label="Defisit">${s.kls4.tidak}</td><td data-label="% Lancar">${pctPill(s.kls4.lancar/s.kls4.tot*100)}</td></tr>`
+      ? `<tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls4.lancar}</td><td data-label="Belum">${s.kls4.belum}</td><td data-label="Prioritas">${s.kls4.tidak}</td><td data-label="% Lancar">${pctPill(s.kls4.lancar/s.kls4.tot*100)}</td></tr>`
       : `<tr><td data-label="Kelas">Kelas IV</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Belum terdapat laporan BTQ untuk Kelas 4 pada periode yang dipilih.</span></td></tr>`;
       
     const k5Html = s.kls5.tersedia 
-      ? `<tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls5.lancar}</td><td data-label="Belum">${s.kls5.belum}</td><td data-label="Defisit">${s.kls5.tidak}</td><td data-label="% Lancar">${pctPill(s.kls5.lancar/s.kls5.tot*100)}</td></tr>`
+      ? `<tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls5.lancar}</td><td data-label="Belum">${s.kls5.belum}</td><td data-label="Prioritas">${s.kls5.tidak}</td><td data-label="% Lancar">${pctPill(s.kls5.lancar/s.kls5.tot*100)}</td></tr>`
       : `<tr><td data-label="Kelas">Kelas V</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Sekolah ini belum memiliki peserta aktif pada Kelas 5 untuk periode ini.</span></td></tr>`;
 
     const totalLabel = selectedKelas === 'all' ? 'Total Akumulasi' : `Total (Kelas ${selectedKelas})`;
-    const totalHtml = `<tr style="font-weight:800;background:var(--surface-2)"><td data-label="Kelas">${totalLabel}</td><td data-label="Populasi">${s.tot>0?s.tot:'<span style="color:var(--text-muted)">–</span>'}</td><td data-label="Lancar" style="color:var(--success)">${s.tot>0?s.lancar:'–'}</td><td data-label="Belum">${s.tot>0?s.belum:'–'}</td><td data-label="Defisit">${s.tot>0?s.tidak:'–'}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>`;
+    const totalHtml = `<tr style="font-weight:800;background:var(--surface-2)"><td data-label="Kelas">${totalLabel}</td><td data-label="Populasi">${s.tot>0?s.tot:'<span style="color:var(--text-muted)">–</span>'}</td><td data-label="Lancar" style="color:var(--success)">${s.tot>0?s.lancar:'–'}</td><td data-label="Belum">${s.tot>0?s.belum:'–'}</td><td data-label="Prioritas">${s.tot>0?s.tidak:'–'}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>`;
 
     el.innerHTML = `
       <table class="modal-table">
-        <thead><tr><th>Kelas</th><th>Populasi</th><th>Lancar</th><th>Belum</th><th>Defisit</th><th>% Lancar</th></tr></thead>
+        <thead><tr><th>Kelas</th><th>Populasi</th><th>Lancar</th><th>Belum</th><th>Prioritas</th><th>% Lancar</th></tr></thead>
         <tbody>
           ${k4Html}
           ${k5Html}
           ${totalHtml}
         </tbody>
       </table>
-      ${s.warnings.length ? `<div style="margin-top:16px;padding:14px 20px;background:var(--warning-dim);border-radius:12px;font-size:13.5px;color:var(--warning);border:1px solid rgba(217,119,6,.2);box-shadow:var(--shadow-sm);">⚠ Sinyal peringatan manipulasi kuantitas. Anomali struktur terdeteksi pada baris operator: <strong>${s.warnings.join(', ')}</strong></div>` : ''}
+      ${s.warnings.length ? `<div style="margin-top:16px;padding:14px 20px;background:var(--warning-dim);border-radius:12px;font-size:13.5px;color:var(--warning);border:1px solid rgba(217,119,6,.2);box-shadow:var(--shadow-sm);">⚠ Ditemukan indikasi ketidaksesuaian struktur data yang memerlukan verifikasi lanjutan terkait: <strong>${s.warnings.join(', ')}</strong></div>` : ''}
     `;
   } else if (idx === 1) {
     el.innerHTML = `
@@ -3454,7 +3454,7 @@ function renderModalTab(idx) {
           ${s.guru.map((g, i) => `<tr>
             <td data-label="Guru">${g}</td>
             <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
-            <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Defisit</span>'}</td>
+            <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
           </tr>`).join('')}
         </tbody>
       </table>
