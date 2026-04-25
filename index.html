@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#ffffff" id="themeColorMeta">
 <title>SMART BTQ — Monitoring Baca Tulis Al-Qur'an</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -194,8 +194,7 @@ a {
 .sort-btn:active,
 .m-tab:active,
 .duo-card:active,
-.insight-item:active,
-.premium-row-card:active {
+.insight-item:active {
   transform: scale(0.985);
   transition: 0.12s;
 }
@@ -1161,7 +1160,7 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   border-radius: var(--r-xl);
   padding: 20px 24px;
   box-shadow: var(--shadow-sm);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -1170,52 +1169,47 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 .tc-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
 .tc-group { display: flex; flex-direction: column; gap: 6px; }
 .tc-label { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; }
+.trend-summary-banner {
+  background: var(--primary-dim);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tsb-title { font-size: 14px; font-weight: 700; color: var(--primary-hover); }
+.tsb-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 
-/* Premium Trend KPI Grid */
-.trend-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-@media(max-width:900px) { .trend-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
-@media(max-width:480px) { .trend-kpi-grid { grid-template-columns: 1fr; } }
-.trend-kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; box-shadow: var(--shadow-xs); display: flex; flex-direction: column; transition: var(--transition-base); }
-.trend-kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-.tk-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-.tk-value { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
-.tk-sub { font-size: 12px; color: var(--text-tertiary); }
-.tk-card-blue { border-bottom: 3px solid var(--primary); }
-.tk-card-green { border-bottom: 3px solid var(--success); }
-.tk-card-amber { border-bottom: 3px solid var(--warning); }
-.tk-card-red { border-bottom: 3px solid var(--danger); }
+/* Progress Tracking List */
+.progress-list { display: flex; flex-direction: column; gap: 8px; }
+.pl-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: var(--surface-2); border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  transition: var(--transition-fast);
+}
+.pl-item:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--text-tertiary); }
+.pl-info { display: flex; flex-direction: column; gap: 2px; }
+.pl-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.pl-meta { font-size: 11px; color: var(--text-tertiary); }
+.pl-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.pl-badge.up { background: var(--success-dim); color: var(--success); }
+.pl-badge.down { background: var(--danger-dim); color: var(--danger); }
+.pl-badge.flat { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); }
 
-/* Premium List Items (Top Progress & Need Attention) */
-.premium-row-card { display: flex; flex-direction: column; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); margin-bottom: 12px; transition: var(--transition-fast); cursor: pointer; box-shadow: var(--shadow-xs); }
-.premium-row-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: var(--primary); }
-.pr-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.pr-name-group { display: flex; flex-direction: column; gap: 4px; }
-.pr-name { font-size: 14.5px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-.pr-students { font-size: 11px; color: var(--text-tertiary); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
-.pr-diff-badge { padding: 4px 10px; border-radius: 6px; font-size: 13.5px; font-weight: 800; font-family: 'JetBrains Mono', monospace; display: inline-flex; align-items: center; justify-content: center; }
-.pr-diff-badge.up { background: var(--success-dim); color: var(--success); }
-.pr-diff-badge.down { background: var(--danger-dim); color: var(--danger); }
-.pr-diff-badge.flat { background: var(--surface-2); color: var(--text-secondary); }
-.pr-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
-.pr-stat { display: flex; flex-direction: column; gap: 4px; }
-.pr-stat-lbl { font-size: 10px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; }
-.pr-stat-val { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
-.pr-validation { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); padding: 8px 10px; background: var(--surface-2); border-radius: 6px; }
-.pr-validation.warning { background: var(--warning-dim); color: var(--warning); }
-.badge-prio { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.badge-prio-a { background: var(--danger); color: white; }
-.badge-prio-b { background: var(--warning); color: white; }
-.badge-prio-c { background: var(--text-secondary); color: white; }
+body.dark .trend-summary-banner { background: rgba(37,99,235,0.1); border-left-color: #3b82f6; }
+body.dark .tsb-title { color: #60a5fa; }
+body.dark .tsb-desc { color: #cbd5e1; }
+body.dark .pl-item { background: var(--surface-2); border-color: var(--border); }
 
 .trend-empty { text-align: center; padding: 48px 24px; color: var(--text-tertiary); font-size: 13px; }
 .trend-empty-icon { font-size: 32px; margin-bottom: 10px; }
-
-/* Dark mode fixes for new trend UI */
-body.dark .trend-kpi-card { background: var(--surface); border-color: var(--border); }
-body.dark .premium-row-card { background: var(--surface-2); border-color: var(--border); }
-body.dark .pr-validation { background: var(--surface); border: 1px solid var(--border); }
-body.dark .pr-validation.warning { background: rgba(217,119,6,0.1); border-color: rgba(217,119,6,0.3); color: #fcd34d; }
-body.dark .badge-prio-c { background: #475569; }
 
 /* ────────────────────────────────────────────
    MODAL (BASE)
@@ -2273,33 +2267,10 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
-        <!-- NEW: Executive Summary KPI Grid -->
-        <div class="trend-kpi-grid" id="trendKpiGrid" style="display: none;">
-            <div class="trend-kpi-card tk-card-blue">
-                <div class="tk-label">Total Sekolah Aktif</div>
-                <div class="tk-value" id="tkTotalSekolah">-</div>
-                <div class="tk-sub">Data komparatif tervalidasi</div>
-            </div>
-            <div class="trend-kpi-card tk-card-blue">
-                <div class="tk-label">Total Siswa Aktif</div>
-                <div class="tk-value" id="tkTotalSiswa">-</div>
-                <div class="tk-sub">Pada periode terbaru</div>
-            </div>
-            <div class="trend-kpi-card tk-card-green">
-                <div class="tk-label">Progress Positif</div>
-                <div class="tk-value" id="tkProgressPositif">-</div>
-                <div class="tk-sub">Sekolah mengalami kenaikan tren</div>
-            </div>
-            <div class="trend-kpi-card tk-card-amber">
-                <div class="tk-label">Perlu Pendampingan</div>
-                <div class="tk-value" id="tkPendampingan">-</div>
-                <div class="tk-sub">Sekolah stagnan/menurun</div>
-            </div>
-        </div>
-
-        <!-- NEW: Validation Banner -->
-        <div id="trendValidationBanner" class="highlight-callout" style="display:none; border-left-color: var(--warning); background: var(--warning-dim); margin-bottom: 24px;">
-            <strong>Status Validasi Data:</strong> <span id="trendValidationText"></span>
+        <!-- Auto Summary Banner -->
+        <div class="trend-summary-banner" id="trendSummaryBanner">
+          <div class="tsb-title" id="tsbTitle">Menyiapkan Data...</div>
+          <div class="tsb-desc" id="tsbDesc">Sedang memproses rentang analisis komprehensif.</div>
         </div>
 
         <!-- Main Chart -->
@@ -2307,7 +2278,7 @@ body.dark .loading-progress-value {
           <div class="chart-card-header">
             <div>
               <div class="chart-card-title">Grafik Tren & Proyeksi Performa</div>
-              <div class="chart-card-sub" id="trendChartSub">Visualisasi pergerakan kinerja komprehensif berdasar persentase kelancaran</div>
+              <div class="chart-card-sub" id="trendChartSub">Visualisasi data sesuai mode analisis</div>
             </div>
           </div>
           <div class="chart-card-body">
@@ -2321,35 +2292,25 @@ body.dark .loading-progress-value {
             <div class="chart-card-header" style="border-top: 3px solid var(--success);">
               <div>
                 <div class="chart-card-title">Top Progress</div>
-                <div class="chart-card-sub">Peringkat sekolah dengan peningkatan terbaik</div>
+                <div class="chart-card-sub">Peningkatan tertinggi di rentang ini</div>
               </div>
             </div>
-            <div class="chart-card-body" style="background:var(--surface-2); padding:16px;">
-              <div id="trendTopList"></div>
+            <div class="chart-card-body">
+              <div class="progress-list" id="trendTopList"></div>
             </div>
           </div>
 
           <div class="chart-card" style="margin-bottom:0;">
             <div class="chart-card-header" style="border-top: 3px solid var(--danger);">
               <div>
-                <div class="chart-card-title">Need Attention & Priority</div>
-                <div class="chart-card-sub">Sekolah prioritas pendampingan intensif</div>
+                <div class="chart-card-title">Need Attention</div>
+                <div class="chart-card-sub">Stagnan atau mengalami penurunan</div>
               </div>
             </div>
-            <div class="chart-card-body" style="background:var(--surface-2); padding:16px;">
-              <div id="trendBotList"></div>
+            <div class="chart-card-body">
+              <div class="progress-list" id="trendBotList"></div>
             </div>
           </div>
-        </div>
-
-        <!-- NEW: Executive Conclusion -->
-        <div class="chart-card" id="trendConclusionCard" style="display: none; margin-top: 24px; border-left: 4px solid var(--primary);">
-            <div class="chart-card-body" style="padding: 24px 28px;">
-                <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Kesimpulan Eksekutif Otomatis</div>
-                <div id="trendConclusionText" style="font-size: 14.5px; color: var(--text-primary); line-height: 1.6; font-weight: 500;">
-                    <!-- Auto generated text -->
-                </div>
-            </div>
         </div>
 
       </div>
@@ -3626,7 +3587,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 }
 
 // ────────────────────────────────────────────
-// TREN KOMPREHENSIF (NEW EXECUTIVE LOGIC)
+// TREN KOMPREHENSIF (NEW ENTERPRISE LOGIC)
 // ────────────────────────────────────────────
 function initTrendControls() {
     const allP = getAllPeriods();
@@ -3689,22 +3650,15 @@ function renderTrend(cakupan) {
   const summaryTitle = document.getElementById('tsbTitle');
   const summaryDesc = document.getElementById('tsbDesc');
   const gridColorConfig = document.body.classList.contains('dark') ? '#334155' : '#e2e8f0';
-  const isDark = document.body.classList.contains('dark');
   const mode = document.getElementById('trendMode').value;
   const warningEl = document.getElementById('trendWarning');
   const progressGrid = document.getElementById('trendProgressGrid');
-  const kpiGrid = document.getElementById('trendKpiGrid');
-  const valBanner = document.getElementById('trendValidationBanner');
-  const conclusionCard = document.getElementById('trendConclusionCard');
 
   if (allP.length === 0) {
     tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data belum tersedia.</div>`;
     summaryTitle.textContent = "Data Kosong";
     summaryDesc.textContent = "-";
     progressGrid.style.display = 'none';
-    kpiGrid.style.display = 'none';
-    valBanner.style.display = 'none';
-    conclusionCard.style.display = 'none';
     return;
   }
   
@@ -3724,6 +3678,7 @@ function renderTrend(cakupan) {
       isBarChart = true;
       const years = [...new Set(allP.map(p => p.year))].sort();
       validPeriods = years.map(yr => {
+          // Kumpulkan semua data valid di tahun ini
           let tLancar=0, tTot=0;
           allP.filter(p => p.year === yr).forEach(p => {
               let raw = DATABASE[p.year][p.month];
@@ -3754,9 +3709,6 @@ function renderTrend(cakupan) {
           summaryTitle.textContent = "Rentang Waktu Terbalik";
           summaryDesc.textContent = "Silakan perbaiki pilihan bulan dan tahun agar proses analitik dapat berjalan.";
           progressGrid.style.display = 'none';
-          kpiGrid.style.display = 'none';
-          valBanner.style.display = 'none';
-          conclusionCard.style.display = 'none';
           return;
       }
       warningEl.style.display = 'none';
@@ -3771,113 +3723,11 @@ function renderTrend(cakupan) {
           summaryTitle.textContent = "Data Tidak Ditemukan";
           summaryDesc.textContent = `Periode ${dM} ${dY} s.d. ${sM} ${sY} kosong.`;
           progressGrid.style.display = 'none';
-          kpiGrid.style.display = 'none';
-          valBanner.style.display = 'none';
-          conclusionCard.style.display = 'none';
           return;
       }
       
       summaryTitle.textContent = `Analisis Rentang Kustom`;
       summaryDesc.textContent = `Memantau perkembangan dari ${dM} ${dY} sampai dengan ${sM} ${sY}.`;
-  }
-
-  // Cek untuk data agregat sebelum dan sesudah jika ada detail bulanan
-  let progressMap = [];
-  let totalSekolahAktif = 0;
-  let totalSiswaTerbaru = 0;
-  let progressPositif = 0;
-  let perluPendampingan = 0;
-  let hasStructuralChange = false;
-
-  if (!isBarChart && validPeriods.length >= 2) {
-      const pStart = validPeriods[0];
-      const pEnd = validPeriods[validPeriods.length - 1];
-
-      let rawStart = DATABASE[pStart.year][pStart.month];
-      let rawEnd = DATABASE[pEnd.year][pEnd.month];
-      if (selectedKecamatan !== 'all') {
-          rawStart = rawStart.filter(s => s.kecamatan === selectedKecamatan);
-          rawEnd = rawEnd.filter(s => s.kecamatan === selectedKecamatan);
-      }
-
-      const schStart = aggregateSchools(rawStart);
-      const schEnd = aggregateSchools(rawEnd);
-
-      // Hitung metrik
-      schEnd.forEach(eSch => {
-          if(eSch.tot > 0) {
-              totalSekolahAktif++;
-              totalSiswaTerbaru += eSch.tot;
-          }
-
-          const sSch = schStart.find(s => s.no === eSch.no);
-          if(sSch && sSch.tot > 0 && eSch.tot > 0) {
-              const diff = eSch.pct - sSch.pct;
-              let validNote = "Comparable Data Valid";
-              
-              if(sSch.kls4.tersedia !== eSch.kls4.tersedia || sSch.kls5.tersedia !== eSch.kls5.tersedia) {
-                  validNote = "Perubahan Struktur Kelas Terdeteksi";
-                  hasStructuralChange = true;
-              }
-
-              let priority = '';
-              let evalStatus = '';
-              if(diff > 0) {
-                  progressPositif++;
-                  evalStatus = 'Progress Positif';
-              } else {
-                  perluPendampingan++;
-                  // Klasifikasi Level
-                  if(diff < -10 || eSch.pct < 40) { priority = 'A'; evalStatus = 'Menurun Tajam / Kritis'; }
-                  else if(diff < 0 || eSch.pct < 60) { priority = 'B'; evalStatus = 'Menurun / Kurang'; }
-                  else { priority = 'C'; evalStatus = 'Stagnan / Perlu Penguatan'; }
-              }
-
-              let reason = '';
-              if (priority) {
-                  if (eSch.kls5.tersedia && sSch.kls5.tersedia && (eSch.kls5.lancar / eSch.kls5.tot) < (sSch.kls5.lancar / sSch.kls5.tot)) {
-                      reason = 'Penurunan signifikan pada Kelas 5';
-                  } else if (eSch.kls4.tersedia && sSch.kls4.tersedia && (eSch.kls4.lancar / eSch.kls4.tot) < (sSch.kls4.lancar / sSch.kls4.tot)) {
-                      reason = 'Penurunan signifikan pada Kelas 4';
-                  } else if (diff === 0) {
-                      reason = 'Stagnasi capian kelancaran';
-                  } else {
-                      reason = 'Penurunan merata di seluruh kelas';
-                  }
-              }
-
-              progressMap.push({
-                  no: eSch.no,
-                  nama: eSch.nama,
-                  start: sSch.pct,
-                  end: eSch.pct,
-                  diff: diff,
-                  latestTot: eSch.tot,
-                  validNote: validNote,
-                  evalStatus: evalStatus,
-                  priority: priority,
-                  reason: reason
-              });
-          }
-      });
-      
-      // Render Validation Banner
-      if(hasStructuralChange) {
-          valBanner.style.display = 'block';
-          document.getElementById('trendValidationText').innerHTML = "Terdapat perubahan struktur ketersediaan kelas antar periode. Analisis disesuaikan secara otomatis menggunakan <em>comparable data</em> untuk menjaga akurasi.";
-      } else {
-          valBanner.style.display = 'none';
-      }
-
-      // Render Executive KPI Grid
-      kpiGrid.style.display = 'grid';
-      document.getElementById('tkTotalSekolah').textContent = fmt(totalSekolahAktif);
-      document.getElementById('tkTotalSiswa').textContent = fmt(totalSiswaTerbaru);
-      document.getElementById('tkProgressPositif').textContent = progressPositif;
-      document.getElementById('tkPendampingan').textContent = perluPendampingan;
-  } else {
-      kpiGrid.style.display = 'none';
-      valBanner.style.display = 'none';
   }
 
   // PREPARE CHART DATA
@@ -3899,122 +3749,98 @@ function renderTrend(cakupan) {
           const T = computeTotals(aggregateSchools(raw));
           return T.tot > 0 ? parseFloat(n2(T.lancar / T.tot * 100)) : 0;
       });
-      document.getElementById('trendChartSub').textContent = "Perkembangan capaian rata-rata dari seluruh sekolah";
+      document.getElementById('trendChartSub').textContent = "Perkembangan capaian per bulan sesuai rentang waktu";
   }
 
-  // Custom Chart Plugin for gradient fill
-  const canvas = document.getElementById('trendChart');
-  const ctx = canvas.getContext('2d');
-  let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  if (isDark) {
-      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
-      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-  } else {
-      gradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
-      gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
-  }
-
-  // RENDER CHART PREMIUM
+  // RENDER CHART
   charts['trend'] = new Chart(document.getElementById('trendChart'), {
     type: isBarChart ? 'bar' : 'line',
     data: {
       labels,
       datasets: [{
         label: '% Lancar', data: pctData,
-        borderColor: isDark ? '#60a5fa' : '#2563eb', 
-        backgroundColor: isBarChart ? (isDark ? '#3b82f6' : '#2563eb') : gradient, 
-        pointBackgroundColor: isDark ? '#60a5fa' : '#2563eb',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: isBarChart ? 0 : 5, 
-        pointHoverRadius: isBarChart ? 0 : 7, 
-        borderWidth: isBarChart ? 0 : 3, 
+        borderColor: 'rgba(37,99,235,1)', 
+        backgroundColor: isBarChart ? 'rgba(37,99,235,1)' : 'rgba(37,99,235,.12)', 
+        pointBackgroundColor: 'rgba(37,99,235,1)',
+        pointRadius: isBarChart ? 0 : 6, 
+        pointHoverRadius: isBarChart ? 0 : 8, 
+        borderWidth: isBarChart ? 0 : 2.5, 
         borderRadius: isBarChart ? 6 : 0,
         fill: !isBarChart, 
-        tension: 0.35 // smooth curve
+        tension: .4
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       scales: {
-        y: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:11, weight: '500'}}, border:{display:false} },
-        x: { grid: {display: false}, ticks: {font:{size:11, weight: '600'}}, border:{display:false} }
+        y: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:11}}, border:{display:false} },
+        x: { grid: {display: false}, ticks: {font:{size:11}}, border:{display:false} }
       },
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: isDark ? 'rgba(15,23,42,.95)' : 'rgba(15,23,42,.9)', 
-          titleColor: '#fff', bodyColor: 'rgba(255,255,255,.8)',
-          padding: 12, cornerRadius: 8,
-          titleFont: { size: 13, family: "'Plus Jakarta Sans', sans-serif" },
-          bodyFont: { size: 12, family: "'Plus Jakarta Sans', sans-serif" },
-          callbacks: { label: ctx => ` Kinerja: ${ctx.raw}%` }
+          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+          padding: 10, cornerRadius: 8,
+          callbacks: { label: ctx => ` ${ctx.raw}% siswa lancar` }
         }
       }
     }
   });
 
-  // PREPARE SCHOOL PROGRESS TRACKER (Premium Cards)
+  // PREPARE SCHOOL PROGRESS TRACKER (Top Progress & Need Attention)
+  // Fitur ini butuh minimal 2 periode untuk dihitung
   if (isBarChart || validPeriods.length < 2) {
-      progressGrid.style.display = 'none';
-      conclusionCard.style.display = 'none';
+      progressGrid.style.display = 'none'; // Sembunyikan untuk tahunan atau data tunggal
       return;
   }
   
-  progressGrid.style.display = 'grid';
+  progressGrid.style.display = 'grid'; // Pastikan grid aktif
+
+  const pStart = validPeriods[0];
+  const pEnd = validPeriods[validPeriods.length - 1];
+
+  let rawStart = DATABASE[pStart.year][pStart.month];
+  let rawEnd = DATABASE[pEnd.year][pEnd.month];
+  if (selectedKecamatan !== 'all') {
+      rawStart = rawStart.filter(s => s.kecamatan === selectedKecamatan);
+      rawEnd = rawEnd.filter(s => s.kecamatan === selectedKecamatan);
+  }
+
+  const schStart = aggregateSchools(rawStart);
+  const schEnd = aggregateSchools(rawEnd);
+
+  let progressMap = [];
+  schEnd.forEach(eSch => {
+      if(eSch.tot === 0) return;
+      const sSch = schStart.find(s => s.no === eSch.no);
+      if(sSch && sSch.tot > 0) {
+          const diff = eSch.pct - sSch.pct;
+          progressMap.push({ nama: eSch.nama, start: sSch.pct, end: eSch.pct, diff: diff, no: eSch.no });
+      }
+  });
 
   // Sort by highest diff
   progressMap.sort((a,b) => b.diff - a.diff);
   
-  const topList = progressMap.filter(s => s.diff > 0).slice(0, 10);
-  const botList = [...progressMap].reverse().filter(s => s.diff <= 0).slice(0, 10);
+  const topList = progressMap.filter(s => s.diff > 0).slice(0, 5); // Maks 5 terbaik
+  // Untuk bottom, kita balik array, ambil yg negatif/paling kecil, max 5.
+  const botList = [...progressMap].reverse().slice(0, 5);
 
-  const renderPremiumCard = (s, isTop) => {
-      let badgeCls = 'flat'; let textDiff = '0.0%'; let sign = '';
-      if(s.diff > 0) { badgeCls = 'up'; textDiff = '+'+n2(s.diff)+'%'; }
-      else if (s.diff < 0) { badgeCls = 'down'; textDiff = n2(s.diff)+'%'; }
+  const renderPLItem = (s, isTop) => {
+      let badgeCls = 'flat'; let icon = '→'; let textDiff = '0%';
+      if(s.diff > 0) { badgeCls = 'up'; icon = '▲'; textDiff = '+'+n2(s.diff)+'%'; }
+      else if (s.diff < 0) { badgeCls = 'down'; icon = '▼'; textDiff = n2(s.diff)+'%'; }
 
-      let prioHtml = ''; let reasonHtml = '';
-      if (!isTop && s.priority) {
-          prioHtml = `<span class="badge-prio badge-prio-${s.priority.toLowerCase()}">Priority Level ${s.priority}</span>`;
-          reasonHtml = `
-            <div style="grid-column: 1 / -1; font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; padding-left: 8px; border-left: 2px solid var(--border);">
-              <em>Catatan: ${s.reason}</em>
-            </div>
-          `;
-      }
-
-      let validClass = s.validNote.includes("Perubahan") ? 'warning' : '';
+      // Jika di list Need Attention tapi difnya positif (berarti tidak ada yg negatif), warnai abu/biasa
+      if (!isTop && s.diff >= 0) badgeCls = 'flat';
 
       return `
-      <div class="premium-row-card" onclick="openModal(${s.no}, 2)">
-          <div class="pr-header">
-              <div class="pr-name-group">
-                  <div class="pr-name">${s.nama}</div>
-                  <div class="pr-students">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                      Total Siswa: ${s.latestTot}
-                  </div>
-              </div>
-              <div class="pr-diff-badge ${badgeCls}">${textDiff}</div>
+      <div class="pl-item clickable" onclick="openModal(${s.no})">
+          <div class="pl-info">
+              <div class="pl-name">${s.nama}</div>
+              <div class="pl-meta">${n2(s.start)}% → ${n2(s.end)}% (Awal - Akhir)</div>
           </div>
-          <div class="pr-body">
-              <div class="pr-stat">
-                  <span class="pr-stat-lbl">Progress Lancar</span>
-                  <span class="pr-stat-val">${n2(s.start)}% → ${n2(s.end)}%</span>
-              </div>
-              <div class="pr-stat">
-                  <span class="pr-stat-lbl">Status Evaluasi</span>
-                  <span class="pr-stat-val" style="display:flex; align-items:center; gap:6px;">
-                    ${s.evalStatus} ${prioHtml}
-                  </span>
-              </div>
-              <div class="pr-validation ${validClass}">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                  Validasi: ${s.validNote}
-              </div>
-              ${reasonHtml}
-          </div>
+          <div class="pl-badge ${badgeCls}">${icon} ${textDiff}</div>
       </div>
       `;
   };
@@ -4023,37 +3849,29 @@ function renderTrend(cakupan) {
   const botEl = document.getElementById('trendBotList');
 
   if(topList.length > 0) {
-      topEl.innerHTML = topList.map(s => renderPremiumCard(s, true)).join('');
+      topEl.innerHTML = topList.map(s => renderPLItem(s, true)).join('');
   } else {
-      topEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📈</div>Belum ada sekolah yang mencatat tren progres positif di rentang ini.</div>`;
+      topEl.innerHTML = `<div style="font-size:12px;color:var(--text-tertiary);text-align:center;padding:16px;">Belum ada sekolah yang mengalami kenaikan persentase.</div>`;
   }
 
   if(botList.length > 0) {
-      botEl.innerHTML = botList.map(s => renderPremiumCard(s, false)).join('');
+      botEl.innerHTML = botList.map(s => renderPLItem(s, false)).join('');
   } else {
-      botEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">🏆</div>Luar biasa! Seluruh sekolah berhasil mempertahankan atau meningkatkan performanya.</div>`;
+      botEl.innerHTML = `<div style="font-size:12px;color:var(--text-tertiary);text-align:center;padding:16px;">Tidak ada data komparasi yang cukup.</div>`;
   }
 
-  // EXECUTIVE CONCLUSION AUTO GENERATION
-  conclusionCard.style.display = 'block';
-  const concText = document.getElementById('trendConclusionText');
+  // Update Summary Banner dengan Delta Total
   const dStart = pctData[0];
   const dEnd = pctData[pctData.length-1];
   const dTot = dEnd - dStart;
   
-  let concHtml = `Berdasarkan pengolahan data analitik dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif `;
-  
   if(dTot > 0) {
-      concHtml += `menunjukkan tren <strong>peningkatan yang solid sebesar +${n2(dTot)}%</strong>. `;
+      summaryDesc.innerHTML += `<br><strong style="color:var(--success)">▲ Terjadi peningkatan +${n2(dTot)}%</strong> dari periode awal ke akhir rentang ini secara keseluruhan.`;
   } else if (dTot < 0) {
-      concHtml += `mengalami <strong>penurunan sebesar ${n2(Math.abs(dTot))}%</strong>. `;
+      summaryDesc.innerHTML += `<br><strong style="color:var(--danger)">▼ Terjadi penurunan ${n2(dTot)}%</strong> dari periode awal ke akhir rentang ini secara keseluruhan.`;
   } else {
-      concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
+      summaryDesc.innerHTML += `<br>→ Performa stagnan/stabil (0% perubahan) antara titik awal dan titik akhir periode.`;
   }
-
-  concHtml += `Secara spesifik, dari total ${totalSekolahAktif} sekolah aktif, mayoritas (${progressPositif} sekolah) berhasil mengukir progres positif. Namun, sistem mendeteksi keberadaan <strong>${perluPendampingan} sekolah</strong> yang membutuhkan atensi khusus dari Dinas Pendidikan (berada pada level prioritas pembinaan) guna mencegah terjadinya kemunduran capaian akademis secara sistemik.`;
-
-  concText.innerHTML = concHtml;
 }
 
 // ────────────────────────────────────────────
@@ -4095,14 +3913,13 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
 // ────────────────────────────────────────────
 // MODAL DETAIL SEKOLAH
 // ────────────────────────────────────────────
-function openModal(no, tabIdx = 0) {
+function openModal(no) {
   lastSchoolCardId = `school-row-${no}`; 
   currentModalSchool = currentSchools.find(s => s.no === no);
   if(!currentModalSchool) return;
   document.getElementById('modalTitle').textContent = currentModalSchool.nama;
-  
-  document.querySelectorAll('.m-tab').forEach((t,i) => t.classList.toggle('active', i === tabIdx));
-  renderModalTab(tabIdx);
+  document.querySelectorAll('.m-tab').forEach((t,i) => t.classList.toggle('active', i === 0));
+  renderModalTab(0);
   
   lockOverlayBackground();
   document.getElementById('modalOverlay').classList.add('open');
