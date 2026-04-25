@@ -279,6 +279,7 @@ a {
 #loginView .brand-name .dark { color: var(--log-ink-1); }
 #loginView .brand-name .blue { color: var(--log-blue); }
 #loginView .brand-sub { font-size: 13px; color: var(--log-ink-3); font-weight: 400; line-height: 1.5; }
+#loginView .department-text { margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--log-dept, #64748b); letter-spacing: 0.2px; transition: color 0.35s ease; }
 #loginView .divider { height: 1px; background: var(--log-border); margin-bottom: 28px; opacity: 0.6; }
 #loginView .form-group { margin-bottom: 18px; }
 #loginView label { display: block; font-size: 13px; font-weight: 600; color: var(--log-ink-2); margin-bottom: 7px; letter-spacing: 0.1px; }
@@ -445,6 +446,7 @@ body.dark #loginView {
   --log-shadow-card: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.03);
   --log-card-border: rgba(255, 255, 255, 0.08);
   --log-input-bg: rgba(255, 255, 255, 0.03);
+  --log-dept: #94a3b8;
   
   /* Footer Dark Mode Adaptive Colors */
   --log-footer-name: #ffffff;
@@ -1782,6 +1784,7 @@ body.dark .loading-progress-value {
           <span class="dark">SMART</span> <span class="blue">BTQ</span>
         </div>
         <div class="brand-sub">Monitoring Baca Tulis Al-Qur'an</div>
+        <div class="department-text">Dinas Pendidikan dan Kebudayaan</div>
       </div>
 
       <div class="divider" aria-hidden="true"></div>
@@ -1839,11 +1842,6 @@ body.dark .loading-progress-value {
         <div class="owner-name">© Hak Cipta Fazry Irawan</div>
         <div class="owner-role">Guru BTQ</div>
         <div class="school-name">MI Panatasan &bull; SDN 1 Batulawang</div>
-        <div class="system-desc">
-          <strong>SMART BTQ</strong><br>
-          Platform Monitoring BTQ Digital<br>
-          Dinas Pendidikan dan Kebudayaan
-        </div>
       </div>
 
     </div>
