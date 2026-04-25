@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#ffffff" id="themeColorMeta">
 <title>SMART BTQ — Monitoring Baca Tulis Al-Qur'an</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -194,7 +194,8 @@ a {
 .sort-btn:active,
 .m-tab:active,
 .duo-card:active,
-.insight-item:active {
+.insight-item:active,
+.premium-row-card:active {
   transform: scale(0.985);
   transition: 0.12s;
 }
@@ -279,6 +280,7 @@ a {
 #loginView .brand-name .dark { color: var(--log-ink-1); }
 #loginView .brand-name .blue { color: var(--log-blue); }
 #loginView .brand-sub { font-size: 13px; color: var(--log-ink-3); font-weight: 400; line-height: 1.4; }
+#loginView .department-text { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--log-dept, #64748b); letter-spacing: 0.2px; transition: color 0.35s ease; }
 #loginView .divider { height: 1px; background: var(--log-border); margin-bottom: 20px; opacity: 0.6; }
 #loginView .form-group { margin-bottom: 14px; }
 #loginView label { display: block; font-size: 12.5px; font-weight: 600; color: var(--log-ink-2); margin-bottom: 6px; letter-spacing: 0.1px; }
@@ -438,6 +440,7 @@ body.dark #loginView {
   --log-shadow-card: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.03);
   --log-card-border: rgba(255, 255, 255, 0.08);
   --log-input-bg: rgba(255, 255, 255, 0.03);
+  --log-dept: #94a3b8;
   
   /* Footer Dark Mode Adaptive Colors */
   --log-footer-name: #ffffff;
@@ -892,7 +895,7 @@ body.dark .nav-icon { background: rgba(0,0,0,0.2); }
   transform: none; /* HAPUS ROTATE/SCALE */
 }
 
-/* Premium Filter Area in Menu (UPDATED FOR RANGE) */
+/* Premium Filter Area in Menu */
 .sidebar-filter {
   margin-top: 16px;
   padding: 24px;
@@ -921,58 +924,6 @@ body.dark .sidebar-filter {
   font-size: 14.5px;
   height: auto;
   border-radius: var(--r-md);
-}
-
-.filter-divider { 
-  height: 1px; 
-  background: var(--border); 
-  margin: 24px 0; 
-  opacity: 0.7; 
-}
-body.dark .filter-divider { 
-  background: rgba(255,255,255,0.06); 
-}
-
-.period-group { 
-  margin-bottom: 16px; 
-}
-.period-label { 
-  font-size: 12.5px; 
-  font-weight: 600; 
-  color: var(--text-secondary); 
-  margin-bottom: 8px; 
-  letter-spacing: 0.2px; 
-}
-body.dark .period-label { 
-  color: var(--text-tertiary); 
-}
-
-.period-summary-box {
-  margin-top: 20px; 
-  padding: 14px 16px; 
-  background: var(--primary-dim); 
-  border: 1px solid rgba(37,99,235,0.15); 
-  border-radius: var(--r-md);
-  font-size: 12.5px; 
-  color: var(--primary); 
-  line-height: 1.5;
-  text-align: center; 
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-.period-summary-box strong { 
-  font-weight: 700; 
-  color: var(--primary-hover); 
-  display: block; 
-  margin-top: 4px; 
-}
-body.dark .period-summary-box {
-  background: rgba(37,99,235,0.1); 
-  border-color: rgba(37,99,235,0.2); 
-  color: #94a3b8;
-}
-body.dark .period-summary-box strong { 
-  color: #f8fafc; 
 }
 
 /* ────────────────────────────────────────────
@@ -1202,11 +1153,73 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 .reco-num { width: 24px; height: 24px; flex-shrink: 0; background: var(--primary); color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; box-shadow: 0 2px 6px rgba(37,99,235,.3); }
 
 /* ────────────────────────────────────────────
-   17. TREND & MODAL (BASE)
+   17. TREN KOMPREHENSIF (NEW EXECUTIVE STYLES)
 ──────────────────────────────────────────── */
+.trend-controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+.tc-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+.tc-group { display: flex; flex-direction: column; gap: 6px; }
+.tc-label { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; }
+
+/* Premium Trend KPI Grid */
+.trend-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+@media(max-width:900px) { .trend-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width:480px) { .trend-kpi-grid { grid-template-columns: 1fr; } }
+.trend-kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; box-shadow: var(--shadow-xs); display: flex; flex-direction: column; transition: var(--transition-base); }
+.trend-kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.tk-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.tk-value { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
+.tk-sub { font-size: 12px; color: var(--text-tertiary); }
+.tk-card-blue { border-bottom: 3px solid var(--primary); }
+.tk-card-green { border-bottom: 3px solid var(--success); }
+.tk-card-amber { border-bottom: 3px solid var(--warning); }
+.tk-card-red { border-bottom: 3px solid var(--danger); }
+
+/* Premium List Items (Top Progress & Need Attention) */
+.premium-row-card { display: flex; flex-direction: column; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); margin-bottom: 12px; transition: var(--transition-fast); cursor: pointer; box-shadow: var(--shadow-xs); }
+.premium-row-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: var(--primary); }
+.pr-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.pr-name-group { display: flex; flex-direction: column; gap: 4px; }
+.pr-name { font-size: 14.5px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+.pr-students { font-size: 11px; color: var(--text-tertiary); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.pr-diff-badge { padding: 4px 10px; border-radius: 6px; font-size: 13.5px; font-weight: 800; font-family: 'JetBrains Mono', monospace; display: inline-flex; align-items: center; justify-content: center; }
+.pr-diff-badge.up { background: var(--success-dim); color: var(--success); }
+.pr-diff-badge.down { background: var(--danger-dim); color: var(--danger); }
+.pr-diff-badge.flat { background: var(--surface-2); color: var(--text-secondary); }
+.pr-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+.pr-stat { display: flex; flex-direction: column; gap: 4px; }
+.pr-stat-lbl { font-size: 10px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; }
+.pr-stat-val { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+.pr-validation { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); padding: 8px 10px; background: var(--surface-2); border-radius: 6px; }
+.pr-validation.warning { background: var(--warning-dim); color: var(--warning); }
+.badge-prio { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.badge-prio-a { background: var(--danger); color: white; }
+.badge-prio-b { background: var(--warning); color: white; }
+.badge-prio-c { background: var(--text-secondary); color: white; }
+
 .trend-empty { text-align: center; padding: 48px 24px; color: var(--text-tertiary); font-size: 13px; }
 .trend-empty-icon { font-size: 32px; margin-bottom: 10px; }
 
+/* Dark mode fixes for new trend UI */
+body.dark .trend-kpi-card { background: var(--surface); border-color: var(--border); }
+body.dark .premium-row-card { background: var(--surface-2); border-color: var(--border); }
+body.dark .pr-validation { background: var(--surface); border: 1px solid var(--border); }
+body.dark .pr-validation.warning { background: rgba(217,119,6,0.1); border-color: rgba(217,119,6,0.3); color: #fcd34d; }
+body.dark .badge-prio-c { background: #475569; }
+
+/* ────────────────────────────────────────────
+   MODAL (BASE)
+──────────────────────────────────────────── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.55); backdrop-filter: blur(6px); z-index: 600; align-items: center; justify-content: center; }
 .modal-overlay.open { display: flex; }
 .modal-box { background: var(--surface); border-radius: var(--r-xl); width: 90%; max-width: 680px; max-height: 86vh; overflow-y: auto; box-shadow: 0 24px 72px rgba(15,23,42,.25), 0 4px 16px rgba(15,23,42,.15); border: 1px solid var(--border); animation: modalEnter 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -1587,6 +1600,8 @@ body.dark .pct-pill.pill-low { background: rgba(220, 38, 38, 0.15); color: #f871
   
   body.dark .sort-btn { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; }
   body.dark .sort-btn.active { background: #2563eb; border-color: #3b82f6; color: #fff; }
+  
+  body.dark .trend-controls { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); }
 }
 
 
@@ -1779,57 +1794,6 @@ body.dark .loading-progress-value {
   100% { left: 100%; width: 40%; }
 }
 
-/* Sidebar Filter Period Range */
-.filter-divider { 
-  height: 1px; 
-  background: var(--border); 
-  margin: 24px 0; 
-  opacity: 0.7; 
-}
-body.dark .filter-divider { 
-  background: rgba(255,255,255,0.06); 
-}
-.period-group { 
-  margin-bottom: 16px; 
-}
-.period-label { 
-  font-size: 12.5px; 
-  font-weight: 600; 
-  color: var(--text-secondary); 
-  margin-bottom: 8px; 
-  letter-spacing: 0.2px; 
-}
-body.dark .period-label { 
-  color: var(--text-tertiary); 
-}
-.period-summary-box {
-  margin-top: 20px; 
-  padding: 14px 16px; 
-  background: var(--primary-dim); 
-  border: 1px solid rgba(37,99,235,0.15); 
-  border-radius: var(--r-md);
-  font-size: 12.5px; 
-  color: var(--primary); 
-  line-height: 1.5;
-  text-align: center; 
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-.period-summary-box strong { 
-  font-weight: 700; 
-  color: var(--primary-hover); 
-  display: block; 
-  margin-top: 4px; 
-}
-body.dark .period-summary-box {
-  background: rgba(37,99,235,0.1); 
-  border-color: rgba(37,99,235,0.2); 
-  color: #94a3b8;
-}
-body.dark .period-summary-box strong { 
-  color: #f8fafc; 
-}
-
 @media print {
   .shell { display: block; }
   .header { position: relative; }
@@ -1841,7 +1805,7 @@ body.dark .period-summary-box strong {
   #darkToggleBtn { display: none !important; }
   #loginView { display: none !important; }
   .global-loading { display: none !important; }
-  .log-theme-toggle { display: none !important; }
+  .log-theme-switch { display: none !important; }
 }
 </style>
 </head>
@@ -1877,6 +1841,7 @@ body.dark .period-summary-box strong {
           <span class="dark">SMART</span> <span class="blue">BTQ</span>
         </div>
         <div class="brand-sub">Monitoring Baca Tulis Al-Qur'an</div>
+        <div class="department-text">Dinas Pendidikan dan Kebudayaan</div>
       </div>
 
       <div class="divider" aria-hidden="true"></div>
@@ -2012,7 +1977,7 @@ body.dark .period-summary-box strong {
             <span class="nav-icon">↗</span> <span class="nav-text">Grafik & Insight Analitik</span>
           </button>
           <button class="nav-item" data-target="view-trend" onclick="showSection('view-trend')">
-            <span class="nav-icon">∿</span> <span class="nav-text">Tren Perkembangan Bulanan</span>
+            <span class="nav-icon">∿</span> <span class="nav-text">Pusat Analitik & Tren</span>
           </button>
           <button class="nav-item" data-target="view-kesimpulan" onclick="showSection('view-kesimpulan')">
             <span class="nav-icon">◎</span> <span class="nav-text">Kesimpulan & Rekomendasi</span>
@@ -2020,8 +1985,8 @@ body.dark .period-summary-box strong {
         </nav>
 
         <div class="sidebar-filter">
-          <span class="sidebar-filter-label">Filter Wilayah & Kelas</span>
-          <select class="sel select" id="sbKecamatan" style="width:100%;">
+          <span class="sidebar-filter-label">Filter Wilayah & Periode</span>
+          <select class="sel select" id="sbKecamatan">
             <option value="all">Semua Kecamatan</option>
             <option value="Langensari">Langensari</option>
             <option value="Purwaharja">Purwaharja</option>
@@ -2033,29 +1998,9 @@ body.dark .period-summary-box strong {
             <option value="4">Hanya Kelas 4</option>
             <option value="5">Hanya Kelas 5</option>
           </select>
-
-          <div class="filter-divider"></div>
-
-          <span class="sidebar-filter-label">Rentang Periode</span>
-          
-          <div class="period-group">
-            <div class="period-label">Dari Periode</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-              <select class="sel" id="sbStartMonth"></select>
-              <select class="sel" id="sbStartYear"></select>
-            </div>
-          </div>
-
-          <div class="period-group">
-            <div class="period-label">Sampai Periode</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-              <select class="sel" id="sbEndMonth"></select>
-              <select class="sel" id="sbEndYear"></select>
-            </div>
-          </div>
-
-          <div class="period-summary-box" id="sidebarPeriodSummary">
-            Menampilkan analisis data...
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+            <select class="sel" id="sbYear"></select>
+            <select class="sel" id="sbMonth"></select>
           </div>
         </div>
       </div>
@@ -2282,26 +2227,131 @@ body.dark .period-summary-box strong {
         <div class="exec-banner" id="exec-banner"></div>
       </div>
 
-      <!-- ══ VIEW: TREND ══ -->
+      <!-- ══ VIEW: TREND (NEW EXECUTIVE STYLE) ══ -->
       <div id="view-trend" class="view">
         <div class="page-header">
           <div>
-            <div class="page-title">Tren Perkembangan Bulanan</div>
-            <div class="page-subtitle" id="trend-sub">Pola perubahan kelancaran BTQ dari bulan ke bulan</div>
+            <div class="page-title">Pusat Analitik & Tren Komprehensif</div>
+            <div class="page-subtitle" id="trend-sub">Monitoring performa institusional (Tahunan & Kustom Periode)</div>
           </div>
         </div>
+
+        <!-- Control Panel -->
+        <div class="trend-controls">
+          <div class="tc-row">
+            <div class="tc-group">
+              <label class="tc-label">Mode Analisis</label>
+              <select id="trendMode" class="sel" style="min-width: 240px;" onchange="handleTrendModeChange()">
+                <option value="seluruh">Seluruh Waktu (Awal s.d. Sekarang)</option>
+                <option value="tahunan">Agregat Tahunan (Yearly)</option>
+                <option value="kustom">Rentang Periode Kustom</option>
+              </select>
+            </div>
+
+            <!-- Custom Selectors -->
+            <div id="tcCustomGroup" style="display:none; gap:20px; flex-wrap:wrap;">
+              <div class="tc-group">
+                <label class="tc-label">Dari Periode</label>
+                <div style="display:flex; gap:8px;">
+                  <select id="tDariBulan" class="sel" onchange="updateTrendView()"></select>
+                  <select id="tDariTahun" class="sel" onchange="updateTrendView()"></select>
+                </div>
+              </div>
+              <div class="tc-group">
+                <label class="tc-label">Sampai Periode</label>
+                <div style="display:flex; gap:8px;">
+                  <select id="tSampaiBulan" class="sel" onchange="updateTrendView()"></select>
+                  <select id="tSampaiTahun" class="sel" onchange="updateTrendView()"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="trendWarning" class="error-msg" style="margin-top:0; padding:8px 14px; display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <strong>Validasi Gagal:</strong> Periode 'Sampai' tidak boleh lebih awal dari periode 'Dari'.
+          </div>
+        </div>
+
+        <!-- NEW: Executive Summary KPI Grid -->
+        <div class="trend-kpi-grid" id="trendKpiGrid" style="display: none;">
+            <div class="trend-kpi-card tk-card-blue">
+                <div class="tk-label">Total Sekolah Aktif</div>
+                <div class="tk-value" id="tkTotalSekolah">-</div>
+                <div class="tk-sub">Data komparatif tervalidasi</div>
+            </div>
+            <div class="trend-kpi-card tk-card-blue">
+                <div class="tk-label">Total Siswa Aktif</div>
+                <div class="tk-value" id="tkTotalSiswa">-</div>
+                <div class="tk-sub">Pada periode terbaru</div>
+            </div>
+            <div class="trend-kpi-card tk-card-green">
+                <div class="tk-label">Progress Positif</div>
+                <div class="tk-value" id="tkProgressPositif">-</div>
+                <div class="tk-sub">Sekolah mengalami kenaikan tren</div>
+            </div>
+            <div class="trend-kpi-card tk-card-amber">
+                <div class="tk-label">Perlu Pendampingan</div>
+                <div class="tk-value" id="tkPendampingan">-</div>
+                <div class="tk-sub">Sekolah stagnan/menurun</div>
+            </div>
+        </div>
+
+        <!-- NEW: Validation Banner -->
+        <div id="trendValidationBanner" class="highlight-callout" style="display:none; border-left-color: var(--warning); background: var(--warning-dim); margin-bottom: 24px;">
+            <strong>Status Validasi Data:</strong> <span id="trendValidationText"></span>
+        </div>
+
+        <!-- Main Chart -->
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
-              <div class="chart-card-title">Histori Persentase Kelancaran</div>
-              <div class="chart-card-sub">Perkembangan capaian multiwaktu</div>
+              <div class="chart-card-title">Grafik Tren & Proyeksi Performa</div>
+              <div class="chart-card-sub" id="trendChartSub">Visualisasi pergerakan kinerja komprehensif berdasar persentase kelancaran</div>
             </div>
           </div>
           <div class="chart-card-body">
-            <div id="trendContent"></div>
-            <div id="trend-insight" style="margin-top:14px"></div>
+            <div id="trendContent" style="position:relative; height:320px;"></div>
           </div>
         </div>
+
+        <!-- School Progress Tracking (Grid) -->
+        <div class="charts-2col" id="trendProgressGrid" style="display: none; margin-top: 24px;">
+          <div class="chart-card" style="margin-bottom:0;">
+            <div class="chart-card-header" style="border-top: 3px solid var(--success);">
+              <div>
+                <div class="chart-card-title">Top Progress</div>
+                <div class="chart-card-sub">Peringkat sekolah dengan peningkatan terbaik</div>
+              </div>
+            </div>
+            <div class="chart-card-body" style="background:var(--surface-2); padding:16px;">
+              <div id="trendTopList"></div>
+            </div>
+          </div>
+
+          <div class="chart-card" style="margin-bottom:0;">
+            <div class="chart-card-header" style="border-top: 3px solid var(--danger);">
+              <div>
+                <div class="chart-card-title">Need Attention & Priority</div>
+                <div class="chart-card-sub">Sekolah prioritas pendampingan intensif</div>
+              </div>
+            </div>
+            <div class="chart-card-body" style="background:var(--surface-2); padding:16px;">
+              <div id="trendBotList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Executive Conclusion -->
+        <div class="chart-card" id="trendConclusionCard" style="display: none; margin-top: 24px; border-left: 4px solid var(--primary);">
+            <div class="chart-card-body" style="padding: 24px 28px;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Kesimpulan Eksekutif Otomatis</div>
+                <div id="trendConclusionText" style="font-size: 14.5px; color: var(--text-primary); line-height: 1.6; font-weight: 500;">
+                    <!-- Auto generated text -->
+                </div>
+            </div>
+        </div>
+
       </div>
 
       <!-- ══ VIEW: KESIMPULAN ══ -->
@@ -2389,11 +2439,7 @@ const MONTH_ORDER = [
 ];
 
 let DATABASE = {};
-
-// Variabel Rentang Periode Baru
-let startYear = null, startMonth = null;
-let endYear = null, endMonth = null;
-
+let currentYear = null, currentMonth = null;
 let selectedKecamatan = 'all';
 let selectedKelas = 'all';
 let currentSchools = [], filteredSchools = [];
@@ -2406,10 +2452,8 @@ let currentModalSchool = null;
 // Premium Loading Lock State
 let isLoading = false;
 
-// Helper Komparasi Periode
-function periodValue(year, month) {
-  return parseInt(year) * 100 + MONTH_ORDER.indexOf(month);
-}
+// Trend State
+let isTrendInitialized = false;
 
 // ────────────────────────────────────────────
 // GLOBAL OVERLAY LOCK SYSTEM
@@ -2483,7 +2527,7 @@ async function showDashboardView() {
   // Inisialisasi event dan ambil data
   setupEventListeners(); 
   initFullscreenSystem();
-  await loadData(); // Ganti dari initDashboard ke flow data sentral
+  await initDashboard();
 }
 
 function showLoginView() {
@@ -2607,141 +2651,100 @@ function setupLoginLogic() {
 // ────────────────────────────────────────────
 // DASHBOARD DATA INIT & EVENT LISTENERS
 // ────────────────────────────────────────────
-
-// Memuat data dari server hanya SEKALI di awal sesi. 
-// Render selanjutnya hanya memfilter variabel global DATABASE
-async function loadData() {
+async function initDashboard() {
   if (isLoading) return;
   try {
     showLoading("Menyinkronkan Dashboard", "Mengambil data inisial dari server...");
-    
     const [res] = await Promise.all([
         fetch(API_URL),
         new Promise(resolve => setTimeout(resolve, 800))
     ]);
-    const data = await res.json();
-    
-    DATABASE = data; 
+    DATABASE = await res.json();
 
-    // Setup Rentang Periode Default (Misal: Semua data di tahun terbaru)
-    const allAvailable = [];
-    Object.keys(DATABASE).sort().forEach(y => {
-        MONTH_ORDER.forEach(m => {
-            if(DATABASE[y][m]) allAvailable.push({y, m});
-        });
-    });
+    // Setup tahun default
+    const years = Object.keys(DATABASE).sort((a, b) => b - a);
+    if (years.length > 0) {
+      currentYear = years[0];
+      
+      const availableMonths = MONTH_ORDER.filter(m => DATABASE[currentYear][m]);
+      if (availableMonths.length > 0) {
+        currentMonth = availableMonths[availableMonths.length - 1];
+      }
+    }
 
-    if (allAvailable.length > 0) {
-      endYear = allAvailable[allAvailable.length - 1].y;
-      endMonth = allAvailable[allAvailable.length - 1].m;
-      // Set awal ke bulan pertama dari tahun terakhir yang ada datanya
-      startYear = endYear;
-      const firstMonthOfYear = allAvailable.find(p => p.y === startYear);
-      startMonth = firstMonthOfYear ? firstMonthOfYear.m : endMonth;
-      
-      initPeriodDropdowns();
-      
-      const pStr = startYear === endYear && startMonth === endMonth 
-                  ? `${startMonth} ${startYear}` 
-                  : `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
-      document.getElementById('sidebarPeriodSummary').innerHTML = `Menampilkan analisis data<br><strong>${pStr}</strong>`;
-      
-      renderUI();
+    initYearDropdown();
+    initMonthDropdown();
+
+    if (currentYear && currentMonth && DATABASE[currentYear][currentMonth]) {
+      renderUI(DATABASE[currentYear][currentMonth]);
     } else {
       showEmpty();
     }
-
   } catch (err) {
-    console.error("Fetch API Error:", err);
+    console.error("Init Error:", err);
     showError();
   } finally {
     hideLoading();
   }
 }
 
-// Event Dropdown Bersih (addEventListener)
 function setupEventListeners() {
+  const sbTahun = document.getElementById("sbYear");
+  const sbBulan = document.getElementById("sbMonth");
   const sbKec = document.getElementById("sbKecamatan");
   const sbKelas = document.getElementById("sbKelas");
-  
-  const sbSM = document.getElementById("sbStartMonth");
-  const sbSY = document.getElementById("sbStartYear");
-  const sbEM = document.getElementById("sbEndMonth");
-  const sbEY = document.getElementById("sbEndYear");
+
+  const handleYearChange = (e) => {
+    if (isLoading) { e.preventDefault(); return; }
+    currentYear = e.target.value;
+    if (sbTahun) sbTahun.value = currentYear;
+    
+    initMonthDropdown(); 
+    loadData(currentYear, currentMonth);
+  };
+
+  const handleMonthChange = (e) => {
+    if (isLoading) { e.preventDefault(); return; }
+    currentMonth = e.target.value;
+    if (sbBulan) sbBulan.value = currentMonth;
+    
+    loadData(currentYear, currentMonth);
+  };
 
   const handleKecChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     selectedKecamatan = e.target.value;
+    if (sbKec) sbKec.value = selectedKecamatan;
     
     stackDisplayMode = selectedKecamatan === 'all' ? 'top20' : 'all';
     
-    triggerLocalLoading(
-      `Memfilter ${selectedKecamatan === 'all' ? 'Semua Wilayah' : 'Kec. ' + selectedKecamatan}`, 
-      "Menerapkan konfigurasi filter pada dashboard...",
-      () => { renderUI(); }
-    );
+    if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+        triggerLocalLoading(
+          `Memfilter ${selectedKecamatan === 'all' ? 'Semua Wilayah' : 'Kec. ' + selectedKecamatan}`, 
+          "Menerapkan konfigurasi filter pada dashboard...",
+          () => { renderUI(DATABASE[currentYear][currentMonth]); }
+        );
+    }
   };
 
   const handleKelasChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     selectedKelas = e.target.value;
     
-    const namaKelas = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
-    triggerLocalLoading(
-      `Memfilter Data ${namaKelas}`, 
-      "Menyinkronkan ulang metrik dashboard...",
-      () => { renderUI(); }
-    );
-  };
-
-  const handlePeriodChange = (e) => {
-    if (isLoading) { e.preventDefault(); return; }
-
-    startYear = document.getElementById('sbStartYear').value;
-    startMonth = document.getElementById('sbStartMonth').value;
-    endYear = document.getElementById('sbEndYear').value;
-    endMonth = document.getElementById('sbEndMonth').value;
-
-    const sVal = periodValue(startYear, startMonth);
-    const eVal = periodValue(endYear, endMonth);
-    const summaryBox = document.getElementById('sidebarPeriodSummary');
-
-    let isValid = true;
-    if (sVal > eVal) {
-        isValid = false;
-        endYear = startYear;
-        endMonth = startMonth;
-        document.getElementById('sbEndYear').value = endYear;
-        document.getElementById('sbEndMonth').value = endMonth;
-        
-        summaryBox.innerHTML = `⚠ Rentang tidak valid<br><strong>Periode akhir tidak boleh lebih kecil dari periode awal.</strong>`;
-        summaryBox.style.borderColor = "var(--warning)";
-        summaryBox.style.color = "var(--warning)";
+    if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+        const namaKelas = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
+        triggerLocalLoading(
+          `Memfilter Data ${namaKelas}`, 
+          "Menyinkronkan ulang metrik dashboard...",
+          () => { renderUI(DATABASE[currentYear][currentMonth]); }
+        );
     }
-
-    setTimeout(() => {
-        summaryBox.style.borderColor = "";
-        summaryBox.style.color = "";
-        
-        const pStr = startYear === endYear && startMonth === endMonth 
-                    ? `${startMonth} ${startYear}` 
-                    : `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
-                    
-        summaryBox.innerHTML = `Menampilkan analisis data<br><strong>${pStr}</strong>`;
-        
-        triggerLocalLoading("Menyinkronkan Periode", `Mengkalkulasi akumulasi data ${pStr}`, () => {
-            renderUI();
-        });
-    }, isValid ? 0 : 1800);
   };
 
+  if (sbTahun) sbTahun.onchange = handleYearChange;
+  if (sbBulan) sbBulan.onchange = handleMonthChange;
   if (sbKec) sbKec.onchange = handleKecChange;
   if (sbKelas) sbKelas.onchange = handleKelasChange;
-
-  if (sbSM) sbSM.onchange = handlePeriodChange;
-  if (sbSY) sbSY.onchange = handlePeriodChange;
-  if (sbEM) sbEM.onchange = handlePeriodChange;
-  if (sbEY) sbEY.onchange = handlePeriodChange;
 }
 
 // ────────────────────────────────────────────
@@ -2756,12 +2759,11 @@ function initFullscreenSystem() {
   document.addEventListener('mozfullscreenchange', updateFsUI);
   document.addEventListener('MSFullscreenChange', updateFsUI);
 
-  // Auto show pada saat first load (delay 800ms) untuk memastikan UI stabil
   setTimeout(() => {
       showFullscreenPrompt();
   }, 800);
 
-  updateFsUI(); // initial state check
+  updateFsUI(); 
 }
 
 function isFullscreenActive() {
@@ -2776,21 +2778,21 @@ function toggleFullscreen() {
     const doc = document.documentElement;
     if (doc.requestFullscreen) {
       doc.requestFullscreen().catch(err => console.log("Fullscreen gagal:", err));
-    } else if (doc.webkitRequestFullscreen) { /* Safari */
+    } else if (doc.webkitRequestFullscreen) {
       doc.webkitRequestFullscreen();
-    } else if (doc.msRequestFullscreen) { /* IE11 */
+    } else if (doc.msRequestFullscreen) {
       doc.msRequestFullscreen();
-    } else if (doc.mozRequestFullScreen) { /* Firefox */
+    } else if (doc.mozRequestFullScreen) {
       doc.mozRequestFullScreen();
     }
   } else {
     if (document.exitFullscreen) {
       document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) { /* Safari */
+    } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { /* IE11 */
+    } else if (document.msExitFullscreen) {
       document.msExitFullscreen();
-    } else if (document.mozCancelFullScreen) { /* Firefox */
+    } else if (document.mozCancelFullScreen) {
       document.mozCancelFullScreen();
     }
   }
@@ -2802,16 +2804,13 @@ function updateFsUI() {
   
   if(isFullscreen) {
     if(fsBtn) fsBtn.classList.add("hide");
-    hideFullscreenPrompt(false); // Auto hide saat masuk fullscreen tanpa mencatat dismiss
+    hideFullscreenPrompt(false); 
   } else {
     if(fsBtn) fsBtn.classList.remove("hide");
-    
-    // Wajib reset status dismiss agar selalu muncul saat keluar fullscreen
     isFsPromptDismissed = false; 
-    
     setTimeout(() => {
         showFullscreenPrompt();
-    }, 600); // Auto show saat keluar fullscreen
+    }, 600);
   }
 }
 
@@ -2821,10 +2820,7 @@ function showFullscreenPrompt() {
   if (prompt) {
     prompt.classList.remove('hide');
     prompt.classList.add('show');
-    
     clearTimeout(fsPromptTimer);
-    
-    // Auto hide prompt setelah 10 detik
     fsPromptTimer = setTimeout(() => {
         hideFullscreenPrompt(false);
     }, 10000); 
@@ -2838,13 +2834,13 @@ function hideFullscreenPrompt(userDismissed = false) {
     prompt.classList.add('hide');
   }
   if (userDismissed) {
-    isFsPromptDismissed = true; // Dismiss sementara dalam sesi ini (akan reset jika refresh/keluar FS)
+    isFsPromptDismissed = true; 
   }
-  clearTimeout(fsPromptTimer); // Bersihkan timer
+  clearTimeout(fsPromptTimer); 
 }
 
 function acceptFullscreenPrompt() {
-  toggleFullscreen(); // Trigger API Fullscreen pertama agar tidak diblokir browser security
+  toggleFullscreen(); 
   hideFullscreenPrompt(false);
 }
 
@@ -2854,7 +2850,7 @@ function acceptFullscreenPrompt() {
 
 function showLoading(titleText, subText) {
   isLoading = true;
-  lockOverlayBackground(); // Gantikan ui-frozen
+  lockOverlayBackground(); 
   
   const overlay = document.getElementById('globalLoadingOverlay');
   if(titleText) document.getElementById('loadingContextTitle').textContent = titleText;
@@ -2868,10 +2864,8 @@ function showLoading(titleText, subText) {
 function hideLoading() {
   const overlay = document.getElementById('globalLoadingOverlay');
   if(overlay) overlay.classList.remove('active');
-  
-  // Wait untuk menyelesaikan animasi CSS fade out overlay
   setTimeout(() => {
-     unlockOverlayBackground(); // Lepas lock background
+     unlockOverlayBackground(); 
      isLoading = false;
   }, 400); 
 }
@@ -2882,14 +2876,12 @@ function triggerLocalLoading(title, subtitle, callback) {
   setTimeout(() => {
       callback();
       hideLoading();
-  }, 800); // Waktu yang pas agar transisi blur background berjalan utuh
+  }, 800); 
 }
 
-// Menggantikan struktur visual sebelum data masuk
 function renderSkeletonUI() {
     const skelBox = (w, h, r = '6px') => `<div class="skeleton-box" style="width:${w}; height:${h}; border-radius:${r};"></div>`;
     
-    // Header Metric
     const heroPct = document.getElementById('hero-pct');
     if (heroPct) heroPct.innerHTML = skelBox('120px', '64px');
     const heroDesc = document.getElementById('hero-desc');
@@ -2897,19 +2889,16 @@ function renderSkeletonUI() {
     const progBar = document.getElementById('hero-prog');
     if (progBar) progBar.innerHTML = skelBox('100%', '8px', '8px');
 
-    // Hero Sub-stats
     ['hs-sekolah', 'hs-siswa', 'hs-lancar', 'hs-belum', 'hs-tidak'].forEach(id => {
        const el = document.getElementById(id);
        if (el) el.innerHTML = skelBox('40px', '26px');
     });
 
-    // KPI Cards
     ['kpi-sekolah', 'kpi-lancar', 'kpi-belum', 'kpi-tidak', 'kpi-hadir'].forEach(id => {
        const el = document.getElementById(id);
        if (el) el.innerHTML = skelBox('60px', '32px');
     });
 
-    // Table Skeletons
     const tBody = document.getElementById('tableBody');
     if (tBody) {
         let skRows = '';
@@ -2918,6 +2907,35 @@ function renderSkeletonUI() {
         }
         tBody.innerHTML = skRows;
     }
+}
+
+async function loadData(year, month) {
+  if (isLoading) return;
+  try {
+    showLoading(
+       `Memuat Data ${month} ${year}`, 
+       "Menarik data langsung dari sistem rekapitulasi utama..."
+    );
+    
+    const [res] = await Promise.all([
+        fetch(API_URL),
+        new Promise(resolve => setTimeout(resolve, 800))
+    ]);
+    const data = await res.json();
+    
+    DATABASE = data; 
+
+    if (!data[year] || !data[year][month]) {
+      showEmpty();
+    } else {
+      renderUI(data[year][month]);
+    }
+  } catch (err) {
+    console.error("Fetch API Error:", err);
+    showError();
+  } finally {
+    hideLoading();
+  }
 }
 
 function showError() {
@@ -2929,51 +2947,42 @@ function showError() {
 }
 
 function showEmpty() {
-  document.getElementById("r-title").textContent = "Data belum tersedia pada rentang ini";
-  document.getElementById("r-subtitle").textContent = `Data kosong untuk filter terpilih`;
+  document.getElementById("r-title").textContent = "Data belum tersedia pada periode ini";
+  document.getElementById("r-subtitle").textContent = `Data kosong untuk ${currentMonth} ${currentYear}`;
   document.getElementById("hero-pct").innerHTML = `-<sup>%</sup>`;
-  document.getElementById("hero-desc").innerHTML = "Silakan ubah rentang filter periode pada menu samping.";
-  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di rentang periode tersebut</td></tr>`;
+  document.getElementById("hero-desc").innerHTML = "Silakan pilih bulan atau tahun lain pada menu.";
+  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di periode tersebut</td></tr>`;
 }
 
 // ────────────────────────────────────────────
-// DROPDOWN RENDERERS (RANGE)
+// DROPDOWN RENDERERS
 // ────────────────────────────────────────────
-function initPeriodDropdowns() {
+function initYearDropdown() {
   const years = Object.keys(DATABASE).sort((a, b) => b - a);
-  const yrOpts = years.map(y => `<option value="${y}">${y}</option>`).join("");
+  const opts = years.map(y => `<option value="${y}">${y}</option>`).join("");
   
-  const sbSY = document.getElementById("sbStartYear");
-  const sbEY = document.getElementById("sbEndYear");
-  if (sbSY) { sbSY.innerHTML = yrOpts; sbSY.value = startYear; }
-  if (sbEY) { sbEY.innerHTML = yrOpts; sbEY.value = endYear; }
-
-  // Set Semua Bulan Saja, Pengecekan Validasi Dilakukan Pas Submit Change
-  const moOpts = MONTH_ORDER.map(m => `<option value="${m}">${m}</option>`).join("");
-  
-  const sbSM = document.getElementById("sbStartMonth");
-  const sbEM = document.getElementById("sbEndMonth");
-  if (sbSM) { sbSM.innerHTML = moOpts; sbSM.value = startMonth; }
-  if (sbEM) { sbEM.innerHTML = moOpts; sbEM.value = endMonth; }
+  const sbY = document.getElementById("sbYear");
+  if (sbY) { sbY.innerHTML = opts; sbY.value = currentYear; }
 }
 
-// Mengambil Data Tepat Di Rentang Yg Dipilih
-function getValidPeriodsInRange() {
-  const periods = [];
-  const sVal = periodValue(startYear, startMonth);
-  const eVal = periodValue(endYear, endMonth);
+function initMonthDropdown() {
+  const availableMonths = DATABASE[currentYear] || {};
+  const months = MONTH_ORDER.filter(m => availableMonths[m]);
+
+  if (months.length === 0) {
+    const noOpt = '<option value="">- Kosong -</option>';
+    if (document.getElementById("sbMonth")) document.getElementById("sbMonth").innerHTML = noOpt;
+    return;
+  }
+
+  if (!months.includes(currentMonth)) {
+    currentMonth = months[0];
+  }
+
+  const opts = months.map(m => `<option value="${m}">${m}</option>`).join("");
   
-  Object.keys(DATABASE).sort().forEach(y => {
-      MONTH_ORDER.forEach(m => {
-          if(DATABASE[y] && DATABASE[y][m]) {
-              const val = periodValue(y, m);
-              if (val >= sVal && val <= eVal) {
-                  periods.push({year: y, month: m});
-              }
-          }
-      });
-  });
-  return periods;
+  const sbM = document.getElementById("sbMonth");
+  if (sbM) { sbM.innerHTML = opts; sbM.value = currentMonth; }
 }
 
 // ────────────────────────────────────────────
@@ -2982,12 +2991,10 @@ function getValidPeriodsInRange() {
 const n2 = n => parseFloat(n).toFixed(1);
 const fmt = n => n.toLocaleString('id-ID');
 
-// Validasi Kelas
 function isValidClass(kls) {
   return kls && kls.total && kls.total > 0;
 }
 
-// Cek Kelengkapan Data
 function checkIncompleteData(schools) {
   return schools.some(s =>
     s.rows.some(r => !isValidClass(r.kls4) || !isValidClass(r.kls5))
@@ -3005,7 +3012,6 @@ function aggregateSchools(rawArr) {
       const isK4Valid = isValidClass(r.kls4);
       const isK5Valid = isValidClass(r.kls5);
 
-      // Hanya kalkulasi data valid yang mencegah bias perhitungan pada nilai kosong
       if (isK4Valid) {
         hasKls4 = true;
         const k4s = r.kls4.lancar + r.kls4.belum + r.kls4.tidak;
@@ -3060,6 +3066,35 @@ function computeTotals(schools) {
   };
 }
 
+function getPrevPeriod(year, month) {
+  const idx = MONTH_ORDER.indexOf(month);
+  if(idx <= 0) {
+    const py = String(parseInt(year)-1);
+    if(!DATABASE[py]) return null;
+    const pym = MONTH_ORDER.filter(m => DATABASE[py][m]);
+    return pym.length ? { year: py, month: pym[pym.length-1] } : null;
+  }
+  for(let i = idx - 1; i >= 0; i--) {
+    if(DATABASE[year] && DATABASE[year][MONTH_ORDER[i]]) return { year, month: MONTH_ORDER[i] };
+  }
+  return null;
+}
+
+function getAllPeriods() {
+  const result = [];
+  Object.keys(DATABASE).sort().forEach(yr => {
+    MONTH_ORDER.forEach(mo => {
+      if(DATABASE[yr] && DATABASE[yr][mo]) result.push({ year: yr, month: mo });
+    });
+  });
+  return result;
+}
+
+// Convert Year+Month to a sortable integer
+function getPeriodValue(year, month) {
+  return parseInt(year) * 12 + MONTH_ORDER.indexOf(month);
+}
+
 function dataQuality(school) {
   if (school.warnings.length > 0) return 'check';
   const avgH = school.hadir.reduce((a,b)=>a+b,0) / school.hadir.length;
@@ -3076,8 +3111,16 @@ function showSection(id) {
   document.querySelectorAll('.nav-item').forEach(l => {
     l.classList.toggle('active', l.getAttribute('data-target') === id);
   });
-  // ALWAYS close sidebar immediately after navigating
   closeSidebar();
+  
+  // Jika menu Trend dibuka, inisialisasi kontrol jika belum
+  if (id === 'view-trend') {
+      if (!isTrendInitialized) {
+          initTrendControls();
+      }
+      renderTrend(selectedKecamatan); // Pastikan render pakai filter terkini
+  }
+  
   window.dispatchEvent(new Event('resize'));
 }
 
@@ -3096,35 +3139,12 @@ function closeSidebar() {
 }
 
 // ────────────────────────────────────────────
-// RENDER UI (MENDUKUNG DATA RENTANG TANGGAL)
+// RENDER UI (Pemisahan Logika)
 // ────────────────────────────────────────────
-function renderUI() {
+function renderUI(data) {
   document.getElementById('tableBody').innerHTML = '';
 
-  const periods = getValidPeriodsInRange();
-  
-  if (periods.length === 0) {
-      showEmpty();
-      return;
-  }
-
-  // AGGREGATION: Accumulate Data for Each School within the selected range
-  const schoolMap = new Map();
-  periods.forEach(p => {
-      if (!DATABASE[p.year] || !DATABASE[p.year][p.month]) return;
-      DATABASE[p.year][p.month].forEach(s => {
-          if (schoolMap.has(s.no)) {
-              // Jika sudah ada, gabungkan (akumulasi) rows-nya
-              const existing = schoolMap.get(s.no);
-              existing.rows = existing.rows.concat(s.rows);
-          } else {
-              // Clone object agar tidak merubah referensi asli di DATABASE
-              schoolMap.set(s.no, JSON.parse(JSON.stringify(s)));
-          }
-      });
-  });
-  
-  const rawMaster = Array.from(schoolMap.values());
+  const rawMaster = data;
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
   let rawArr = rawMaster;
@@ -3134,16 +3154,11 @@ function renderUI() {
 
   const T = computeTotals(currentSchools);
   const pct = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
-  
-  const periodStr = startYear === endYear && startMonth === endMonth 
-                  ? `${startMonth} ${startYear}` 
-                  : `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
-                  
+  const periodStr = `${currentMonth} ${currentYear}`;
   const isAll = selectedKecamatan === 'all';
   const cakupan = isAll ? 'Kota Banjar' : `Kec. ${selectedKecamatan}`;
   const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
 
-  // Update Teks Label
   document.getElementById('r-title').textContent = `Ringkasan — ${cakupan}`;
   document.getElementById('r-subtitle').textContent = `Periode ${periodStr} · ${currentSchools.length} Sekolah Dasar Negeri · ${classStr}`;
   document.getElementById('g-title').textContent = `Grafik & Analisis — ${cakupan}`;
@@ -3155,7 +3170,6 @@ function renderUI() {
 
   document.getElementById('hero-label').textContent = `Tingkat Kelancaran BTQ (${classStr})`;
 
-  // Cek Status Incomplete / Warning
   const isCurrentIncomplete = checkIncompleteData(rawArr);
   const hasWarn = currentSchools.some(s => s.warnings.length > 0);
   const dqBanner = document.getElementById('dqBanner');
@@ -3176,10 +3190,28 @@ function renderUI() {
     dqBanner.className = "dq-banner hidden";
   }
 
-  // Trend Chip Indicator logic adjusted to check against earliest period in range vs previous month before range
-  document.getElementById('r-trend-chip').innerHTML = ''; // Hide trend chip if using range > 1 month to avoid confusion, or can be enabled with deep range logic.
+  const prev = getPrevPeriod(currentYear, currentMonth);
+  let chipHTML = '';
+  
+  if(prev) {
+    let pRaw = DATABASE[prev.year][prev.month];
+    if(!isAll) pRaw = pRaw.filter(s => s.kecamatan === selectedKecamatan);
+    
+    const isPrevIncomplete = checkIncompleteData(pRaw);
+    
+    if (isCurrentIncomplete !== isPrevIncomplete) {
+      chipHTML = `<span class="trend-chip" style="background:var(--warning-dim);color:var(--warning);" title="Periode ini tidak sebanding dengan bulan sebelumnya karena kelengkapan data yang berbeda">⚠ Data Tidak Sebanding</span>`;
+    } else {
+      const pT = computeTotals(aggregateSchools(pRaw));
+      const pPct = pT.tot > 0 ? (pT.lancar / pT.tot * 100) : 0;
+      const diff = pct - pPct;
+      if(diff > 0.05) chipHTML = `<span class="trend-chip chip-up">▲ +${n2(diff)}% dari ${prev.month}</span>`;
+      else if(diff < -0.05) chipHTML = `<span class="trend-chip chip-down">▼ ${n2(diff)}% dari ${prev.month}</span>`;
+      else chipHTML = `<span class="trend-chip chip-flat">→ Stabil</span>`;
+    }
+  }
+  document.getElementById('r-trend-chip').innerHTML = chipHTML;
 
-  // Hero Metrics & Progress Bar
   document.getElementById('hero-pct').innerHTML = `${n2(pct)}<sup>%</sup>`;
   const pctL = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
   const pctB = T.tot > 0 ? (T.belum / T.tot * 100) : 0;
@@ -3198,7 +3230,6 @@ function renderUI() {
   }
   document.getElementById('hero-desc').innerHTML = desc;
 
-  // Populate Small KPI Cards
   document.getElementById('hs-sekolah').textContent = currentSchools.length;
   document.getElementById('hs-siswa').textContent = fmt(T.tot);
   document.getElementById('hs-lancar').textContent = fmt(T.lancar);
@@ -3220,10 +3251,15 @@ function renderUI() {
   document.getElementById('kpi-q-hadir').textContent = T.avgHadir >= 90 ? '● Baik' : T.avgHadir >= 75 ? '● Menengah' : '● Optimalisasi Kehadiran';
   document.getElementById('kpi-q-hadir').className = 'kpi-badge ' + qH;
 
-  // Render Sub-Sections
   renderTable();
   renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
-  renderTrend(cakupan, periods); // Lewatkan rentang periode ke fungsi renderTrend
+  
+  // Jika menu Trend sedang aktif, perbarui secara background
+  if(document.getElementById('view-trend').classList.contains('active')) {
+      if(!isTrendInitialized) initTrendControls();
+      renderTrend(cakupan);
+  }
+
   renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll);
 }
 
@@ -3318,7 +3354,7 @@ function setStackMode(mode) {
   document.getElementById('btnStackTop20').classList.toggle('active', mode === 'top20');
   document.getElementById('btnStackAll').classList.toggle('active', mode === 'all');
   if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-      renderUI(); 
+      renderUI(DATABASE[currentYear][currentMonth]); 
   }
 }
 
@@ -3590,79 +3626,434 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 }
 
 // ────────────────────────────────────────────
-// TREND BULANAN (MENYESUAIKAN RANGE YANG DIPILIH)
+// TREN KOMPREHENSIF (NEW EXECUTIVE LOGIC)
 // ────────────────────────────────────────────
-function renderTrend(cakupan, periods) {
-  const allP = periods || getValidPeriodsInRange(); // Memastikan hanya periode dalam rentang yang tampil
-  const tEl = document.getElementById('trendContent');
-  const iEl = document.getElementById('trend-insight');
-  const gridColorConfig = document.body.classList.contains('dark') ? '#334155' : '#e2e8f0';
+function initTrendControls() {
+    const allP = getAllPeriods();
+    if(allP.length === 0) return;
+    
+    // Sort chronologically
+    allP.sort((a,b) => getPeriodValue(a.year, a.month) - getPeriodValue(b.year, b.month));
+    
+    // Populate Dropdowns
+    const years = [...new Set(allP.map(p => p.year))];
+    const months = MONTH_ORDER;
+    
+    const popSelect = (id, arr) => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.innerHTML = arr.map(v => `<option value="${v}">${v}</option>`).join('');
+    };
 
-  if (allP.length < 2) {
-    tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Memerlukan lebih dari 1 periode dalam rentang untuk menampilkan tren.</div>`;
-    iEl.innerHTML = ''; return;
+    popSelect('tDariBulan', months);
+    popSelect('tSampaiBulan', months);
+    popSelect('tDariTahun', years);
+    popSelect('tSampaiTahun', years);
+
+    // Set defaults: Dari = Awal, Sampai = Akhir
+    const firstP = allP[0];
+    const lastP = allP[allP.length-1];
+
+    document.getElementById('tDariBulan').value = firstP.month;
+    document.getElementById('tDariTahun').value = firstP.year;
+    document.getElementById('tSampaiBulan').value = lastP.month;
+    document.getElementById('tSampaiTahun').value = lastP.year;
+
+    isTrendInitialized = true;
+}
+
+function handleTrendModeChange() {
+    const mode = document.getElementById('trendMode').value;
+    const customGroup = document.getElementById('tcCustomGroup');
+    const warningEl = document.getElementById('trendWarning');
+    
+    if (mode === 'kustom') {
+        customGroup.style.display = 'flex';
+    } else {
+        customGroup.style.display = 'none';
+        warningEl.style.display = 'none';
+    }
+    
+    updateTrendView();
+}
+
+function updateTrendView() {
+    if(!isTrendInitialized) return;
+    const cakupan = selectedKecamatan === 'all' ? 'Kota Banjar' : `Kec. ${selectedKecamatan}`;
+    renderTrend(cakupan);
+}
+
+function renderTrend(cakupan) {
+  const allP = getAllPeriods();
+  const tEl = document.getElementById('trendContent');
+  const summaryTitle = document.getElementById('tsbTitle');
+  const summaryDesc = document.getElementById('tsbDesc');
+  const gridColorConfig = document.body.classList.contains('dark') ? '#334155' : '#e2e8f0';
+  const isDark = document.body.classList.contains('dark');
+  const mode = document.getElementById('trendMode').value;
+  const warningEl = document.getElementById('trendWarning');
+  const progressGrid = document.getElementById('trendProgressGrid');
+  const kpiGrid = document.getElementById('trendKpiGrid');
+  const valBanner = document.getElementById('trendValidationBanner');
+  const conclusionCard = document.getElementById('trendConclusionCard');
+
+  if (allP.length === 0) {
+    tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data belum tersedia.</div>`;
+    summaryTitle.textContent = "Data Kosong";
+    summaryDesc.textContent = "-";
+    progressGrid.style.display = 'none';
+    kpiGrid.style.display = 'none';
+    valBanner.style.display = 'none';
+    conclusionCard.style.display = 'none';
+    return;
   }
   
-  const labels = allP.map(p => `${p.month.substring(0,3)} ${p.year}`);
-  const pctData = allP.map(p => {
-    let raw = DATABASE[p.year][p.month];
-    if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
-    const T = computeTotals(aggregateSchools(raw));
-    return T.tot > 0 ? parseFloat(n2(T.lancar / T.tot * 100)) : 0;
-  });
+  allP.sort((a,b) => getPeriodValue(a.year, a.month) - getPeriodValue(b.year, b.month));
   
-  tEl.innerHTML = '<div style="height:260px"><canvas id="trendChart"></canvas></div>';
+  let validPeriods = [];
+  let isBarChart = false;
+  
+  // LOGIC MODE: SELURUH WAKTU
+  if (mode === 'seluruh') {
+      validPeriods = [...allP];
+      summaryTitle.textContent = `Menampilkan Seluruh Waktu`;
+      summaryDesc.textContent = `Perkembangan historis lengkap dari ${allP[0].month} ${allP[0].year} sampai ${allP[allP.length-1].month} ${allP[allP.length-1].year}.`;
+  } 
+  // LOGIC MODE: TAHUNAN
+  else if (mode === 'tahunan') {
+      isBarChart = true;
+      const years = [...new Set(allP.map(p => p.year))].sort();
+      validPeriods = years.map(yr => {
+          let tLancar=0, tTot=0;
+          allP.filter(p => p.year === yr).forEach(p => {
+              let raw = DATABASE[p.year][p.month];
+              if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
+              const T = computeTotals(aggregateSchools(raw));
+              tLancar += T.lancar;
+              tTot += T.tot;
+          });
+          return { label: `Tahun ${yr}`, pct: tTot > 0 ? (tLancar/tTot*100) : 0, year: yr };
+      });
+      
+      summaryTitle.textContent = `Agregat Performa Tahunan`;
+      summaryDesc.textContent = `Analisis rata-rata capaian BTQ dari tahun ke tahun untuk memetakan progres jangka panjang.`;
+  }
+  // LOGIC MODE: RENTANG KUSTOM
+  else if (mode === 'kustom') {
+      const dM = document.getElementById('tDariBulan').value;
+      const dY = document.getElementById('tDariTahun').value;
+      const sM = document.getElementById('tSampaiBulan').value;
+      const sY = document.getElementById('tSampaiTahun').value;
+      
+      const vDari = getPeriodValue(dY, dM);
+      const vSampai = getPeriodValue(sY, sM);
+      
+      if (vSampai < vDari) {
+          warningEl.style.display = 'flex';
+          tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">⚠</div>Menunggu rentang waktu yang valid...</div>`;
+          summaryTitle.textContent = "Rentang Waktu Terbalik";
+          summaryDesc.textContent = "Silakan perbaiki pilihan bulan dan tahun agar proses analitik dapat berjalan.";
+          progressGrid.style.display = 'none';
+          kpiGrid.style.display = 'none';
+          valBanner.style.display = 'none';
+          conclusionCard.style.display = 'none';
+          return;
+      }
+      warningEl.style.display = 'none';
+      
+      validPeriods = allP.filter(p => {
+          const v = getPeriodValue(p.year, p.month);
+          return v >= vDari && v <= vSampai;
+      });
+      
+      if(validPeriods.length === 0) {
+          tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📂</div>Tidak ada data yang terekam pada rentang kustom tersebut.</div>`;
+          summaryTitle.textContent = "Data Tidak Ditemukan";
+          summaryDesc.textContent = `Periode ${dM} ${dY} s.d. ${sM} ${sY} kosong.`;
+          progressGrid.style.display = 'none';
+          kpiGrid.style.display = 'none';
+          valBanner.style.display = 'none';
+          conclusionCard.style.display = 'none';
+          return;
+      }
+      
+      summaryTitle.textContent = `Analisis Rentang Kustom`;
+      summaryDesc.textContent = `Memantau perkembangan dari ${dM} ${dY} sampai dengan ${sM} ${sY}.`;
+  }
+
+  // Cek untuk data agregat sebelum dan sesudah jika ada detail bulanan
+  let progressMap = [];
+  let totalSekolahAktif = 0;
+  let totalSiswaTerbaru = 0;
+  let progressPositif = 0;
+  let perluPendampingan = 0;
+  let hasStructuralChange = false;
+
+  if (!isBarChart && validPeriods.length >= 2) {
+      const pStart = validPeriods[0];
+      const pEnd = validPeriods[validPeriods.length - 1];
+
+      let rawStart = DATABASE[pStart.year][pStart.month];
+      let rawEnd = DATABASE[pEnd.year][pEnd.month];
+      if (selectedKecamatan !== 'all') {
+          rawStart = rawStart.filter(s => s.kecamatan === selectedKecamatan);
+          rawEnd = rawEnd.filter(s => s.kecamatan === selectedKecamatan);
+      }
+
+      const schStart = aggregateSchools(rawStart);
+      const schEnd = aggregateSchools(rawEnd);
+
+      // Hitung metrik
+      schEnd.forEach(eSch => {
+          if(eSch.tot > 0) {
+              totalSekolahAktif++;
+              totalSiswaTerbaru += eSch.tot;
+          }
+
+          const sSch = schStart.find(s => s.no === eSch.no);
+          if(sSch && sSch.tot > 0 && eSch.tot > 0) {
+              const diff = eSch.pct - sSch.pct;
+              let validNote = "Comparable Data Valid";
+              
+              if(sSch.kls4.tersedia !== eSch.kls4.tersedia || sSch.kls5.tersedia !== eSch.kls5.tersedia) {
+                  validNote = "Perubahan Struktur Kelas Terdeteksi";
+                  hasStructuralChange = true;
+              }
+
+              let priority = '';
+              let evalStatus = '';
+              if(diff > 0) {
+                  progressPositif++;
+                  evalStatus = 'Progress Positif';
+              } else {
+                  perluPendampingan++;
+                  // Klasifikasi Level
+                  if(diff < -10 || eSch.pct < 40) { priority = 'A'; evalStatus = 'Menurun Tajam / Kritis'; }
+                  else if(diff < 0 || eSch.pct < 60) { priority = 'B'; evalStatus = 'Menurun / Kurang'; }
+                  else { priority = 'C'; evalStatus = 'Stagnan / Perlu Penguatan'; }
+              }
+
+              let reason = '';
+              if (priority) {
+                  if (eSch.kls5.tersedia && sSch.kls5.tersedia && (eSch.kls5.lancar / eSch.kls5.tot) < (sSch.kls5.lancar / sSch.kls5.tot)) {
+                      reason = 'Penurunan signifikan pada Kelas 5';
+                  } else if (eSch.kls4.tersedia && sSch.kls4.tersedia && (eSch.kls4.lancar / eSch.kls4.tot) < (sSch.kls4.lancar / sSch.kls4.tot)) {
+                      reason = 'Penurunan signifikan pada Kelas 4';
+                  } else if (diff === 0) {
+                      reason = 'Stagnasi capian kelancaran';
+                  } else {
+                      reason = 'Penurunan merata di seluruh kelas';
+                  }
+              }
+
+              progressMap.push({
+                  no: eSch.no,
+                  nama: eSch.nama,
+                  start: sSch.pct,
+                  end: eSch.pct,
+                  diff: diff,
+                  latestTot: eSch.tot,
+                  validNote: validNote,
+                  evalStatus: evalStatus,
+                  priority: priority,
+                  reason: reason
+              });
+          }
+      });
+      
+      // Render Validation Banner
+      if(hasStructuralChange) {
+          valBanner.style.display = 'block';
+          document.getElementById('trendValidationText').innerHTML = "Terdapat perubahan struktur ketersediaan kelas antar periode. Analisis disesuaikan secara otomatis menggunakan <em>comparable data</em> untuk menjaga akurasi.";
+      } else {
+          valBanner.style.display = 'none';
+      }
+
+      // Render Executive KPI Grid
+      kpiGrid.style.display = 'grid';
+      document.getElementById('tkTotalSekolah').textContent = fmt(totalSekolahAktif);
+      document.getElementById('tkTotalSiswa').textContent = fmt(totalSiswaTerbaru);
+      document.getElementById('tkProgressPositif').textContent = progressPositif;
+      document.getElementById('tkPendampingan').textContent = perluPendampingan;
+  } else {
+      kpiGrid.style.display = 'none';
+      valBanner.style.display = 'none';
+  }
+
+  // PREPARE CHART DATA
+  tEl.innerHTML = '<canvas id="trendChart"></canvas>';
   destroyChart('trend');
   
+  let labels = [];
+  let pctData = [];
+
+  if (isBarChart) {
+      labels = validPeriods.map(p => p.label);
+      pctData = validPeriods.map(p => parseFloat(n2(p.pct)));
+      document.getElementById('trendChartSub').textContent = "Pencapaian agregat rata-rata setiap tahunnya";
+  } else {
+      labels = validPeriods.map(p => `${p.month.substring(0,3)} ${p.year}`);
+      pctData = validPeriods.map(p => {
+          let raw = DATABASE[p.year][p.month];
+          if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
+          const T = computeTotals(aggregateSchools(raw));
+          return T.tot > 0 ? parseFloat(n2(T.lancar / T.tot * 100)) : 0;
+      });
+      document.getElementById('trendChartSub').textContent = "Perkembangan capaian rata-rata dari seluruh sekolah";
+  }
+
+  // Custom Chart Plugin for gradient fill
+  const canvas = document.getElementById('trendChart');
+  const ctx = canvas.getContext('2d');
+  let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+  if (isDark) {
+      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+  } else {
+      gradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
+      gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+  }
+
+  // RENDER CHART PREMIUM
   charts['trend'] = new Chart(document.getElementById('trendChart'), {
-    type: 'line',
+    type: isBarChart ? 'bar' : 'line',
     data: {
       labels,
       datasets: [{
         label: '% Lancar', data: pctData,
-        borderColor: 'rgba(37,99,235,1)', backgroundColor: 'rgba(37,99,235,.12)', pointBackgroundColor: 'rgba(37,99,235,1)',
-        pointRadius: 6, pointHoverRadius: 8, borderWidth: 2.5, fill: true, tension: .4
+        borderColor: isDark ? '#60a5fa' : '#2563eb', 
+        backgroundColor: isBarChart ? (isDark ? '#3b82f6' : '#2563eb') : gradient, 
+        pointBackgroundColor: isDark ? '#60a5fa' : '#2563eb',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: isBarChart ? 0 : 5, 
+        pointHoverRadius: isBarChart ? 0 : 7, 
+        borderWidth: isBarChart ? 0 : 3, 
+        borderRadius: isBarChart ? 6 : 0,
+        fill: !isBarChart, 
+        tension: 0.35 // smooth curve
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       scales: {
-        y: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:11}}, border:{display:false} },
-        x: { grid: {display: false}, ticks: {font:{size:11}}, border:{display:false} }
+        y: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:11, weight: '500'}}, border:{display:false} },
+        x: { grid: {display: false}, ticks: {font:{size:11, weight: '600'}}, border:{display:false} }
       },
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
-          padding: 10, cornerRadius: 8,
-          callbacks: { label: ctx => ` ${ctx.raw}% siswa lancar` }
+          backgroundColor: isDark ? 'rgba(15,23,42,.95)' : 'rgba(15,23,42,.9)', 
+          titleColor: '#fff', bodyColor: 'rgba(255,255,255,.8)',
+          padding: 12, cornerRadius: 8,
+          titleFont: { size: 13, family: "'Plus Jakarta Sans', sans-serif" },
+          bodyFont: { size: 12, family: "'Plus Jakarta Sans', sans-serif" },
+          callbacks: { label: ctx => ` Kinerja: ${ctx.raw}%` }
         }
       }
     }
   });
-  
-  const diff = pctData[pctData.length-1] - pctData[0];
-  
-  // Warning dinamis pada trendline jika ada data belum lengkap
-  const someIncomplete = allP.some(p => {
-    let raw = DATABASE[p.year][p.month];
-    if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
-    return checkIncompleteData(raw);
-  });
 
-  const incompleteWarningHtml = someIncomplete 
-    ? `<div class="insight-item amber" style="margin-top:12px;"><div class="ii-label">Catatan Validitas</div><div class="ii-text">Beberapa titik pada rentang ini mencerminkan <strong>data yang belum lengkap</strong>. Hindari melakukan perbandingan mutlak pada kurva ini.</div></div>` 
-    : '';
+  // PREPARE SCHOOL PROGRESS TRACKER (Premium Cards)
+  if (isBarChart || validPeriods.length < 2) {
+      progressGrid.style.display = 'none';
+      conclusionCard.style.display = 'none';
+      return;
+  }
+  
+  progressGrid.style.display = 'grid';
 
-  iEl.innerHTML = `
-    <div class="insight-strip">
-      <div class="insight-item ${diff > 0 ? 'green' : diff < 0 ? 'red' : 'blue'}">
-        <div class="ii-label">Tren Rentang Terpilih</div>
-        <div class="ii-text">Dalam rentang ${allP.length} bulan tersebut, kelancaran BTQ <strong>${diff > 0 ? 'naik +'+n2(diff)+'%' : diff < 0 ? 'turun '+n2(diff)+'%' : 'stabil'}</strong>.</div>
+  // Sort by highest diff
+  progressMap.sort((a,b) => b.diff - a.diff);
+  
+  const topList = progressMap.filter(s => s.diff > 0).slice(0, 10);
+  const botList = [...progressMap].reverse().filter(s => s.diff <= 0).slice(0, 10);
+
+  const renderPremiumCard = (s, isTop) => {
+      let badgeCls = 'flat'; let textDiff = '0.0%'; let sign = '';
+      if(s.diff > 0) { badgeCls = 'up'; textDiff = '+'+n2(s.diff)+'%'; }
+      else if (s.diff < 0) { badgeCls = 'down'; textDiff = n2(s.diff)+'%'; }
+
+      let prioHtml = ''; let reasonHtml = '';
+      if (!isTop && s.priority) {
+          prioHtml = `<span class="badge-prio badge-prio-${s.priority.toLowerCase()}">Priority Level ${s.priority}</span>`;
+          reasonHtml = `
+            <div style="grid-column: 1 / -1; font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; padding-left: 8px; border-left: 2px solid var(--border);">
+              <em>Catatan: ${s.reason}</em>
+            </div>
+          `;
+      }
+
+      let validClass = s.validNote.includes("Perubahan") ? 'warning' : '';
+
+      return `
+      <div class="premium-row-card" onclick="openModal(${s.no}, 2)">
+          <div class="pr-header">
+              <div class="pr-name-group">
+                  <div class="pr-name">${s.nama}</div>
+                  <div class="pr-students">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                      Total Siswa: ${s.latestTot}
+                  </div>
+              </div>
+              <div class="pr-diff-badge ${badgeCls}">${textDiff}</div>
+          </div>
+          <div class="pr-body">
+              <div class="pr-stat">
+                  <span class="pr-stat-lbl">Progress Lancar</span>
+                  <span class="pr-stat-val">${n2(s.start)}% → ${n2(s.end)}%</span>
+              </div>
+              <div class="pr-stat">
+                  <span class="pr-stat-lbl">Status Evaluasi</span>
+                  <span class="pr-stat-val" style="display:flex; align-items:center; gap:6px;">
+                    ${s.evalStatus} ${prioHtml}
+                  </span>
+              </div>
+              <div class="pr-validation ${validClass}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  Validasi: ${s.validNote}
+              </div>
+              ${reasonHtml}
+          </div>
       </div>
-    </div>
-    ${incompleteWarningHtml}
-  `;
+      `;
+  };
+
+  const topEl = document.getElementById('trendTopList');
+  const botEl = document.getElementById('trendBotList');
+
+  if(topList.length > 0) {
+      topEl.innerHTML = topList.map(s => renderPremiumCard(s, true)).join('');
+  } else {
+      topEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📈</div>Belum ada sekolah yang mencatat tren progres positif di rentang ini.</div>`;
+  }
+
+  if(botList.length > 0) {
+      botEl.innerHTML = botList.map(s => renderPremiumCard(s, false)).join('');
+  } else {
+      botEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">🏆</div>Luar biasa! Seluruh sekolah berhasil mempertahankan atau meningkatkan performanya.</div>`;
+  }
+
+  // EXECUTIVE CONCLUSION AUTO GENERATION
+  conclusionCard.style.display = 'block';
+  const concText = document.getElementById('trendConclusionText');
+  const dStart = pctData[0];
+  const dEnd = pctData[pctData.length-1];
+  const dTot = dEnd - dStart;
+  
+  let concHtml = `Berdasarkan pengolahan data analitik dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif `;
+  
+  if(dTot > 0) {
+      concHtml += `menunjukkan tren <strong>peningkatan yang solid sebesar +${n2(dTot)}%</strong>. `;
+  } else if (dTot < 0) {
+      concHtml += `mengalami <strong>penurunan sebesar ${n2(Math.abs(dTot))}%</strong>. `;
+  } else {
+      concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
+  }
+
+  concHtml += `Secara spesifik, dari total ${totalSekolahAktif} sekolah aktif, mayoritas (${progressPositif} sekolah) berhasil mengukir progres positif. Namun, sistem mendeteksi keberadaan <strong>${perluPendampingan} sekolah</strong> yang membutuhkan atensi khusus dari Dinas Pendidikan (berada pada level prioritas pembinaan) guna mencegah terjadinya kemunduran capaian akademis secara sistemik.`;
+
+  concText.innerHTML = concHtml;
 }
 
 // ────────────────────────────────────────────
@@ -3690,12 +4081,8 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
   document.getElementById('k-callout').innerHTML = callout;
   
   const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
-  const periodStr = startYear === endYear && startMonth === endMonth 
-                  ? `${startMonth} ${startYear}` 
-                  : `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
-
   document.getElementById('k-body').innerHTML = `
-    Asesmen formal dari ekstraksi data matriks <strong>${classStr}</strong> pada rentang <strong>${periodStr}</strong> dalam area komputasi <strong>${cakupan}</strong> mengkalkulasi kumpulan <strong>${fmt(T.tot)} jejak digital valid</strong> dari total ${currentSchools.length} klaster unit dasar. Nilai valuasi capaian di ekuilibrium angka <strong>${n2(pct)}%</strong>. Menjabarkan rincian teknis: <strong>${pL}%</strong> SDM telah terklasifikasi mapan secara alfabetikal bahasa Al-Qur'an, diiringi <strong>${pB}%</strong> pada ambang fase medium, sekaligus menyisakan celah berat pada <strong>${pK}%</strong> demografi siswa tanpa pengenalan struktur huruf yang paling minimal sekalipun.
+    Asesmen formal dari ekstraksi data matriks <strong>${classStr}</strong> per <strong>${currentMonth} ${currentYear}</strong> dalam area komputasi <strong>${cakupan}</strong> mengkalkulasi kumpulan <strong>${fmt(T.tot)} jejak digital valid</strong> dari total ${currentSchools.length} klaster unit dasar. Nilai valuasi capaian di ekuilibrium angka <strong>${n2(pct)}%</strong>. Menjabarkan rincian teknis: <strong>${pL}%</strong> SDM telah terklasifikasi mapan secara alfabetikal bahasa Al-Qur'an, diiringi <strong>${pB}%</strong> pada ambang fase medium, sekaligus menyisakan celah berat pada <strong>${pK}%</strong> demografi siswa tanpa pengenalan struktur huruf yang paling minimal sekalipun.
   `;
   document.getElementById('k-reco').innerHTML = [
     `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
@@ -3708,15 +4095,15 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
 // ────────────────────────────────────────────
 // MODAL DETAIL SEKOLAH
 // ────────────────────────────────────────────
-function openModal(no) {
-  lastSchoolCardId = `school-row-${no}`; // Simpan target spesifik sekolah
+function openModal(no, tabIdx = 0) {
+  lastSchoolCardId = `school-row-${no}`; 
   currentModalSchool = currentSchools.find(s => s.no === no);
   if(!currentModalSchool) return;
   document.getElementById('modalTitle').textContent = currentModalSchool.nama;
-  document.querySelectorAll('.m-tab').forEach((t,i) => t.classList.toggle('active', i === 0));
-  renderModalTab(0);
   
-  // Lock overlay DULU untuk menyimpan posisi scroll yang akurat
+  document.querySelectorAll('.m-tab').forEach((t,i) => t.classList.toggle('active', i === tabIdx));
+  renderModalTab(tabIdx);
+  
   lockOverlayBackground();
   document.getElementById('modalOverlay').classList.add('open');
 }
@@ -3769,7 +4156,7 @@ function renderModalTab(idx) {
       <div style="margin-top:10px;font-size:12px;color:var(--text-tertiary)">Rata-rata kehadiran: <strong style="color:var(--text-primary)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
     `;
   } else {
-    const allP = getValidPeriodsInRange();
+    const allP = getAllPeriods();
     const rows = allP.map(p => {
       const raw = DATABASE[p.year][p.month];
       const found = raw.find(r => r.no === s.no);
@@ -3779,7 +4166,7 @@ function renderModalTab(idx) {
     }).filter(Boolean);
     
     if (rows.length < 2) {
-      el.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📅</div>Perlu setidaknya rentang 2 periode.</div>`;
+      el.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📅</div>Butuh minimal 2 periode untuk menampilkan riwayat.</div>`;
     } else {
       el.innerHTML = `<div>${rows.map((h, i) => {
         let diff = '';
@@ -3814,7 +4201,6 @@ function closeModal(e) {
   }
 }
 
-// Support keydown to close overlays / sidebar / fullscreen prompt
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { 
       closeModal(); 
@@ -3825,7 +4211,6 @@ document.addEventListener('keydown', e => {
 
 /**
  * SMART BTQ — Dark Mode Toggle + UI Enhancement
- * Di-inject tanpa merusak logika JS yang sudah ada.
  */
 (function() {
   'use strict';
@@ -3835,14 +4220,12 @@ document.addEventListener('keydown', e => {
   function applyDark(isDark) {
     document.body.classList.toggle('dark', isDark);
     
-    // Toggle for Dashboard Header Button
     const btn = document.getElementById('darkToggleBtn');
     if (btn) {
       btn.textContent = isDark ? '☀️' : '🌙';
       btn.title = isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode';
     }
 
-    // Toggle for Premium Login Switch (Top Right)
     const loginThemeToggle = document.getElementById('loginThemeToggle');
     if (loginThemeToggle) {
       const iconMoon = loginThemeToggle.querySelector('.icon-moon');
@@ -3872,7 +4255,6 @@ document.addEventListener('keydown', e => {
     }
   }
 
-  // Explicit function to Set Theme from login buttons
   function setTheme(isDark) {
     if (document.body.classList.contains('dark') === isDark) return;
     localStorage.setItem(DARK_KEY, isDark ? '1' : '0');
@@ -3880,13 +4262,12 @@ document.addEventListener('keydown', e => {
 
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
-      if (typeof DATABASE !== 'undefined' && Object.keys(DATABASE).length > 0) {
-        renderUI(); // Update UI to reflect chart color changes
+      if (typeof DATABASE !== 'undefined' && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+        renderUI(DATABASE[currentYear][currentMonth]);
       }
     }, 50);
   }
 
-  // Dashboard Header Toggle Function (Existing)
   function toggleDark() {
     setTheme(!document.body.classList.contains('dark'));
   }
@@ -3917,7 +4298,6 @@ document.addEventListener('keydown', e => {
     }
   }
 
-  // Attach events for Login Theme Switch
   const loginThemeToggle = document.getElementById('loginThemeToggle');
   if (loginThemeToggle) {
     loginThemeToggle.addEventListener('click', () => {
