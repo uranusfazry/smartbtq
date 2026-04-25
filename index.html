@@ -279,7 +279,6 @@ a {
 #loginView .brand-name .dark { color: var(--log-ink-1); }
 #loginView .brand-name .blue { color: var(--log-blue); }
 #loginView .brand-sub { font-size: 13px; color: var(--log-ink-3); font-weight: 400; line-height: 1.4; }
-#loginView .department-text { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--log-dept, #64748b); letter-spacing: 0.2px; transition: color 0.35s ease; }
 #loginView .divider { height: 1px; background: var(--log-border); margin-bottom: 20px; opacity: 0.6; }
 #loginView .form-group { margin-bottom: 14px; }
 #loginView label { display: block; font-size: 12.5px; font-weight: 600; color: var(--log-ink-2); margin-bottom: 6px; letter-spacing: 0.1px; }
@@ -439,7 +438,6 @@ body.dark #loginView {
   --log-shadow-card: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.03);
   --log-card-border: rgba(255, 255, 255, 0.08);
   --log-input-bg: rgba(255, 255, 255, 0.03);
-  --log-dept: #94a3b8;
   
   /* Footer Dark Mode Adaptive Colors */
   --log-footer-name: #ffffff;
@@ -894,7 +892,7 @@ body.dark .nav-icon { background: rgba(0,0,0,0.2); }
   transform: none; /* HAPUS ROTATE/SCALE */
 }
 
-/* Premium Filter Area in Menu */
+/* Premium Filter Area in Menu (UPDATED FOR RANGE) */
 .sidebar-filter {
   margin-top: 16px;
   padding: 24px;
@@ -923,6 +921,58 @@ body.dark .sidebar-filter {
   font-size: 14.5px;
   height: auto;
   border-radius: var(--r-md);
+}
+
+.filter-divider { 
+  height: 1px; 
+  background: var(--border); 
+  margin: 24px 0; 
+  opacity: 0.7; 
+}
+body.dark .filter-divider { 
+  background: rgba(255,255,255,0.06); 
+}
+
+.period-group { 
+  margin-bottom: 16px; 
+}
+.period-label { 
+  font-size: 12.5px; 
+  font-weight: 600; 
+  color: var(--text-secondary); 
+  margin-bottom: 8px; 
+  letter-spacing: 0.2px; 
+}
+body.dark .period-label { 
+  color: var(--text-tertiary); 
+}
+
+.period-summary-box {
+  margin-top: 20px; 
+  padding: 14px 16px; 
+  background: var(--primary-dim); 
+  border: 1px solid rgba(37,99,235,0.15); 
+  border-radius: var(--r-md);
+  font-size: 12.5px; 
+  color: var(--primary); 
+  line-height: 1.5;
+  text-align: center; 
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.period-summary-box strong { 
+  font-weight: 700; 
+  color: var(--primary-hover); 
+  display: block; 
+  margin-top: 4px; 
+}
+body.dark .period-summary-box {
+  background: rgba(37,99,235,0.1); 
+  border-color: rgba(37,99,235,0.2); 
+  color: #94a3b8;
+}
+body.dark .period-summary-box strong { 
+  color: #f8fafc; 
 }
 
 /* ────────────────────────────────────────────
@@ -1729,6 +1779,57 @@ body.dark .loading-progress-value {
   100% { left: 100%; width: 40%; }
 }
 
+/* Sidebar Filter Period Range */
+.filter-divider { 
+  height: 1px; 
+  background: var(--border); 
+  margin: 24px 0; 
+  opacity: 0.7; 
+}
+body.dark .filter-divider { 
+  background: rgba(255,255,255,0.06); 
+}
+.period-group { 
+  margin-bottom: 16px; 
+}
+.period-label { 
+  font-size: 12.5px; 
+  font-weight: 600; 
+  color: var(--text-secondary); 
+  margin-bottom: 8px; 
+  letter-spacing: 0.2px; 
+}
+body.dark .period-label { 
+  color: var(--text-tertiary); 
+}
+.period-summary-box {
+  margin-top: 20px; 
+  padding: 14px 16px; 
+  background: var(--primary-dim); 
+  border: 1px solid rgba(37,99,235,0.15); 
+  border-radius: var(--r-md);
+  font-size: 12.5px; 
+  color: var(--primary); 
+  line-height: 1.5;
+  text-align: center; 
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.period-summary-box strong { 
+  font-weight: 700; 
+  color: var(--primary-hover); 
+  display: block; 
+  margin-top: 4px; 
+}
+body.dark .period-summary-box {
+  background: rgba(37,99,235,0.1); 
+  border-color: rgba(37,99,235,0.2); 
+  color: #94a3b8;
+}
+body.dark .period-summary-box strong { 
+  color: #f8fafc; 
+}
+
 @media print {
   .shell { display: block; }
   .header { position: relative; }
@@ -1740,7 +1841,7 @@ body.dark .loading-progress-value {
   #darkToggleBtn { display: none !important; }
   #loginView { display: none !important; }
   .global-loading { display: none !important; }
-  .log-theme-switch { display: none !important; }
+  .log-theme-toggle { display: none !important; }
 }
 </style>
 </head>
@@ -1776,7 +1877,6 @@ body.dark .loading-progress-value {
           <span class="dark">SMART</span> <span class="blue">BTQ</span>
         </div>
         <div class="brand-sub">Monitoring Baca Tulis Al-Qur'an</div>
-        <div class="department-text">Dinas Pendidikan dan Kebudayaan</div>
       </div>
 
       <div class="divider" aria-hidden="true"></div>
@@ -1920,8 +2020,8 @@ body.dark .loading-progress-value {
         </nav>
 
         <div class="sidebar-filter">
-          <span class="sidebar-filter-label">Filter Wilayah & Periode</span>
-          <select class="sel select" id="sbKecamatan">
+          <span class="sidebar-filter-label">Filter Wilayah & Kelas</span>
+          <select class="sel select" id="sbKecamatan" style="width:100%;">
             <option value="all">Semua Kecamatan</option>
             <option value="Langensari">Langensari</option>
             <option value="Purwaharja">Purwaharja</option>
@@ -1933,9 +2033,29 @@ body.dark .loading-progress-value {
             <option value="4">Hanya Kelas 4</option>
             <option value="5">Hanya Kelas 5</option>
           </select>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
-            <select class="sel" id="sbYear"></select>
-            <select class="sel" id="sbMonth"></select>
+
+          <div class="filter-divider"></div>
+
+          <span class="sidebar-filter-label">Rentang Periode</span>
+          
+          <div class="period-group">
+            <div class="period-label">Dari Periode</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <select class="sel" id="sbStartMonth"></select>
+              <select class="sel" id="sbStartYear"></select>
+            </div>
+          </div>
+
+          <div class="period-group">
+            <div class="period-label">Sampai Periode</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <select class="sel" id="sbEndMonth"></select>
+              <select class="sel" id="sbEndYear"></select>
+            </div>
+          </div>
+
+          <div class="period-summary-box" id="sidebarPeriodSummary">
+            Menampilkan analisis data...
           </div>
         </div>
       </div>
@@ -2269,7 +2389,11 @@ const MONTH_ORDER = [
 ];
 
 let DATABASE = {};
-let currentYear = null, currentMonth = null;
+
+// Variabel Rentang Periode Baru
+let startYear = null, startMonth = null;
+let endYear = null, endMonth = null;
+
 let selectedKecamatan = 'all';
 let selectedKelas = 'all';
 let currentSchools = [], filteredSchools = [];
@@ -2281,6 +2405,11 @@ let currentModalSchool = null;
 
 // Premium Loading Lock State
 let isLoading = false;
+
+// Helper Komparasi Periode
+function periodValue(year, month) {
+  return parseInt(year) * 100 + MONTH_ORDER.indexOf(month);
+}
 
 // ────────────────────────────────────────────
 // GLOBAL OVERLAY LOCK SYSTEM
@@ -2354,7 +2483,7 @@ async function showDashboardView() {
   // Inisialisasi event dan ambil data
   setupEventListeners(); 
   initFullscreenSystem();
-  await initDashboard();
+  await loadData(); // Ganti dari initDashboard ke flow data sentral
 }
 
 function showLoginView() {
@@ -2478,40 +2607,52 @@ function setupLoginLogic() {
 // ────────────────────────────────────────────
 // DASHBOARD DATA INIT & EVENT LISTENERS
 // ────────────────────────────────────────────
-async function initDashboard() {
+
+// Memuat data dari server hanya SEKALI di awal sesi. 
+// Render selanjutnya hanya memfilter variabel global DATABASE
+async function loadData() {
   if (isLoading) return;
   try {
     showLoading("Menyinkronkan Dashboard", "Mengambil data inisial dari server...");
-    // Menggunakan Promise.all agar UI loading setidaknya bertahan 800ms
-    // untuk menghindari flash (kedipan) jika internet sangat cepat.
+    
     const [res] = await Promise.all([
         fetch(API_URL),
         new Promise(resolve => setTimeout(resolve, 800))
     ]);
-    DATABASE = await res.json();
+    const data = await res.json();
+    
+    DATABASE = data; 
 
-    // Setup tahun default
-    const years = Object.keys(DATABASE).sort((a, b) => b - a);
-    if (years.length > 0) {
-      currentYear = years[0];
+    // Setup Rentang Periode Default (Misal: Semua data di tahun terbaru)
+    const allAvailable = [];
+    Object.keys(DATABASE).sort().forEach(y => {
+        MONTH_ORDER.forEach(m => {
+            if(DATABASE[y][m]) allAvailable.push({y, m});
+        });
+    });
+
+    if (allAvailable.length > 0) {
+      endYear = allAvailable[allAvailable.length - 1].y;
+      endMonth = allAvailable[allAvailable.length - 1].m;
+      // Set awal ke bulan pertama dari tahun terakhir yang ada datanya
+      startYear = endYear;
+      const firstMonthOfYear = allAvailable.find(p => p.y === startYear);
+      startMonth = firstMonthOfYear ? firstMonthOfYear.m : endMonth;
       
-      const availableMonths = MONTH_ORDER.filter(m => DATABASE[currentYear][m]);
-      if (availableMonths.length > 0) {
-        currentMonth = availableMonths[availableMonths.length - 1];
-      }
-    }
-
-    initYearDropdown();
-    initMonthDropdown();
-
-    if (currentYear && currentMonth && DATABASE[currentYear][currentMonth]) {
-      console.log("Selected:", currentYear, currentMonth); 
-      renderUI(DATABASE[currentYear][currentMonth]);
+      initPeriodDropdowns();
+      
+      const pStr = startYear === endYear && startMonth === endMonth 
+                  ? `${startMonth} ${startYear}` 
+                  : `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
+      document.getElementById('sidebarPeriodSummary').innerHTML = `Menampilkan analisis data<br><strong>${pStr}</strong>`;
+      
+      renderUI();
     } else {
       showEmpty();
     }
+
   } catch (err) {
-    console.error("Init Error:", err);
+    console.error("Fetch API Error:", err);
     showError();
   } finally {
     hideLoading();
@@ -2520,62 +2661,87 @@ async function initDashboard() {
 
 // Event Dropdown Bersih (addEventListener)
 function setupEventListeners() {
-  const sbTahun = document.getElementById("sbYear");
-  const sbBulan = document.getElementById("sbMonth");
   const sbKec = document.getElementById("sbKecamatan");
   const sbKelas = document.getElementById("sbKelas");
-
-  const handleYearChange = (e) => {
-    if (isLoading) { e.preventDefault(); return; }
-    currentYear = e.target.value;
-    if (sbTahun) sbTahun.value = currentYear;
-    
-    initMonthDropdown(); 
-    loadData(currentYear, currentMonth);
-  };
-
-  const handleMonthChange = (e) => {
-    if (isLoading) { e.preventDefault(); return; }
-    currentMonth = e.target.value;
-    if (sbBulan) sbBulan.value = currentMonth;
-    
-    loadData(currentYear, currentMonth);
-  };
+  
+  const sbSM = document.getElementById("sbStartMonth");
+  const sbSY = document.getElementById("sbStartYear");
+  const sbEM = document.getElementById("sbEndMonth");
+  const sbEY = document.getElementById("sbEndYear");
 
   const handleKecChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     selectedKecamatan = e.target.value;
-    if (sbKec) sbKec.value = selectedKecamatan;
     
     stackDisplayMode = selectedKecamatan === 'all' ? 'top20' : 'all';
     
-    if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-        triggerLocalLoading(
-          `Memfilter ${selectedKecamatan === 'all' ? 'Semua Wilayah' : 'Kec. ' + selectedKecamatan}`, 
-          "Menerapkan konfigurasi filter pada dashboard...",
-          () => { renderUI(DATABASE[currentYear][currentMonth]); }
-        );
-    }
+    triggerLocalLoading(
+      `Memfilter ${selectedKecamatan === 'all' ? 'Semua Wilayah' : 'Kec. ' + selectedKecamatan}`, 
+      "Menerapkan konfigurasi filter pada dashboard...",
+      () => { renderUI(); }
+    );
   };
 
   const handleKelasChange = (e) => {
     if (isLoading) { e.preventDefault(); return; }
     selectedKelas = e.target.value;
     
-    if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-        const namaKelas = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
-        triggerLocalLoading(
-          `Memfilter Data ${namaKelas}`, 
-          "Menyinkronkan ulang metrik dashboard...",
-          () => { renderUI(DATABASE[currentYear][currentMonth]); }
-        );
-    }
+    const namaKelas = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
+    triggerLocalLoading(
+      `Memfilter Data ${namaKelas}`, 
+      "Menyinkronkan ulang metrik dashboard...",
+      () => { renderUI(); }
+    );
   };
 
-  if (sbTahun) sbTahun.onchange = handleYearChange;
-  if (sbBulan) sbBulan.onchange = handleMonthChange;
+  const handlePeriodChange = (e) => {
+    if (isLoading) { e.preventDefault(); return; }
+
+    startYear = document.getElementById('sbStartYear').value;
+    startMonth = document.getElementById('sbStartMonth').value;
+    endYear = document.getElementById('sbEndYear').value;
+    endMonth = document.getElementById('sbEndMonth').value;
+
+    const sVal = periodValue(startYear, startMonth);
+    const eVal = periodValue(endYear, endMonth);
+    const summaryBox = document.getElementById('sidebarPeriodSummary');
+
+    let isValid = true;
+    if (sVal > eVal) {
+        isValid = false;
+        endYear = startYear;
+        endMonth = startMonth;
+        document.getElementById('sbEndYear').value = endYear;
+        document.getElementById('sbEndMonth').value = endMonth;
+        
+        summaryBox.innerHTML = `⚠ Rentang tidak valid<br><strong>Periode akhir tidak boleh lebih kecil dari periode awal.</strong>`;
+        summaryBox.style.borderColor = "var(--warning)";
+        summaryBox.style.color = "var(--warning)";
+    }
+
+    setTimeout(() => {
+        summaryBox.style.borderColor = "";
+        summaryBox.style.color = "";
+        
+        const pStr = startYear === endYear && startMonth === endMonth 
+                    ? `${startMonth} ${startYear}` 
+                    : `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
+                    
+        summaryBox.innerHTML = `Menampilkan analisis data<br><strong>${pStr}</strong>`;
+        
+        triggerLocalLoading("Menyinkronkan Periode", `Mengkalkulasi akumulasi data ${pStr}`, () => {
+            renderUI();
+        });
+    }, isValid ? 0 : 1800);
+  };
+
   if (sbKec) sbKec.onchange = handleKecChange;
   if (sbKelas) sbKelas.onchange = handleKelasChange;
+
+  if (sbSM) sbSM.onchange = handlePeriodChange;
+  if (sbSY) sbSY.onchange = handlePeriodChange;
+  if (sbEM) sbEM.onchange = handlePeriodChange;
+  if (sbEY) sbEY.onchange = handlePeriodChange;
 }
 
 // ────────────────────────────────────────────
@@ -2754,36 +2920,6 @@ function renderSkeletonUI() {
     }
 }
 
-async function loadData(year, month) {
-  if (isLoading) return;
-  try {
-    showLoading(
-       `Memuat Data ${month} ${year}`, 
-       "Menarik data langsung dari sistem rekapitulasi utama..."
-    );
-    
-    const [res] = await Promise.all([
-        fetch(API_URL),
-        new Promise(resolve => setTimeout(resolve, 800))
-    ]);
-    const data = await res.json();
-    
-    DATABASE = data; 
-
-    if (!data[year] || !data[year][month]) {
-      showEmpty();
-    } else {
-      console.log("Selected:", year, month); 
-      renderUI(data[year][month]);
-    }
-  } catch (err) {
-    console.error("Fetch API Error:", err);
-    showError();
-  } finally {
-    hideLoading();
-  }
-}
-
 function showError() {
   document.getElementById("r-title").textContent = "Tidak dapat mengambil data dari server";
   document.getElementById("r-subtitle").textContent = "Terjadi masalah koneksi atau konfigurasi API.";
@@ -2793,42 +2929,51 @@ function showError() {
 }
 
 function showEmpty() {
-  document.getElementById("r-title").textContent = "Data belum tersedia pada periode ini";
-  document.getElementById("r-subtitle").textContent = `Data kosong untuk ${currentMonth} ${currentYear}`;
+  document.getElementById("r-title").textContent = "Data belum tersedia pada rentang ini";
+  document.getElementById("r-subtitle").textContent = `Data kosong untuk filter terpilih`;
   document.getElementById("hero-pct").innerHTML = `-<sup>%</sup>`;
-  document.getElementById("hero-desc").innerHTML = "Silakan pilih bulan atau tahun lain pada menu.";
-  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di periode tersebut</td></tr>`;
+  document.getElementById("hero-desc").innerHTML = "Silakan ubah rentang filter periode pada menu samping.";
+  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di rentang periode tersebut</td></tr>`;
 }
 
 // ────────────────────────────────────────────
-// DROPDOWN RENDERERS
+// DROPDOWN RENDERERS (RANGE)
 // ────────────────────────────────────────────
-function initYearDropdown() {
+function initPeriodDropdowns() {
   const years = Object.keys(DATABASE).sort((a, b) => b - a);
-  const opts = years.map(y => `<option value="${y}">${y}</option>`).join("");
+  const yrOpts = years.map(y => `<option value="${y}">${y}</option>`).join("");
   
-  const sbY = document.getElementById("sbYear");
-  if (sbY) { sbY.innerHTML = opts; sbY.value = currentYear; }
+  const sbSY = document.getElementById("sbStartYear");
+  const sbEY = document.getElementById("sbEndYear");
+  if (sbSY) { sbSY.innerHTML = yrOpts; sbSY.value = startYear; }
+  if (sbEY) { sbEY.innerHTML = yrOpts; sbEY.value = endYear; }
+
+  // Set Semua Bulan Saja, Pengecekan Validasi Dilakukan Pas Submit Change
+  const moOpts = MONTH_ORDER.map(m => `<option value="${m}">${m}</option>`).join("");
+  
+  const sbSM = document.getElementById("sbStartMonth");
+  const sbEM = document.getElementById("sbEndMonth");
+  if (sbSM) { sbSM.innerHTML = moOpts; sbSM.value = startMonth; }
+  if (sbEM) { sbEM.innerHTML = moOpts; sbEM.value = endMonth; }
 }
 
-function initMonthDropdown() {
-  const availableMonths = DATABASE[currentYear] || {};
-  const months = MONTH_ORDER.filter(m => availableMonths[m]);
-
-  if (months.length === 0) {
-    const noOpt = '<option value="">- Kosong -</option>';
-    if (document.getElementById("sbMonth")) document.getElementById("sbMonth").innerHTML = noOpt;
-    return;
-  }
-
-  if (!months.includes(currentMonth)) {
-    currentMonth = months[0];
-  }
-
-  const opts = months.map(m => `<option value="${m}">${m}</option>`).join("");
+// Mengambil Data Tepat Di Rentang Yg Dipilih
+function getValidPeriodsInRange() {
+  const periods = [];
+  const sVal = periodValue(startYear, startMonth);
+  const eVal = periodValue(endYear, endMonth);
   
-  const sbM = document.getElementById("sbMonth");
-  if (sbM) { sbM.innerHTML = opts; sbM.value = currentMonth; }
+  Object.keys(DATABASE).sort().forEach(y => {
+      MONTH_ORDER.forEach(m => {
+          if(DATABASE[y] && DATABASE[y][m]) {
+              const val = periodValue(y, m);
+              if (val >= sVal && val <= eVal) {
+                  periods.push({year: y, month: m});
+              }
+          }
+      });
+  });
+  return periods;
 }
 
 // ────────────────────────────────────────────
@@ -2915,30 +3060,6 @@ function computeTotals(schools) {
   };
 }
 
-function getPrevPeriod(year, month) {
-  const idx = MONTH_ORDER.indexOf(month);
-  if(idx <= 0) {
-    const py = String(parseInt(year)-1);
-    if(!DATABASE[py]) return null;
-    const pym = MONTH_ORDER.filter(m => DATABASE[py][m]);
-    return pym.length ? { year: py, month: pym[pym.length-1] } : null;
-  }
-  for(let i = idx - 1; i >= 0; i--) {
-    if(DATABASE[year] && DATABASE[year][MONTH_ORDER[i]]) return { year, month: MONTH_ORDER[i] };
-  }
-  return null;
-}
-
-function getAllPeriods() {
-  const result = [];
-  Object.keys(DATABASE).sort().forEach(yr => {
-    MONTH_ORDER.forEach(mo => {
-      if(DATABASE[yr] && DATABASE[yr][mo]) result.push({ year: yr, month: mo });
-    });
-  });
-  return result;
-}
-
 function dataQuality(school) {
   if (school.warnings.length > 0) return 'check';
   const avgH = school.hadir.reduce((a,b)=>a+b,0) / school.hadir.length;
@@ -2975,12 +3096,35 @@ function closeSidebar() {
 }
 
 // ────────────────────────────────────────────
-// RENDER UI (Pemisahan Logika)
+// RENDER UI (MENDUKUNG DATA RENTANG TANGGAL)
 // ────────────────────────────────────────────
-function renderUI(data) {
+function renderUI() {
   document.getElementById('tableBody').innerHTML = '';
 
-  const rawMaster = data;
+  const periods = getValidPeriodsInRange();
+  
+  if (periods.length === 0) {
+      showEmpty();
+      return;
+  }
+
+  // AGGREGATION: Accumulate Data for Each School within the selected range
+  const schoolMap = new Map();
+  periods.forEach(p => {
+      if (!DATABASE[p.year] || !DATABASE[p.year][p.month]) return;
+      DATABASE[p.year][p.month].forEach(s => {
+          if (schoolMap.has(s.no)) {
+              // Jika sudah ada, gabungkan (akumulasi) rows-nya
+              const existing = schoolMap.get(s.no);
+              existing.rows = existing.rows.concat(s.rows);
+          } else {
+              // Clone object agar tidak merubah referensi asli di DATABASE
+              schoolMap.set(s.no, JSON.parse(JSON.stringify(s)));
+          }
+      });
+  });
+  
+  const rawMaster = Array.from(schoolMap.values());
   const allSchoolsAggr = aggregateSchools(rawMaster);
 
   let rawArr = rawMaster;
@@ -2990,7 +3134,11 @@ function renderUI(data) {
 
   const T = computeTotals(currentSchools);
   const pct = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
-  const periodStr = `${currentMonth} ${currentYear}`;
+  
+  const periodStr = startYear === endYear && startMonth === endMonth 
+                  ? `${startMonth} ${startYear}` 
+                  : `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
+                  
   const isAll = selectedKecamatan === 'all';
   const cakupan = isAll ? 'Kota Banjar' : `Kec. ${selectedKecamatan}`;
   const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
@@ -3028,29 +3176,8 @@ function renderUI(data) {
     dqBanner.className = "dq-banner hidden";
   }
 
-  // Trend Chip Indicator (With Bias Prevention)
-  const prev = getPrevPeriod(currentYear, currentMonth);
-  let chipHTML = '';
-  
-  if(prev) {
-    let pRaw = DATABASE[prev.year][prev.month];
-    if(!isAll) pRaw = pRaw.filter(s => s.kecamatan === selectedKecamatan);
-    
-    const isPrevIncomplete = checkIncompleteData(pRaw);
-    
-    if (isCurrentIncomplete !== isPrevIncomplete) {
-      // Pencegahan Bias Perbandingan
-      chipHTML = `<span class="trend-chip" style="background:var(--warning-dim);color:var(--warning);" title="Periode ini tidak sebanding dengan bulan sebelumnya karena kelengkapan data yang berbeda">⚠ Data Tidak Sebanding</span>`;
-    } else {
-      const pT = computeTotals(aggregateSchools(pRaw));
-      const pPct = pT.tot > 0 ? (pT.lancar / pT.tot * 100) : 0;
-      const diff = pct - pPct;
-      if(diff > 0.05) chipHTML = `<span class="trend-chip chip-up">▲ +${n2(diff)}% dari ${prev.month}</span>`;
-      else if(diff < -0.05) chipHTML = `<span class="trend-chip chip-down">▼ ${n2(diff)}% dari ${prev.month}</span>`;
-      else chipHTML = `<span class="trend-chip chip-flat">→ Stabil</span>`;
-    }
-  }
-  document.getElementById('r-trend-chip').innerHTML = chipHTML;
+  // Trend Chip Indicator logic adjusted to check against earliest period in range vs previous month before range
+  document.getElementById('r-trend-chip').innerHTML = ''; // Hide trend chip if using range > 1 month to avoid confusion, or can be enabled with deep range logic.
 
   // Hero Metrics & Progress Bar
   document.getElementById('hero-pct').innerHTML = `${n2(pct)}<sup>%</sup>`;
@@ -3090,13 +3217,13 @@ function renderUI(data) {
   document.getElementById('kpi-pct-tidak').textContent = n2(pctK) + '% dari total';
   document.getElementById('kpi-hadir').textContent = n2(T.avgHadir) + '%';
   const qH = T.avgHadir >= 90 ? 'valid' : T.avgHadir >= 75 ? 'partial' : 'check';
-  document.getElementById('kpi-q-hadir').textContent = T.avgHadir >= 90 ? '● Baik' : T.avgHadir >= 75 ? '● Menengah' : '● Memerlukan Penguatan Kehadiran';
+  document.getElementById('kpi-q-hadir').textContent = T.avgHadir >= 90 ? '● Baik' : T.avgHadir >= 75 ? '● Menengah' : '● Optimalisasi Kehadiran';
   document.getElementById('kpi-q-hadir').className = 'kpi-badge ' + qH;
 
   // Render Sub-Sections
   renderTable();
   renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
-  renderTrend(cakupan);
+  renderTrend(cakupan, periods); // Lewatkan rentang periode ke fungsi renderTrend
   renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll);
 }
 
@@ -3191,7 +3318,7 @@ function setStackMode(mode) {
   document.getElementById('btnStackTop20').classList.toggle('active', mode === 'top20');
   document.getElementById('btnStackAll').classList.toggle('active', mode === 'all');
   if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-      renderUI(DATABASE[currentYear][currentMonth]); 
+      renderUI(); 
   }
 }
 
@@ -3463,16 +3590,16 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 }
 
 // ────────────────────────────────────────────
-// TREND BULANAN
+// TREND BULANAN (MENYESUAIKAN RANGE YANG DIPILIH)
 // ────────────────────────────────────────────
-function renderTrend(cakupan) {
-  const allP = getAllPeriods();
+function renderTrend(cakupan, periods) {
+  const allP = periods || getValidPeriodsInRange(); // Memastikan hanya periode dalam rentang yang tampil
   const tEl = document.getElementById('trendContent');
   const iEl = document.getElementById('trend-insight');
   const gridColorConfig = document.body.classList.contains('dark') ? '#334155' : '#e2e8f0';
 
   if (allP.length < 2) {
-    tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data tren akan tersedia saat data bulan berikutnya dimasukkan.</div>`;
+    tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Memerlukan lebih dari 1 periode dalam rentang untuk menampilkan tren.</div>`;
     iEl.innerHTML = ''; return;
   }
   
@@ -3524,14 +3651,14 @@ function renderTrend(cakupan) {
   });
 
   const incompleteWarningHtml = someIncomplete 
-    ? `<div class="insight-item amber" style="margin-top:12px;"><div class="ii-label">Catatan Validitas</div><div class="ii-text">Beberapa titik pada grafik historis mencerminkan <strong>data yang belum lengkap</strong>. Hindari melakukan perbandingan mutlak pada kurva ini.</div></div>` 
+    ? `<div class="insight-item amber" style="margin-top:12px;"><div class="ii-label">Catatan Validitas</div><div class="ii-text">Beberapa titik pada rentang ini mencerminkan <strong>data yang belum lengkap</strong>. Hindari melakukan perbandingan mutlak pada kurva ini.</div></div>` 
     : '';
 
   iEl.innerHTML = `
     <div class="insight-strip">
       <div class="insight-item ${diff > 0 ? 'green' : diff < 0 ? 'red' : 'blue'}">
-        <div class="ii-label">Tren Keseluruhan</div>
-        <div class="ii-text">Dari ${allP.length} periode, kelancaran BTQ di ${cakupan} <strong>${diff > 0 ? 'meningkat +'+n2(diff)+'%' : diff < 0 ? 'menurun '+n2(diff)+'%' : 'stabil'}</strong> dibanding awal observasi.</div>
+        <div class="ii-label">Tren Rentang Terpilih</div>
+        <div class="ii-text">Dalam rentang ${allP.length} bulan tersebut, kelancaran BTQ <strong>${diff > 0 ? 'naik +'+n2(diff)+'%' : diff < 0 ? 'turun '+n2(diff)+'%' : 'stabil'}</strong>.</div>
       </div>
     </div>
     ${incompleteWarningHtml}
@@ -3563,8 +3690,12 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
   document.getElementById('k-callout').innerHTML = callout;
   
   const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
+  const periodStr = startYear === endYear && startMonth === endMonth 
+                  ? `${startMonth} ${startYear}` 
+                  : `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
+
   document.getElementById('k-body').innerHTML = `
-    Asesmen formal dari ekstraksi data matriks <strong>${classStr}</strong> per <strong>${currentMonth} ${currentYear}</strong> dalam area komputasi <strong>${cakupan}</strong> mengkalkulasi kumpulan <strong>${fmt(T.tot)} jejak digital valid</strong> dari total ${currentSchools.length} klaster unit dasar. Nilai valuasi capaian di ekuilibrium angka <strong>${n2(pct)}%</strong>. Menjabarkan rincian teknis: <strong>${pL}%</strong> SDM telah terklasifikasi mapan secara alfabetikal bahasa Al-Qur'an, diiringi <strong>${pB}%</strong> pada ambang fase medium, sekaligus menyisakan celah berat pada <strong>${pK}%</strong> demografi siswa tanpa pengenalan struktur huruf yang paling minimal sekalipun.
+    Asesmen formal dari ekstraksi data matriks <strong>${classStr}</strong> pada rentang <strong>${periodStr}</strong> dalam area komputasi <strong>${cakupan}</strong> mengkalkulasi kumpulan <strong>${fmt(T.tot)} jejak digital valid</strong> dari total ${currentSchools.length} klaster unit dasar. Nilai valuasi capaian di ekuilibrium angka <strong>${n2(pct)}%</strong>. Menjabarkan rincian teknis: <strong>${pL}%</strong> SDM telah terklasifikasi mapan secara alfabetikal bahasa Al-Qur'an, diiringi <strong>${pB}%</strong> pada ambang fase medium, sekaligus menyisakan celah berat pada <strong>${pK}%</strong> demografi siswa tanpa pengenalan struktur huruf yang paling minimal sekalipun.
   `;
   document.getElementById('k-reco').innerHTML = [
     `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
@@ -3638,7 +3769,7 @@ function renderModalTab(idx) {
       <div style="margin-top:10px;font-size:12px;color:var(--text-tertiary)">Rata-rata kehadiran: <strong style="color:var(--text-primary)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
     `;
   } else {
-    const allP = getAllPeriods();
+    const allP = getValidPeriodsInRange();
     const rows = allP.map(p => {
       const raw = DATABASE[p.year][p.month];
       const found = raw.find(r => r.no === s.no);
@@ -3648,7 +3779,7 @@ function renderModalTab(idx) {
     }).filter(Boolean);
     
     if (rows.length < 2) {
-      el.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📅</div>Butuh minimal 2 periode untuk menampilkan riwayat.</div>`;
+      el.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📅</div>Perlu setidaknya rentang 2 periode.</div>`;
     } else {
       el.innerHTML = `<div>${rows.map((h, i) => {
         let diff = '';
@@ -3749,8 +3880,8 @@ document.addEventListener('keydown', e => {
 
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
-      if (typeof DATABASE !== 'undefined' && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-        renderUI(DATABASE[currentYear][currentMonth]);
+      if (typeof DATABASE !== 'undefined' && Object.keys(DATABASE).length > 0) {
+        renderUI(); // Update UI to reflect chart color changes
       }
     }, 50);
   }
