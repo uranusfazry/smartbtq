@@ -1045,7 +1045,7 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   position: fixed;
   bottom: 32px;
   left: 50%;
-  transform: translateX(-50%) translateY(100px) scale(0.95);
+  transform: translateX(-50%) translateY(24px) scale(0.96);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -1059,7 +1059,7 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   z-index: 9999;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.4s ease;
 }
 .fs-prompt.show {
   transform: translateX(-50%) translateY(0) scale(1);
@@ -1119,13 +1119,30 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
   box-shadow: 0 4px 12px rgba(37,99,235,0.35);
 }
 
+/* Premium Dark Mode Override for Fullscreen Prompt */
 body.dark .fs-prompt {
-  background: rgba(15,23,42,0.85);
-  border-color: rgba(255,255,255,0.08);
-  box-shadow: 0 20px 40px -8px rgba(0,0,0,0.5);
+  background: rgba(15,23,42,0.88);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+  color: #e2e8f0;
+}
+body.dark .fs-prompt-text strong {
+  color: #ffffff;
+}
+body.dark .fs-prompt-text span {
+  color: #94a3b8;
 }
 body.dark .fs-prompt-actions { border-color: rgba(255,255,255,0.1); }
-body.dark .fs-btn-dismiss:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+body.dark .fs-btn-dismiss {
+  color: #94a3b8;
+}
+body.dark .fs-btn-dismiss:hover {
+  background: rgba(255,255,255,0.05);
+  color: #ffffff;
+}
+body.dark .fs-btn-accept {
+  box-shadow: 0 8px 24px rgba(37,99,235,0.28);
+}
 
 @media (max-width: 640px) {
   .fs-prompt {
@@ -2315,8 +2332,7 @@ function setupEventListeners() {
 // ────────────────────────────────────────────
 // FULLSCREEN TRUE API SYSTEM
 // ────────────────────────────────────────────
-let fsPromptShown = false;
-let fsDismissTime = 0;
+let isFsPromptDismissed = false;
 
 function initFullscreenSystem() {
   document.addEventListener('fullscreenchange', updateFsUI);
@@ -2324,17 +2340,11 @@ function initFullscreenSystem() {
   document.addEventListener('mozfullscreenchange', updateFsUI);
   document.addEventListener('MSFullscreenChange', updateFsUI);
 
-  // Add click listener on main area to suggest fullscreen if not active
-  const mainArea = document.getElementById('mainContentArea');
-  if(mainArea) {
-    mainArea.addEventListener('click', () => {
-      // Show prompt naturally upon interaction
-      setTimeout(suggestFullscreen, 100);
-    });
-  }
+  // Auto show pada saat first load (delay 800ms) untuk memastikan UI stabil
+  setTimeout(() => {
+      showFullscreenPrompt();
+  }, 800);
 
-  // Suggest automatically after short delay on load
-  setTimeout(suggestFullscreen, 3500);
   updateFsUI(); // initial state check
 }
 
@@ -2371,51 +2381,44 @@ function toggleFullscreen() {
 }
 
 function updateFsUI() {
-  const isFs = isFullscreenActive();
+  const isFullscreen = isFullscreenActive();
   const fsBtn = document.getElementById('fsToggleBtn');
   
-  if(isFs) {
+  if(isFullscreen) {
     if(fsBtn) fsBtn.classList.add("hide");
-    hideFsPrompt(false);
+    hideFullscreenPrompt(false); // Auto hide saat masuk fullscreen tanpa mencatat dismiss
   } else {
     if(fsBtn) fsBtn.classList.remove("hide");
-    // When exited manually, allow prompt again after 5 mins
-    fsDismissTime = Date.now() - 300000;
+    
+    // Wajib reset status dismiss agar selalu muncul saat keluar fullscreen
+    isFsPromptDismissed = false; 
+    
+    setTimeout(() => {
+        showFullscreenPrompt();
+    }, 600); // Auto show saat keluar fullscreen
   }
 }
 
-function suggestFullscreen() {
-  if (isFullscreenActive()) return;
-  if (fsPromptShown) return;
-  
-  // 10 menit cooldown jika di-dismiss
-  if (Date.now() - fsDismissTime < 600000) return; 
-
+function showFullscreenPrompt() {
+  if (isFullscreenActive() || isFsPromptDismissed) return;
   const prompt = document.getElementById('fsPrompt');
   if (prompt) {
     prompt.classList.add('show');
-    fsPromptShown = true;
-    lockOverlayBackground(); // Lock screen untul prompt
-    
-    // Auto hide prompt after 10s if ignored
-    setTimeout(() => {
-      if(fsPromptShown) hideFsPrompt(false);
-    }, 10000);
   }
 }
 
-function hideFsPrompt(dismissedByUser = true) {
+function hideFullscreenPrompt(userDismissed = false) {
   const prompt = document.getElementById('fsPrompt');
-  if (prompt && prompt.classList.contains('show')) {
+  if (prompt) {
     prompt.classList.remove('show');
-    unlockOverlayBackground(); // Unlock screen
   }
-  if (dismissedByUser) fsDismissTime = Date.now();
-  setTimeout(() => { fsPromptShown = false; }, 600); // Allow animation to finish
+  if (userDismissed) {
+    isFsPromptDismissed = true; // Dismiss sementara dalam sesi ini (akan reset jika refresh/keluar FS)
+  }
 }
 
-function acceptFsPrompt() {
-  hideFsPrompt(false);
+function acceptFullscreenPrompt() {
+  hideFullscreenPrompt(false);
   toggleFullscreen();
 }
 
