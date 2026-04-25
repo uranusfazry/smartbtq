@@ -258,6 +258,7 @@ a {
 }
 
 #loginView .login-card {
+  position: relative;
   background: var(--log-surface);
   border-radius: 28px;
   box-shadow: var(--log-shadow-card);
@@ -359,21 +360,73 @@ a {
 
 /* Premium Legal Footer */
 #loginView .login-footer { 
-  margin-top: 34px; 
+  margin-top: 32px; 
   padding-top: 24px;
   border-top: 1px solid var(--log-border);
   text-align: center; 
-  font-size: 13px; 
-  color: var(--log-footer-text, #94a3b8); 
-  line-height: 1.9; 
-  font-weight: 500;
   transition: color 0.35s ease, border-color 0.35s ease;
 }
-#loginView .login-footer strong {
-  color: var(--log-footer-strong, #1e293b);
+#loginView .login-footer .owner-name {
+  font-size: 15.5px;
   font-weight: 700;
-  font-size: 13px;
+  color: var(--log-footer-name, #1e293b);
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
   transition: color 0.35s ease;
+}
+#loginView .login-footer .owner-role {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--log-footer-role, #475569);
+  margin-bottom: 2px;
+  transition: color 0.35s ease;
+}
+#loginView .login-footer .school-name {
+  font-size: 12.5px;
+  color: var(--log-footer-school, #64748b);
+  transition: color 0.35s ease;
+}
+#loginView .login-footer .system-desc {
+  margin-top: 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--log-footer-desc, #94a3b8);
+  transition: color 0.35s ease;
+}
+
+/* ────────────────────────────────────────────
+   PREMIUM THEME SWITCH (LOGIN SCREEN)
+──────────────────────────────────────────── */
+.log-theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 10;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.log-theme-toggle svg { 
+  width: 15px; 
+  height: 15px; 
+  flex-shrink: 0; 
+}
+.log-theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+  color: #1e293b;
+  border-color: rgba(37, 99, 235, 0.2);
 }
 
 /* ────────────────────────────────────────────
@@ -392,8 +445,12 @@ body.dark #loginView {
   --log-shadow-card: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.03);
   --log-card-border: rgba(255, 255, 255, 0.08);
   --log-input-bg: rgba(255, 255, 255, 0.03);
-  --log-footer-text: #94a3b8;
-  --log-footer-strong: #ffffff;
+  
+  /* Footer Dark Mode Adaptive Colors */
+  --log-footer-name: #ffffff;
+  --log-footer-role: #cbd5e1;
+  --log-footer-school: #94a3b8;
+  --log-footer-desc: #64748b;
   
   background: radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 30%),
               radial-gradient(circle at bottom right, rgba(59,130,246,0.06), transparent 35%),
@@ -443,10 +500,30 @@ body.dark #loginView .toggle-pw:hover {
   color: #cbd5e1;
 }
 
+/* Dark Mode Override for Theme Switch */
+body.dark .log-theme-toggle {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+body.dark .log-theme-toggle:hover {
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 @media (max-width: 480px) {
   #loginView .login-card { padding: 32px 24px 28px; border-radius: 24px; }
   body.dark #loginView .login-card { border-radius: 24px; }
   #loginView .brand-name { font-size: 23px; }
+  
+  .log-theme-toggle {
+    top: 16px;
+    right: 16px;
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+  .log-theme-toggle svg { width: 13px; height: 13px; }
 }
 @media (max-width: 360px) {
   #loginView .login-card { padding: 28px 18px; }
@@ -1669,6 +1746,7 @@ body.dark .loading-progress-value {
   #darkToggleBtn { display: none !important; }
   #loginView { display: none !important; }
   .global-loading { display: none !important; }
+  .log-theme-switch { display: none !important; }
 }
 </style>
 </head>
@@ -1676,8 +1754,20 @@ body.dark .loading-progress-value {
 
 <!-- ═══════════════ VIEW: LOGIN ═══════════════ -->
 <div id="loginView" style="display: none;">
+  
   <div class="login-wrapper">
     <div class="login-card" id="loginCard">
+
+      <!-- Premium Dynamic Theme Switch -->
+      <button class="log-theme-toggle" id="loginThemeToggle" aria-label="Ganti Tema" type="button">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span class="toggle-text">Mode Gelap</span>
+      </button>
 
       <!-- Brand -->
       <div class="brand">
@@ -1746,13 +1836,14 @@ body.dark .loading-progress-value {
 
       <!-- Dipindahkan ke dalam card dengan Premium Branding -->
       <div class="login-footer" aria-label="Informasi hak cipta dan sistem">
-        <strong>© Hak Cipta Fazry Irawan</strong>
-        <div style="height: 8px;"></div>
-        Guru BTQ<br>
-        MI Panatasan &bull; SDN 1 Batulawang
-        <div style="height: 14px;"></div>
-        Sistem Monitoring Baca Tulis Al-Qur'an<br>
-        Dashboard Internal Pendidikan
+        <div class="owner-name">© Hak Cipta Fazry Irawan</div>
+        <div class="owner-role">Guru BTQ</div>
+        <div class="school-name">MI Panatasan &bull; SDN 1 Batulawang</div>
+        <div class="system-desc">
+          <strong>SMART BTQ</strong><br>
+          Platform Monitoring BTQ Digital<br>
+          Dinas Pendidikan dan Kebudayaan
+        </div>
       </div>
 
     </div>
@@ -3607,7 +3698,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { 
       closeModal(); 
       closeSidebar(); 
-      hideFsPrompt(true);
+      hideFullscreenPrompt(true);
   }
 });
 
@@ -3622,15 +3713,35 @@ document.addEventListener('keydown', e => {
 
   function applyDark(isDark) {
     document.body.classList.toggle('dark', isDark);
+    
+    // Toggle for Dashboard Header Button
     const btn = document.getElementById('darkToggleBtn');
     if (btn) {
       btn.textContent = isDark ? '☀️' : '🌙';
       btn.title = isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode';
     }
 
+    // Toggle for Premium Login Switch (Top Right)
+    const loginThemeToggle = document.getElementById('loginThemeToggle');
+    if (loginThemeToggle) {
+      const iconMoon = loginThemeToggle.querySelector('.icon-moon');
+      const iconSun = loginThemeToggle.querySelector('.icon-sun');
+      const textEl = loginThemeToggle.querySelector('.toggle-text');
+      
+      if (isDark) {
+        if(iconMoon) iconMoon.style.display = 'none';
+        if(iconSun) iconSun.style.display = 'block';
+        if(textEl) textEl.textContent = 'Mode Terang';
+      } else {
+        if(iconMoon) iconMoon.style.display = 'block';
+        if(iconSun) iconSun.style.display = 'none';
+        if(textEl) textEl.textContent = 'Mode Gelap';
+      }
+    }
+
     const themeColorMeta = document.getElementById('themeColorMeta');
     if(themeColorMeta) {
-      themeColorMeta.setAttribute('content', isDark ? '#0f172a' : '#ffffff');
+      themeColorMeta.setAttribute('content', isDark ? '#020817' : '#ffffff');
     }
 
     if (window.Chart) {
@@ -3640,17 +3751,23 @@ document.addEventListener('keydown', e => {
     }
   }
 
-  function toggleDark() {
-    const isDark = !document.body.classList.contains('dark');
+  // Explicit function to Set Theme from login buttons
+  function setTheme(isDark) {
+    if (document.body.classList.contains('dark') === isDark) return;
     localStorage.setItem(DARK_KEY, isDark ? '1' : '0');
     applyDark(isDark);
 
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
-      if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+      if (typeof DATABASE !== 'undefined' && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
         renderUI(DATABASE[currentYear][currentMonth]);
       }
     }, 50);
+  }
+
+  // Dashboard Header Toggle Function (Existing)
+  function toggleDark() {
+    setTheme(!document.body.classList.contains('dark'));
   }
 
   function initDarkMode() {
@@ -3677,6 +3794,15 @@ document.addEventListener('keydown', e => {
     } else {
       headerRight.appendChild(btn);
     }
+  }
+
+  // Attach events for Login Theme Switch
+  const loginThemeToggle = document.getElementById('loginThemeToggle');
+  if (loginThemeToggle) {
+    loginThemeToggle.addEventListener('click', () => {
+      const isCurrentlyDark = document.body.classList.contains('dark');
+      setTheme(!isCurrentlyDark);
+    });
   }
 
   document.addEventListener('keydown', function(e) {
