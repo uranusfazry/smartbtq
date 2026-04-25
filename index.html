@@ -1006,15 +1006,10 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 .modal-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
 .modal-close { background: var(--surface-2); border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-tertiary); flex-shrink: 0; transition: var(--transition-fast); cursor: pointer;}
 .modal-close:hover { background: var(--danger-dim); color: var(--danger); border-color: var(--danger); }
-
-/* Premium Modal Tabs */
-.modal-tabs { display: flex; gap: 16px; padding: 0 28px; border-bottom: 1px solid var(--border); background: var(--surface); }
-.m-tab { background: none; border: none; cursor: pointer; padding: 14px 4px; font-family: var(--font); font-size: 13.5px; font-weight: 600; color: var(--text-tertiary); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: var(--transition-base); position: relative; }
-.m-tab::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--primary); transform: scaleX(0); transition: transform 0.25s ease; }
-.m-tab.active { color: var(--primary); border-bottom-color: transparent; }
-.m-tab.active::after { transform: scaleX(1); }
-.m-tab:hover:not(.active) { color: var(--text-primary); }
-
+.modal-tabs { display: flex; gap: 0; padding: 0 28px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+.m-tab { background: none; border: none; cursor: pointer; padding: 12px 16px; font-family: var(--font); font-size: 13px; font-weight: 500; color: var(--text-tertiary); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: var(--transition-fast); }
+.m-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+.m-tab:hover { color: var(--text-primary); }
 .modal-body { padding: 24px 28px; }
 .m-tab-content { display: none; }
 .m-tab-content.active { display: block; }
@@ -1023,50 +1018,6 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 .modal-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-2); color: var(--text-primary); }
 .modal-table tr:last-child td { border-bottom: none; }
 .modal-table tr:nth-child(even) td { background: var(--bg); }
-
-/* Premium Modal Components (Executive UI) */
-.modal-status-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--surface-2); border-radius: var(--r-md); margin-bottom: 20px; border: 1px solid var(--border); }
-.modal-status-note { font-size: 11.5px; color: var(--text-secondary); font-weight: 500; }
-
-.modal-kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 20px; box-shadow: var(--shadow-xs); }
-.mkc-header { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-.mkc-body { display: flex; align-items: center; gap: 24px; }
-.mkc-main { flex-shrink: 0; }
-.mkc-val { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1; letter-spacing: -1px; }
-.mkc-lbl { font-size: 11px; color: var(--text-tertiary); font-weight: 500; margin-top: 4px; }
-.mkc-div { width: 1px; height: 40px; background: var(--border); }
-.mkc-stats { display: flex; flex: 1; justify-content: space-between; gap: 12px; }
-.mkc-item { display: flex; flex-direction: column; gap: 4px; }
-.mkc-item-val { font-size: 14px; font-weight: 700; color: var(--text-primary); }
-.mkc-item-val.success { color: var(--success); }
-.mkc-item-val.warning { color: var(--warning); }
-.mkc-item-val.danger { color: var(--danger); }
-.mkc-item-lbl { font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; }
-
-.system-summary-box { background: var(--primary-dim); border: 1px solid rgba(37,99,235,0.15); border-radius: var(--r-md); padding: 16px; margin-bottom: 20px; }
-.ssb-title { font-size: 11.5px; font-weight: 700; color: var(--primary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-.ssb-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; }
-
-.guru-insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-xs); display: flex; flex-direction: column; gap: 12px; }
-.gic-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-2); padding-bottom: 10px; }
-.gic-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
-.gic-badge { font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-.gic-badge.success { background: var(--success-dim); color: var(--success); }
-.gic-badge.warning { background: var(--warning-dim); color: var(--warning); }
-.gic-badge.danger { background: var(--danger-dim); color: var(--danger); }
-.gic-body { display: flex; flex-direction: column; gap: 8px; }
-.gic-row { display: flex; justify-content: space-between; font-size: 12.5px; align-items: center; }
-.gic-lbl { color: var(--text-tertiary); font-weight: 500; }
-.gic-val { font-weight: 700; color: var(--text-primary); font-size: 13.5px; }
-.gic-conclusion { background: var(--surface-2); padding: 12px 14px; border-radius: var(--r-sm); font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin-top: 4px; border-left: 3px solid var(--border); }
-.gic-conclusion.danger { border-left-color: var(--danger); }
-.gic-conclusion.warning { border-left-color: var(--warning); }
-.gic-conclusion.success { border-left-color: var(--success); }
-
-.diplomatic-warning { background: var(--surface-2); border-left: 3px solid var(--text-tertiary); padding: 14px 16px; border-radius: 0 var(--r-md) var(--r-md) 0; margin-top: 16px; border: 1px solid var(--border); border-left-width: 3px; }
-.dw-title { font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-.dw-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
-
 .hist-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: var(--r-sm); margin-bottom: 6px; background: var(--surface-2); border: 1px solid var(--border-2); }
 .hist-period { font-weight: 500; font-size: 13px; color: var(--text-primary); }
 .hist-pct { font-size: 13px; font-weight: 700; }
@@ -1317,16 +1268,7 @@ body.dark .fs-btn-accept {
   .modal-box { width: 92%; height: auto; max-height: 88vh; border-radius: var(--r-xl); display: flex; flex-direction: column; margin: auto; }
   .modal-header { padding: 20px; border-top-left-radius: var(--r-xl); border-top-right-radius: var(--r-xl); }
   .modal-body { padding: 16px 20px; }
-  .modal-tabs { padding: 0 16px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; border-radius: var(--r-xl) var(--r-xl) 0 0; }
-  .m-tab { padding: 14px 12px; }
-  .modal-status-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
-  
-  .mkc-body { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .mkc-div { width: 100%; height: 1px; }
-  .mkc-stats { width: 100%; justify-content: space-between; gap: 8px; }
-  .mkc-item-val { font-size: 13px; }
-  .mkc-item-lbl { font-size: 10px; }
-
+  .modal-tabs { padding: 0 20px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
   .modal-table thead { display: none; }
   
   .modal-table tr { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-md); margin-bottom: 12px; padding: 14px; box-shadow: var(--shadow-xs); }
@@ -1391,21 +1333,10 @@ body.dark .modal-header { background: #0f172a; border-bottom: 1px solid rgba(255
 body.dark .modal-title { color: #f8fafc; font-weight: 700; }
 body.dark .modal-close { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; }
 body.dark .modal-close:hover { background: rgba(220, 38, 38, 0.2); border-color: rgba(220, 38, 38, 0.5); color: #fca5a5; }
-body.dark .modal-tabs { background: #1e293b; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-body.dark .m-tab { color: #64748b; }
-body.dark .m-tab:hover:not(.active) { color: #e2e8f0; }
-body.dark .m-tab.active { color: #60a5fa; border-bottom-color: transparent; }
-body.dark .m-tab.active::after { background: #60a5fa; }
-
-body.dark .modal-status-bar { background: #162032; border-color: rgba(255,255,255,0.06); }
-body.dark .modal-kpi-card { background: #162032; border-color: rgba(255,255,255,0.06); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-body.dark .mkc-div { background: rgba(255,255,255,0.06); }
-body.dark .system-summary-box { background: rgba(37,99,235,0.08); border-color: rgba(37,99,235,0.2); }
-body.dark .guru-insight-card { background: #162032; border-color: rgba(255,255,255,0.06); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-body.dark .gic-header { border-bottom-color: rgba(255,255,255,0.04); }
-body.dark .gic-conclusion { background: #0f172a; border-left-color: rgba(255,255,255,0.1); color: #cbd5e1; }
-body.dark .diplomatic-warning { background: #162032; border-color: rgba(255,255,255,0.08); border-left-color: #64748b; }
-
+body.dark .modal-tabs { background: #162032; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+body.dark .m-tab { color: #94a3b8; }
+body.dark .m-tab:hover { color: #e2e8f0; }
+body.dark .m-tab.active { color: #60a5fa; border-bottom-color: #60a5fa; }
 body.dark .modal-table th { background: #1e293b; border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: #94a3b8; }
 body.dark .modal-table td { border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
 body.dark .hist-row { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); }
@@ -3493,150 +3424,41 @@ function renderModalTab(idx) {
   const el = document.getElementById('modalContent');
   
   if (idx === 0) {
-    // 1. Status Data Executive
-    const dataStatus = s.warnings.length > 0 ? '🟡 Perlu Validasi' : '🟢 Tervalidasi';
-    const dataStatusClass = s.warnings.length > 0 ? 'warning' : 'available';
-    
-    // 2. Ringkasan Sistem (Auto-generated AI-like Insight)
-    let k4Avail = s.kls4.tersedia ? 'tersedia' : 'tidak tersedia';
-    let k5Avail = s.kls5.tersedia ? 'tersedia' : 'tidak tersedia';
-    let summaryText = `Data Kelas IV ${k4Avail} dan Kelas V ${k5Avail}. `;
-    
-    if (s.pct >= 80) {
-      summaryText += `Tingkat kelancaran BTQ secara umum sangat baik. Pertahankan ekosistem yang ada. `;
-    } else if (s.pct >= 60) {
-      summaryText += `Tingkat kelancaran BTQ cukup stabil, namun memerlukan pendampingan lanjutan untuk kelompok minoritas siswa. `;
-    } else {
-      summaryText += `Tingkat kelancaran BTQ masih di bawah standar, sangat memerlukan intervensi dan pendampingan intensif. `;
-    }
-    
-    const avgHadir = s.hadir.length ? s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length : 0;
-    if (avgHadir < 75) {
-      summaryText += `Validasi terhadap konsistensi kehadiran Guru BTQ juga perlu diperkuat pada periode ini.`;
-    }
-
-    // 3. Compact Table (Wording Defisit diubah menjadi Perlu Pendampingan)
     const k4Html = s.kls4.tersedia 
-      ? `<tr><td data-label="Kelas" style="font-weight:700;">Kelas IV</td><td data-label="Populasi">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:700">${s.kls4.lancar}</td><td data-label="Belum">${s.kls4.belum}</td><td data-label="Perlu Pend.">${s.kls4.tidak}</td><td data-label="% Lancar">${pctPill(s.kls4.lancar/s.kls4.tot*100)}</td></tr>`
-      : `<tr><td data-label="Kelas" style="font-weight:700;">Kelas IV</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Belum terdapat laporan untuk Kelas 4.</span></td></tr>`;
+      ? `<tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls4.lancar}</td><td data-label="Belum">${s.kls4.belum}</td><td data-label="Defisit">${s.kls4.tidak}</td><td data-label="% Lancar">${pctPill(s.kls4.lancar/s.kls4.tot*100)}</td></tr>`
+      : `<tr><td data-label="Kelas">Kelas IV</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Belum terdapat laporan BTQ untuk Kelas 4 pada periode yang dipilih.</span></td></tr>`;
       
     const k5Html = s.kls5.tersedia 
-      ? `<tr><td data-label="Kelas" style="font-weight:700;">Kelas V</td><td data-label="Populasi">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:700">${s.kls5.lancar}</td><td data-label="Belum">${s.kls5.belum}</td><td data-label="Perlu Pend.">${s.kls5.tidak}</td><td data-label="% Lancar">${pctPill(s.kls5.lancar/s.kls5.tot*100)}</td></tr>`
-      : `<tr><td data-label="Kelas" style="font-weight:700;">Kelas V</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Sekolah ini belum memiliki data Kelas 5.</span></td></tr>`;
+      ? `<tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls5.lancar}</td><td data-label="Belum">${s.kls5.belum}</td><td data-label="Defisit">${s.kls5.tidak}</td><td data-label="% Lancar">${pctPill(s.kls5.lancar/s.kls5.tot*100)}</td></tr>`
+      : `<tr><td data-label="Kelas">Kelas V</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Sekolah ini belum memiliki peserta aktif pada Kelas 5 untuk periode ini.</span></td></tr>`;
 
-    // 4. Diplomatic Warning Box (Aman secara birokrasi)
-    let warningHtml = '';
-    if (s.warnings.length) {
-      warningHtml = `
-        <div class="diplomatic-warning">
-          <div class="dw-title">Catatan Sistem</div>
-          <div class="dw-desc">Ditemukan indikasi ketidaksesuaian struktur data yang memerlukan verifikasi lanjutan oleh operator sekolah terkait rekapan. (Ref: <strong>${s.warnings.join(', ')}</strong>)</div>
-        </div>
-      `;
-    }
+    const totalLabel = selectedKelas === 'all' ? 'Total Akumulasi' : `Total (Kelas ${selectedKelas})`;
+    const totalHtml = `<tr style="font-weight:800;background:var(--surface-2)"><td data-label="Kelas">${totalLabel}</td><td data-label="Populasi">${s.tot>0?s.tot:'<span style="color:var(--text-muted)">–</span>'}</td><td data-label="Lancar" style="color:var(--success)">${s.tot>0?s.lancar:'–'}</td><td data-label="Belum">${s.tot>0?s.belum:'–'}</td><td data-label="Defisit">${s.tot>0?s.tidak:'–'}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>`;
 
-    // 5. KPI Summary Status Definition
-    let statusPencapaian = 'Perlu Pendampingan';
-    let statusClass = 'danger';
-    if (s.pct >= 80) { statusPencapaian = 'Sangat Baik'; statusClass = 'success'; }
-    else if (s.pct >= 60) { statusPencapaian = 'Cukup Stabil'; statusClass = 'warning'; }
-
-    // Merangkai Tab 0
     el.innerHTML = `
-      <div class="modal-status-bar">
-        <span class="status-badge ${dataStatusClass}">${dataStatus}</span>
-        <span class="modal-status-note">Analisis menggunakan data periode terpilih.</span>
-      </div>
-
-      <table class="modal-table" style="margin-bottom: 20px;">
-        <thead><tr><th>Kelas</th><th>Populasi</th><th>Lancar</th><th>Belum</th><th>Perlu Pend.</th><th>% Lancar</th></tr></thead>
+      <table class="modal-table">
+        <thead><tr><th>Kelas</th><th>Populasi</th><th>Lancar</th><th>Belum</th><th>Defisit</th><th>% Lancar</th></tr></thead>
         <tbody>
           ${k4Html}
           ${k5Html}
+          ${totalHtml}
         </tbody>
       </table>
-
-      <!-- KPI Summary Card (Pengganti Row "Total Akumulasi") -->
-      <div class="modal-kpi-card">
-        <div class="mkc-header">Total Akumulasi Siswa</div>
-        <div class="mkc-body">
-          <div class="mkc-main">
-            <div class="mkc-val">${s.tot>0?s.tot:'0'}</div>
-            <div class="mkc-lbl">Total Populasi</div>
-          </div>
-          <div class="mkc-div"></div>
-          <div class="mkc-stats">
-            <div class="mkc-item">
-              <span class="mkc-item-val success">${s.tot>0?s.lancar:'0'}</span>
-              <span class="mkc-item-lbl">Lancar</span>
-            </div>
-            <div class="mkc-item">
-              <span class="mkc-item-val ${s.pct>=60?'success':'warning'}">${s.tot>0?n2(s.pct)+'%':'0.0%'}</span>
-              <span class="mkc-item-lbl">Persentase</span>
-            </div>
-            <div class="mkc-item">
-              <span class="mkc-item-val ${statusClass}">${statusPencapaian}</span>
-              <span class="mkc-item-lbl">Status</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ringkasan Sistem Otomatis -->
-      <div class="system-summary-box">
-        <div class="ssb-title">Ringkasan Sistem</div>
-        <div class="ssb-desc">${summaryText}</div>
-      </div>
-
-      ${warningHtml}
+      ${s.warnings.length ? `<div style="margin-top:16px;padding:14px 20px;background:var(--warning-dim);border-radius:12px;font-size:13.5px;color:var(--warning);border:1px solid rgba(217,119,6,.2);box-shadow:var(--shadow-sm);">⚠ Sinyal peringatan manipulasi kuantitas. Anomali struktur terdeteksi pada baris operator: <strong>${s.warnings.join(', ')}</strong></div>` : ''}
     `;
   } else if (idx === 1) {
-    // ── PREMIUM GURU INSIGHT CARDS (Pengganti Tabel Kosong) ──
-    const avgH = s.hadir.length ? n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length) : 0;
-    
-    const guruCards = s.guru.map((g, i) => {
-      const hadir = s.hadir[i];
-      let statusText = 'Perlu Pendampingan';
-      let statusClass = 'danger';
-      let conclusion = `Belum terdapat aktivitas pendampingan yang memadai pada periode yang dipilih. Kehadiran tercatat <strong>${hadir}%</strong>.`;
-      
-      if (hadir >= 90) {
-        statusText = 'Sangat Disiplin';
-        statusClass = 'success';
-        conclusion = `Tingkat kehadiran sangat baik (<strong>${hadir}%</strong>), mendukung efektivitas dan konsistensi pembelajaran BTQ.`;
-      } else if (hadir >= 75) {
-        statusText = 'Cukup Aktif';
-        statusClass = 'warning';
-        conclusion = `Aktivitas pendampingan cukup berjalan (<strong>${hadir}%</strong>), namun masih bisa dioptimalkan untuk hasil maksimal.`;
-      }
-
-      return `
-        <div class="guru-insight-card">
-          <div class="gic-header">
-            <div class="gic-name">${g}</div>
-            <div class="gic-badge ${statusClass}">${statusText}</div>
-          </div>
-          <div class="gic-body">
-            <div class="gic-row">
-              <span class="gic-lbl">Metrik Kehadiran</span>
-              <span class="gic-val">${hadir}%</span>
-            </div>
-            <div class="gic-conclusion ${statusClass}">
-              <strong>Kesimpulan:</strong> ${conclusion}
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-
     el.innerHTML = `
-      <div class="modal-status-bar" style="margin-bottom: 16px;">
-        <span class="status-badge available">Status Kehadiran Guru</span>
-        <span class="modal-status-note">Rata-rata kumulatif: <strong>${avgH}%</strong></span>
-      </div>
-      <div>
-        ${guruCards}
-      </div>
+      <table class="modal-table">
+        <thead><tr><th>Guru Pembimbing BTQ</th><th>Kehadiran</th><th>Status</th></tr></thead>
+        <tbody>
+          ${s.guru.map((g, i) => `<tr>
+            <td data-label="Guru">${g}</td>
+            <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
+            <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Defisit</span>'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-tertiary)">Rata-rata kehadiran: <strong style="color:var(--text-primary)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
     `;
   } else {
     const allP = getAllPeriods();
