@@ -259,10 +259,11 @@ a {
 
 #loginView .login-card {
   background: var(--log-surface);
-  border-radius: 20px;
+  border-radius: 28px;
   box-shadow: var(--log-shadow-card);
   padding: 44px 40px 40px;
-  border: 1px solid rgba(255,255,255,0.8);
+  border: 1px solid var(--log-card-border, rgba(255,255,255,0.8));
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, border-radius 0.35s ease;
 }
 
 #loginView .brand { text-align: center; margin-bottom: 36px; }
@@ -270,6 +271,7 @@ a {
   display: inline-flex; align-items: center; justify-content: center;
   width: 52px; height: 52px; background: var(--log-blue-dim);
   border-radius: 14px; margin-bottom: 18px;
+  transition: background 0.35s ease, box-shadow 0.35s ease, border 0.35s ease;
 }
 #loginView .brand-logo svg { width: 26px; height: 26px; }
 #loginView .brand-name { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; line-height: 1; margin-bottom: 8px; }
@@ -290,8 +292,8 @@ a {
 #loginView input[type="password"] {
   width: 100%; padding: 12px 14px 12px 42px; font-family: var(--log-font);
   font-size: 14px; font-weight: 500; color: var(--log-ink-1);
-  background: #fafbfc; border: 1.5px solid var(--log-border);
-  border-radius: 10px; outline: none; transition: var(--log-transition); -webkit-appearance: none;
+  background: var(--log-input-bg, #fafbfc); border: 1.5px solid var(--log-border);
+  border-radius: 10px; outline: none; transition: var(--log-transition), background 0.35s ease, border-color 0.35s ease, color 0.35s ease; -webkit-appearance: none;
 }
 
 #loginView input[type="text"]:focus,
@@ -354,10 +356,96 @@ a {
   90% { transform: translateX(3px); }
 }
 #loginView .login-card.shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
-#loginView .login-footer { text-align: center; margin-top: 22px; font-size: 12px; color: var(--log-ink-4); line-height: 1.6; }
+
+/* Premium Legal Footer */
+#loginView .login-footer { 
+  margin-top: 34px; 
+  padding-top: 24px;
+  border-top: 1px solid var(--log-border);
+  text-align: center; 
+  font-size: 13px; 
+  color: var(--log-footer-text, #94a3b8); 
+  line-height: 1.9; 
+  font-weight: 500;
+  transition: color 0.35s ease, border-color 0.35s ease;
+}
+#loginView .login-footer strong {
+  color: var(--log-footer-strong, #1e293b);
+  font-weight: 700;
+  font-size: 13px;
+  transition: color 0.35s ease;
+}
+
+/* ────────────────────────────────────────────
+   PREMIUM DARK MODE OVERRIDES FOR LOGIN
+──────────────────────────────────────────── */
+body.dark #loginView {
+  --log-bg: #020817;
+  --log-surface: rgba(10, 25, 55, 0.88);
+  --log-ink-1: #ffffff;
+  --log-ink-2: #cbd5e1;
+  --log-ink-3: #94a3b8;
+  --log-ink-4: #64748b;
+  --log-border: rgba(255, 255, 255, 0.08);
+  --log-border-focus: #3b82f6;
+  --log-blue-dim: rgba(37, 99, 235, 0.12);
+  --log-shadow-card: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.03);
+  --log-card-border: rgba(255, 255, 255, 0.08);
+  --log-input-bg: rgba(255, 255, 255, 0.03);
+  --log-footer-text: #94a3b8;
+  --log-footer-strong: #ffffff;
+  
+  background: radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 30%),
+              radial-gradient(circle at bottom right, rgba(59,130,246,0.06), transparent 35%),
+              var(--log-bg);
+  transition: background 0.35s ease;
+}
+
+body.dark #loginView .login-card {
+  border-radius: 28px;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+body.dark #loginView .brand-logo {
+  background: rgba(37, 99, 235, 0.12);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+body.dark #loginView input[type="text"]::placeholder,
+body.dark #loginView input[type="password"]::placeholder {
+  color: #64748b;
+}
+
+body.dark #loginView input[type="text"]:focus,
+body.dark #loginView input[type="password"]:focus {
+  background: rgba(10, 25, 55, 0.95);
+}
+
+body.dark #loginView .btn-submit {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+  border: none;
+}
+
+body.dark #loginView .btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.45), 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+body.dark #loginView .login-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.dark #loginView .toggle-pw:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+}
 
 @media (max-width: 480px) {
-  #loginView .login-card { padding: 32px 24px 28px; border-radius: 16px; }
+  #loginView .login-card { padding: 32px 24px 28px; border-radius: 24px; }
+  body.dark #loginView .login-card { border-radius: 24px; }
   #loginView .brand-name { font-size: 23px; }
 }
 @media (max-width: 360px) {
@@ -1655,10 +1743,18 @@ body.dark .loading-progress-value {
         </button>
 
       </form>
-    </div>
 
-    <div class="login-footer" aria-label="Informasi sistem">
-      SMART BTQ v1.0 &nbsp;·&nbsp; Dokumen Internal
+      <!-- Dipindahkan ke dalam card dengan Premium Branding -->
+      <div class="login-footer" aria-label="Informasi hak cipta dan sistem">
+        <strong>© Hak Cipta Fazry Irawan</strong>
+        <div style="height: 8px;"></div>
+        Guru BTQ<br>
+        MI Panatasan &bull; SDN 1 Batulawang
+        <div style="height: 14px;"></div>
+        Sistem Monitoring Baca Tulis Al-Qur'an<br>
+        Dashboard Internal Pendidikan
+      </div>
+
     </div>
   </div>
 </div>
