@@ -905,7 +905,6 @@ tfoot td.c { text-align: center; }
 .q-green { background: var(--success); }
 .q-amber { background: var(--warning); }
 .q-red   { background: var(--danger); }
-.q-orange { background: #f97316; }
 
 .btn-detail {
   padding: 5px 12px;
@@ -1268,23 +1267,23 @@ body.dark .fs-btn-accept {
   
   .modal-box { width: 92%; height: auto; max-height: 88vh; border-radius: var(--r-xl); display: flex; flex-direction: column; margin: auto; }
   .modal-header { padding: 20px; border-top-left-radius: var(--r-xl); border-top-right-radius: var(--r-xl); }
-  .modal-table td:last-child { border-bottom: none; padding-bottom: 0; padding-top: 12px; }
-  tbody td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; margin-right: 12px; }
+  .modal-body { padding: 16px 20px; }
+  .modal-tabs { padding: 0 20px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  .modal-table thead { display: none; }
   
-  /* Update Tampilan Mobile Untuk Status Evaluasi */
-  tbody td[data-label="#"] { display: none; }
-  tbody td[data-label="Status Evaluasi Data"] { 
-    display: flex !important; 
-    flex-direction: column !important; 
-    align-items: flex-start !important; 
-    background: var(--surface-2) !important; 
-    padding: 16px !important; 
-    border-radius: var(--r-md); 
-    margin-bottom: 12px; 
-    border: 1px dashed var(--border) !important; 
-  }
-  tbody td[data-label="Status Evaluasi Data"]::before { display: none !important; }
+  .modal-table tr { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-md); margin-bottom: 12px; padding: 14px; box-shadow: var(--shadow-xs); }
+  .modal-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border-2); text-align: right !important; background: transparent !important; }
+  .modal-table td:last-child { border-bottom: none; padding-bottom: 0; }
+  .modal-table td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; }
 
+  table { border: none; width: 100%; }
+  .table-surface { background: transparent; border: none; box-shadow: none; overflow: visible; margin-bottom: 0; }
+  thead { display: none; }
+  tbody tr { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-md); margin: 0 0 16px 0; padding: 16px; box-shadow: var(--shadow-xs); }
+  tbody td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-2); text-align: right !important; font-size: 13.5px; }
+  tbody td:last-child { border-bottom: none; padding-bottom: 0; padding-top: 12px; }
+  tbody td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; margin-right: 12px; }
+  tbody td[data-label="#"], tbody td[data-label="Kualitas"] { display: none; }
   tbody td[data-label="Sekolah"] { flex-direction: column; align-items: flex-start; text-align: left !important; border-bottom: 2px solid var(--border-2); padding-bottom: 12px; margin-bottom: 4px; }
   tbody td[data-label="Sekolah"]::before { display: none; }
   .td-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
@@ -1292,7 +1291,7 @@ body.dark .fs-btn-accept {
   tfoot tr { display: flex; flex-direction: column; background: var(--primary-dim); border: 1px solid rgba(37,99,235,.2); border-radius: var(--r-md); padding: 16px; margin: 0 0 16px 0; }
   tfoot td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(37,99,235,.2); text-align: right !important; font-size: 14px; background: transparent !important; }
   tfoot td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-secondary); text-align: left; }
-  tfoot td[data-label="#"], tfoot td[data-label="Aksi"], tfoot td[data-label="Status Evaluasi Data"] { display: none; }
+  tfoot td[data-label="#"], tfoot td[data-label="Aksi"], tfoot td[data-label="Kualitas"] { display: none; }
   tfoot td[data-label="Sekolah"] { flex-direction: row; border-bottom: 2px solid rgba(37,99,235,.2); padding-bottom: 12px; margin-bottom: 4px; color: var(--primary); font-size: 14px; justify-content: center; text-align: center !important; }
   tfoot td[data-label="Sekolah"]::before { display: none; }
   
@@ -1893,7 +1892,7 @@ body.dark .loading-progress-value {
                   <th class="c">% Lancar</th>
                   <th class="c">Belum</th>
                   <th class="c">Tidak</th>
-                  <th style="min-width:260px; text-align:left;">Status Evaluasi Data</th>
+                  <th class="c">Kualitas</th>
                   <th class="c">Aksi</th>
                 </tr>
               </thead>
@@ -2763,36 +2762,11 @@ function getAllPeriods() {
   return result;
 }
 
-// Sistem Logic Kualitas Data Enterprise-Grade
-function evaluateDataQuality(school) {
-  const k4 = school.kls4.tersedia;
-  const k5 = school.kls5.tersedia;
-  const warn = school.warnings.length > 0;
-  const tot = school.tot;
-  const noTeacher = school.guru.length === 0 || school.guru.every(g => !g || g.trim() === '');
-  const lowHadir = school.hadir.length > 0 && (school.hadir.reduce((a,b)=>a+b,0)/school.hadir.length) < 70;
-
-  if (tot === 0 && !k4 && !k5) {
-    return { dot: 'q-red', text: 'Belum Terdapat Data BTQ pada Periode Ini' };
-  }
-
-  if (warn) {
-    return { dot: 'q-orange', text: 'Memerlukan Verifikasi Operator' };
-  }
-
-  if (k4 && k5) {
-    if (noTeacher || lowHadir) {
-      return { dot: 'q-green', text: 'Data Siswa Lengkap, Menunggu Validasi Guru BTQ' };
-    }
-    return { dot: 'q-green', text: 'Data Lengkap dan Siap Dianalisis' };
-  }
-
-  if (k4 || k5) {
-    const missing = k4 ? 'Kelas 5' : 'Kelas 4';
-    return { dot: 'q-amber', text: `Perlu Validasi Data ${missing}` };
-  }
-
-  return { dot: 'q-red', text: 'Anomali Data Terdeteksi, Memerlukan Tindak Lanjut' };
+function dataQuality(school) {
+  if (school.warnings.length > 0) return 'check';
+  const avgH = school.hadir.reduce((a,b)=>a+b,0) / school.hadir.length;
+  if (avgH < 70) return 'partial';
+  return 'valid';
 }
 
 // ────────────────────────────────────────────
@@ -2967,19 +2941,12 @@ function renderTable() {
   if(sortMode === 'worst') display.sort((a,b) => a.pct - b.pct);
   
   display.forEach((s, i) => {
-    const evalStatus = evaluateDataQuality(s);
-    
-    // Executive Data Validation Label
-    const qLabel = `
-      <div style="font-size: 10.5px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 800;">Status Data:</div>
-      <div style="display:flex; align-items:flex-start; gap:8px; text-align:left;">
-        <span class="q-dot ${evalStatus.dot}" style="margin-top:5px; flex-shrink:0; width:10px; height:10px; box-shadow: 0 0 0 3px var(--surface-2);"></span>
-        <span style="font-size:13px; color:var(--text-primary); font-weight:600; line-height:1.5;">${evalStatus.text}</span>
-      </div>
-    `;
+    const q = dataQuality(s);
+    const qLabel = q === 'valid' ? '<span class="q-dot q-green" title="Data Valid"></span> Valid' :
+                   q === 'partial' ? '<span class="q-dot q-amber" title="Perlu Periksa"></span> Partial' :
+                   '<span class="q-dot q-red" title="Inkonsistensi"></span> Cek';
     
     const tr = document.createElement('tr');
-    tr.id = `school-row-${s.no}`; // ID SPESIFIK UNTUK RESTORE POSISI
     tr.innerHTML = `
       <td data-label="#">${i+1}</td>
       <td data-label="Sekolah">
@@ -2991,7 +2958,7 @@ function renderTable() {
       <td data-label="% Lancar" class="c">${s.tot>0 ? pctPill(s.pct) : '<span style="color:var(--text-muted)">–</span>'}</td>
       <td data-label="Belum Lancar" class="c" style="color:var(--warning)">${fmt(s.belum)}</td>
       <td data-label="Tidak Bisa" class="c" style="color:var(--danger)">${fmt(s.tidak)}</td>
-      <td data-label="Status Evaluasi Data" style="min-width:260px; white-space:normal; padding-top:16px; padding-bottom:16px;">${qLabel}</td>
+      <td data-label="Kualitas" class="c" style="font-size:12px;white-space:nowrap">${qLabel}</td>
       <td data-label="Aksi" class="c" style="padding-top:12px;">
         <button class="btn-detail" onclick="openModal(${s.no})">Detail Sekolah</button>
       </td>
@@ -3010,7 +2977,7 @@ function renderTable() {
     <td data-label="% Lancar" class="c">${pctPill(p)}</td>
     <td data-label="Belum Lancar" class="c">${fmt(T.belum)}</td>
     <td data-label="Tidak Bisa" class="c">${fmt(T.tidak)}</td>
-    <td data-label="Status Evaluasi Data"></td>
+    <td data-label="Kualitas"></td>
     <td data-label="Aksi"></td>
   </tr>`;
 }
