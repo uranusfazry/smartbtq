@@ -4530,72 +4530,83 @@ function onEditInput() {
 }
 
 async function saveModalChanges() {
+  // 1. SAFE NULL CHECK WAJIB
+  if (!currentModalSchool || !currentModalSchool.nama) {
+      showNotification("Data sekolah tidak ditemukan (Null Error)", "error");
+      return;
+  }
+
   if (!validateEditData()) return;
   
   const btnSave = document.getElementById('btnSaveModal');
-  if(!btnSave) return;
-
-  // STRICT NULL CHECK: Pastikan object sekolah dan NAMANYA tersedia
-  if (!currentModalSchool || !currentModalSchool.nama) {
-      showNotification("Gagal: Referensi sekolah tidak ditemukan untuk diperbarui.", "error");
-      return;
-  }
+  if (!btnSave) return;
   
   btnSave.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;margin-right:6px;"></span>Menyimpan...';
   btnSave.disabled = true;
 
   try {
-    const targetRow = editTempData.rows && editTempData.rows[0] ? editTempData.rows[0] : {};
     const enteredPin = document.getElementById('pinInput') ? document.getElementById('pinInput').value : DEV_PIN;
     
-    // PAYLOAD MURNI ENTERPRISE: Tanpa "id", langsung gunakan parameter Tahun, Bulan, dan Sekolah
-    const requestPayload = {
+    // Pastikan parsing nama guru dan kehadiran aman
+    const namaGuru = (editTempData.guru && editTempData.guru.length > 0) ? String(editTempData.guru[0]) : "";
+    const persenHadir = (editTempData.hadir && editTempData.hadir.length > 0) ? Number(editTempData.hadir[0]) : 0;
+
+    // 2. PAYLOAD EXACT (STRICT MATCHING)
+    // Sesuai standar row matching backend: Tahun + Bulan + Sekolah (Tanpa ID)
+    const payload = {
       pin: enteredPin,
       Tahun: currentYear,
       Bulan: currentMonth,
       Sekolah: String(currentModalSchool.nama).trim(),
-      Total4: parseInt(editTempData.kls4.tot) || 0,
-      Lancar4: parseInt(editTempData.kls4.lancar) || 0,
-      Belum4: parseInt(editTempData.kls4.belum) || 0,
-      Tidak4: parseInt(editTempData.kls4.tidak) || 0,
-      Total5: parseInt(editTempData.kls5.tot) || 0,
-      Lancar5: parseInt(editTempData.kls5.lancar) || 0,
-      Belum5: parseInt(editTempData.kls5.belum) || 0,
-      Tidak5: parseInt(editTempData.kls5.tidak) || 0,
-      Guru: targetRow.guru || (editTempData.guru && editTempData.guru[0]) || "",
-      Hadir: parseInt(targetRow.hadir !== undefined ? targetRow.hadir : (editTempData.hadir && editTempData.hadir[0])) || 0
+      Total4: Number(editTempData.kls4.tot) || 0,
+      Lancar4: Number(editTempData.kls4.lancar) || 0,
+      Belum4: Number(editTempData.kls4.belum) || 0,
+      Tidak4: Number(editTempData.kls4.tidak) || 0,
+      Total5: Number(editTempData.kls5.tot) || 0,
+      Lancar5: Number(editTempData.kls5.lancar) || 0,
+      Belum5: Number(editTempData.kls5.belum) || 0,
+      Tidak5: Number(editTempData.kls5.tidak) || 0,
+      Guru: namaGuru.trim(),
+      Hadir: persenHadir
     };
 
+    // 3. FETCH POST (API_URL HARUS URL DEPLOY TERBARU DI ATAS)
     const response = await fetch(API_URL, { 
-        method: 'POST', 
+        method: "POST", 
         headers: {
-            "Content-Type": "text/plain;charset=utf-8", 
+            // Catatan Developer: application/json sering diblock oleh CORS Preflight Google Apps Script. 
+            // Jika backend memblokir ini, ubah kembali ke "text/plain;charset=utf-8"
+            "Content-Type": "application/json" 
         },
-        body: JSON.stringify(requestPayload) 
+        body: JSON.stringify(payload) 
     });
     
+    // 4. WAJIB CEK RESPONSE.STATUS (ANTI FAKE SUCCESS)
     let result = {};
     try {
         result = await response.json();
     } catch (e) {
-        throw new Error("Respon server bukan JSON yang valid. Cek output Apps Script.");
+        throw new Error("Respon server bukan JSON yang valid. Pastikan URL Web App adalah versi Deploy terbaru.");
     }
     
-    if (result.status !== 'success' && !result.success) {
-        throw new Error(result.message || "Gagal menyimpan ke database server.");
+    if (result.status === "success") {
+        showNotification("Data berhasil diperbarui di Spreadsheet", "success");
+        
+        // Stabilisasi UI Modal
+        disableEditMode();
+        closeModal();
+        
+        // 5. AUTO REFRESH DASHBOARD SECARA SMOOTH (REAL SYNC)
+        await loadData(currentYear, currentMonth);
+    } else {
+        // Backend mendeteksi kesalahan (PIN Salah, Row Tidak Ditemukan, dll)
+        showNotification(result.message || "Gagal memperbarui data dari server", "error");
+        btnSave.innerHTML = 'Simpan Perubahan';
+        btnSave.disabled = false;
     }
 
-    // UPDATE BERHASIL
-    disableEditMode();
-    closeModal();
-    showNotification("Data berhasil diperbarui. Menyinkronkan dashboard...", "success");
-
-    // REFRESH PROFESIONAL ASINKRON: Menarik ulang state terkini dari Apps Script
-    // Mencegah window.location.reload() yang merusak user-experience
-    await loadData(currentYear, currentMonth);
-
   } catch (err) {
-    showNotification("Gagal memperbarui data: " + err.message, "error");
+    showNotification(err.message || "Terjadi kesalahan koneksi saat menyimpan", "error");
     btnSave.innerHTML = 'Simpan Perubahan';
     btnSave.disabled = false;
   }
