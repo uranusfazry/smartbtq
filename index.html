@@ -3139,8 +3139,8 @@ function aggregateSchools(rawArr) {
   if (!rawArr || !Array.isArray(rawArr)) return [];
   
   return rawArr.map((s, idx) => {
-    // PROTEKSI NULL & SAFE ID: Prioritaskan s.no, jika tidak ada gunakan nama dengan Regex Hapus Spasi
-    const safeId = s.no ? String(s.no) : (s.nama ? String(s.nama).replace(/\s+/g, "") + "_" + idx : "school_" + idx);
+    // SAFE ID STABIL: Gunakan NAMA sekolah mutlak untuk referensi yang aman ke fungsi openModal
+    const safeId = String(s.nama || `UNKNOWN_${idx}`).trim().toUpperCase().replace(/\s+/g, "_");
     
     let tot=0, lancar=0, belum=0, tidak=0;
     let k4t=0,k4l=0,k4b=0,k4k=0, k5t=0,k5l=0,k5b=0,k5k=0;
@@ -3664,7 +3664,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
           onClick: (e, els) => { 
              if(els.length > 0) {
                 const s = barChartActiveData[els[0].index];
-                if (s && (s.id || s.no || s.nama)) openModal(s.id || s.no || s.nama);
+                if (s && s.id) openModal(s.id);
              }
           },
           scales: {
@@ -3737,7 +3737,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
           onClick: (e, els) => { 
              if(els.length > 0) {
                 const s = stackChartActiveData[els[0].index];
-                if (s && (s.id || s.no || s.nama)) openModal(s.id || s.no || s.nama);
+                if (s && s.id) openModal(s.id);
              }
           },
           scales: {
@@ -4226,7 +4226,7 @@ function renderTrend(cakupan) {
           }
 
           return `
-          <div class="premium-row-card clickable" onclick="openModal('${item.id || item.no || item.nama}', 2)">
+          <div class="premium-row-card clickable" onclick="openModal('${item.id || item.nama}', 2)">
               <div class="pr-header">
                   <div class="pr-name-group">
                       <div class="pr-name">${item.nama || '-'}</div>
@@ -4311,65 +4311,32 @@ function renderTrend(cakupan) {
 }
 
 // ────────────────────────────────────────────
-// KESIMPULAN & REKOMENDASI
+// MODAL DETAIL SEKOLAH & EDIT SYSTEM
 // ────────────────────────────────────────────
-function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
-  try {
-    const sorted = currentSchools.filter(s => s.tot > 0).sort((a,b) => b.pct - a.pct);
-    const lowC = sorted.filter(s => s.pct < 60).length;
-    const pL = T.tot > 0 ? n2(T.lancar / T.tot * 100) : 0;
-    const pB = T.tot > 0 ? n2(T.belum / T.tot * 100) : 0;
-    const pK = T.tot > 0 ? n2(T.tidak / T.tot * 100) : 0;
-
-    let callout = '';
-    if (isAll) {
-      const kr = ["Langensari","Purwaharja","Pataruman","Banjar"].map(k => {
-        const ks = allSchoolsAggr.filter(s => s.kecamatan === k);
-        const t = computeTotals(ks);
-        return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
-      }).sort((a,b) => b.pct - a.pct);
-      callout = `Pusat orbit prestasi saat ini ada pada Kec. <strong>${kr[0].name}</strong> dengan realisasi ideal (${n2(kr[0].pct)}%). Fokus intervensi diarahkan secara institusional ke Kec. <strong>${kr[kr.length-1].name}</strong> sebagai sektor prioritas pembinaan (${n2(kr[kr.length-1].pct)}%).`;
-    } else {
-      callout = `Sorotan Regional <strong>${cakupan}</strong> — Ekosistem belajar <strong>${best ? best.nama : '-'}</strong> diposisikan sebagai prototipe rujukan (${n2(best ? best.pct : 0)}%). Peringatan: <strong>${lowC} sekolah dasar</strong> dilaporkan berada di bawah standar kelayakan (60%).`;
-    }
-    
-    safeSetHTML('k-callout', callout);
-    
-    const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
-    safeSetHTML('k-body', `
-      Asesmen formal dari ekstraksi data matriks <strong>${classStr}</strong> per <strong>${currentMonth} ${currentYear}</strong> dalam area komputasi <strong>${cakupan}</strong> mengkalkulasi kumpulan <strong>${fmt(T.tot)} jejak digital valid</strong> dari total ${currentSchools.length} klaster unit dasar. Nilai valuasi capaian di ekuilibrium angka <strong>${n2(pct)}%</strong>. Menjabarkan rincian teknis: <strong>${pL}%</strong> SDM telah terklasifikasi mapan secara alfabetikal bahasa Al-Qur'an, diiringi <strong>${pB}%</strong> pada ambang fase medium, sekaligus menyisakan celah berat pada <strong>${pK}%</strong> demografi siswa tanpa pengenalan struktur huruf yang paling minimal sekalipun.
-    `);
-    
-    safeSetHTML('k-reco', [
-      `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
-      `Investigasi guru dengan kehadiran di bawah 80% oleh Dinas Pendidikan untuk memastikan hak siswa atas pembelajaran agama terpenuhi.`,
-      `Kembangkan program "Tutor Sebaya Al-Qur'an" secara struktural di kelas IV–V untuk mempercepat penurunan angka ketidaklancaran.`,
-      `Pastikan kedisiplinan input data sekolah (mencegah data kosong) dengan melibatkan operator wilayah pada rapat koordinasi kepala sekolah bulanan.`
-    ].map((r, i) => `<li><span class="reco-num">${i+1}</span><span>${r}</span></li>`).join(''));
-  } catch(err) {
-    console.error("Kesimpulan Error:", err);
-  }
-}
-
-// ────────────────────────────────────────────
-// MODAL DETAIL SEKOLAH
-// ────────────────────────────────────────────
-function openModal(id, tabIdx = 0) {
+function openModal(schoolKey, tabIdx = 0) {
   // SAFE NULL CHECK
-  if (!id) {
-      showNotification("Akses ditolak: ID Sekolah tidak valid / null.", "error");
+  if (!schoolKey) {
+      showNotification("Akses ditolak: Referensi sekolah tidak valid atau null.", "error");
       return;
   }
 
-  // Mendukung ID String untuk Null Safety
-  lastSchoolCardId = `school-row-${id}`; 
-  currentModalSchool = currentSchools.find(s => String(s.id) === String(id) || String(s.no) === String(id) || String(s.nama) === String(id));
+  // STRICT SEARCH BERDASARKAN ID STABIL ATAU NAMA
+  const school = currentSchools.find(s => 
+      String(s.id) === String(schoolKey) || 
+      String(s.no) === String(schoolKey) || 
+      String(s.nama) === String(schoolKey)
+  );
   
-  if(!currentModalSchool) {
+  // PROTEKSI NULL CRASH (Wajib ada)
+  if(!school) {
       showNotification("Data detail sekolah tidak ditemukan pada sistem.", "error");
-      console.warn("Sekolah null/tidak ditemukan untuk ID:", id);
+      console.warn("Sekolah null/tidak ditemukan untuk key:", schoolKey);
       return;
   }
+  
+  // BINDING GLOBAL STATE SECARA AMAN
+  currentModalSchool = school;
+  lastSchoolCardId = `school-row-${school.id}`; 
   
   const modalTitle = document.getElementById('modalTitle');
   if (modalTitle) modalTitle.textContent = currentModalSchool.nama;
@@ -4414,7 +4381,7 @@ function verifyPin() {
     pinInput.classList.add('error');
     pinInput.value = '';
     pinInput.focus();
-    showNotification("PIN tidak valid. Akses ditolak.", "error");
+    showNotification("PIN Developer salah. Akses ditolak.", "error");
   }
 }
 
@@ -4428,16 +4395,20 @@ function enableEditMode() {
 function disableEditMode() {
   isEditMode = false;
   editTempData = null;
-  document.getElementById('editWarningBanner').classList.remove('visible');
+  const warnBanner = document.getElementById('editWarningBanner');
+  if(warnBanner) warnBanner.classList.remove('visible');
   updateModalActionsHeader();
   
-  currentModalSchool = currentSchools.find(s => s.no === currentModalSchool.no);
+  // Kembalikan referensi ke state asli dari currentModalSchool
+  const originalSchool = currentSchools.find(s => String(s.nama) === String(currentModalSchool.nama));
+  if (originalSchool) currentModalSchool = originalSchool;
   renderModalTab(0);
 }
 
 function updateModalActionsHeader() {
   const actions = document.getElementById('modalActionsHeader');
   const auditLog = document.getElementById('modalAuditLog');
+  if(!actions || !auditLog) return;
   
   if (isEditMode) {
     actions.innerHTML = `
@@ -4458,7 +4429,7 @@ function updateModalActionsHeader() {
       </button>
       <button class="modal-close" onclick="closeModal()">✕</button>
     `;
-    auditLog.innerHTML = `Terakhir diperbarui oleh Developer · ${new Date().toLocaleString('id-ID', {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'})}`;
+    auditLog.innerHTML = `Terakhir diperbarui oleh Sistem · ${new Date().toLocaleString('id-ID', {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'})}`;
     document.querySelectorAll('.m-tab').forEach(t => t.style.pointerEvents = 'auto');
   }
 }
@@ -4479,19 +4450,19 @@ function validateEditData() {
 
   if (!checkClass(editTempData.kls4) || !checkClass(editTempData.kls5)) {
     isValid = false;
-    warnText.textContent = "Data tidak valid. Periksa jumlah siswa (angka tidak boleh negatif dan akumulasi kategori tidak boleh melebihi total siswa).";
+    if(warnText) warnText.textContent = "Data tidak valid. Periksa jumlah siswa (angka tidak boleh negatif dan akumulasi kategori tidak boleh melebihi total siswa).";
   }
 
   if (editTempData.hadir.some(h => h < 0 || h > 100)) {
     isValid = false;
-    warnText.textContent = "Data tidak valid. Kehadiran guru harus di antara 0% hingga 100%.";
+    if(warnText) warnText.textContent = "Data tidak valid. Kehadiran guru harus di antara 0% hingga 100%.";
   }
 
   if (isValid) {
-    warnBanner.classList.remove('visible');
+    if(warnBanner) warnBanner.classList.remove('visible');
     if(btnSave) btnSave.disabled = false;
   } else {
-    warnBanner.classList.add('visible');
+    if(warnBanner) warnBanner.classList.add('visible');
     if(btnSave) btnSave.disabled = true;
   }
   return isValid;
@@ -4533,7 +4504,7 @@ function onEditInput() {
 
   validateEditData();
   
-  // Real-time perhitungan Otomatis Persentase ke DOM UI
+  // REAL-TIME AUTO PERCENTAGE CALCULATION & UI UPDATE
   if (document.getElementById('e_k4_pct') && editTempData.kls4.tersedia) {
     document.getElementById('e_k4_pct').innerHTML = pctPill(editTempData.kls4.tot > 0 ? (editTempData.kls4.lancar/editTempData.kls4.tot*100) : 0);
   }
@@ -4564,9 +4535,9 @@ async function saveModalChanges() {
   const btnSave = document.getElementById('btnSaveModal');
   if(!btnSave) return;
 
-  // SAFE NULL CHECK untuk object sekolah yang diedit
-  if (!editTempData || !editTempData.nama) {
-      showNotification("Gagal: Data sekolah tidak ditemukan atau null.", "error");
+  // STRICT NULL CHECK: Pastikan object sekolah dan NAMANYA tersedia
+  if (!currentModalSchool || !currentModalSchool.nama) {
+      showNotification("Gagal: Referensi sekolah tidak ditemukan untuk diperbarui.", "error");
       return;
   }
   
@@ -4574,16 +4545,15 @@ async function saveModalChanges() {
   btnSave.disabled = true;
 
   try {
-    // 1. Eksekusi Aktual ke Google Apps Script doPost()
     const targetRow = editTempData.rows && editTempData.rows[0] ? editTempData.rows[0] : {};
     const enteredPin = document.getElementById('pinInput') ? document.getElementById('pinInput').value : DEV_PIN;
     
-    // Payload sinkron murni sesuai parameter Apps Script Baru (Tanpa object ID lama)
+    // PAYLOAD MURNI ENTERPRISE: Tanpa "id", langsung gunakan parameter Tahun, Bulan, dan Sekolah
     const requestPayload = {
       pin: enteredPin,
       Tahun: currentYear,
       Bulan: currentMonth,
-      Sekolah: editTempData.nama,
+      Sekolah: String(currentModalSchool.nama).trim(),
       Total4: parseInt(editTempData.kls4.tot) || 0,
       Lancar4: parseInt(editTempData.kls4.lancar) || 0,
       Belum4: parseInt(editTempData.kls4.belum) || 0,
@@ -4608,51 +4578,21 @@ async function saveModalChanges() {
     try {
         result = await response.json();
     } catch (e) {
-        throw new Error("Respon server bukan JSON yang valid. Pastikan doPost() mereturn JSON stringified.");
+        throw new Error("Respon server bukan JSON yang valid. Cek output Apps Script.");
     }
     
     if (result.status !== 'success' && !result.success) {
         throw new Error(result.message || "Gagal menyimpan ke database server.");
     }
 
-    // 2. Terapkan secara Real-Time ke Dashboard Memory State (Optimistic UI Profesional - Anti Jump)
-    if (DATABASE && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-        const rawMonthData = DATABASE[currentYear][currentMonth];
-        const target = rawMonthData.find(s => String(s.no) === String(editTempData.no) || String(s.nama) === String(editTempData.nama));
-        
-        if (target) {
-           if (!target.rows || target.rows.length === 0) target.rows = [{}];
-           const r = target.rows[0];
-           
-           if (editTempData.kls4.tersedia) {
-               r.kls4 = { total: requestPayload.Total4, lancar: requestPayload.Lancar4, belum: requestPayload.Belum4, tidak: requestPayload.Tidak4 };
-           }
-           if (editTempData.kls5.tersedia) {
-               r.kls5 = { total: requestPayload.Total5, lancar: requestPayload.Lancar5, belum: requestPayload.Belum5, tidak: requestPayload.Tidak5 };
-           }
-           
-           if (editTempData.guru && editTempData.guru.length > 0) {
-              editTempData.guru.forEach((gName, idx) => {
-                  if (!target.rows[idx]) target.rows[idx] = {};
-                  target.rows[idx].guru = requestPayload.Guru;
-                  target.rows[idx].hadir = requestPayload.Hadir;
-              });
-           }
-        }
-        
-        disableEditMode();
-        renderUI(rawMonthData);
-        // Buka kembali modal yang sudah memuat data secara halus tanpa reload
-        openModal(editTempData.id || editTempData.no || editTempData.nama, 0);
-        
-        showNotification(`Data ${requestPayload.Sekolah} berhasil diperbarui!`, "success");
-    } else {
-        // Fallback Data Reload
-        await loadData(currentYear, currentMonth);
-        disableEditMode();
-        closeModal();
-        showNotification(`Data berhasil diperbarui ke server.`, "success");
-    }
+    // UPDATE BERHASIL
+    disableEditMode();
+    closeModal();
+    showNotification("Data berhasil diperbarui. Menyinkronkan dashboard...", "success");
+
+    // REFRESH PROFESIONAL ASINKRON: Menarik ulang state terkini dari Apps Script
+    // Mencegah window.location.reload() yang merusak user-experience
+    await loadData(currentYear, currentMonth);
 
   } catch (err) {
     showNotification("Gagal memperbarui data: " + err.message, "error");
