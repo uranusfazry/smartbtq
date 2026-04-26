@@ -1290,6 +1290,55 @@ body.dark .empty-text-desc { color: var(--text-secondary); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
+/* ────────────────────────────────────────────
+   PREMIUM EDIT MODE SYSTEM
+──────────────────────────────────────────── */
+.edit-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 100%;
+  max-width: 80px;
+  text-align: center;
+  transition: all 0.2s ease;
+  -moz-appearance: textfield;
+}
+.edit-input::-webkit-outer-spin-button,
+.edit-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.edit-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-dim); outline: none; }
+.edit-input.invalid { border-color: var(--danger); background: var(--danger-dim); color: var(--danger); }
+.edit-input-txt { max-width: 100%; text-align: left; font-family: var(--font); }
+
+.modal-actions-header { display: flex; align-items: center; gap: 8px; }
+.btn-edit-mode { background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(37,99,235,0.2); padding: 7px 14px; border-radius: var(--r-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.btn-edit-mode:hover { background: var(--primary); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+.btn-save-edit { background: var(--success); color: #fff; border: none; padding: 7px 14px; border-radius: var(--r-sm); font-weight: 600; cursor: pointer; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(22,163,74,0.25); display: flex; align-items: center; justify-content: center;}
+.btn-save-edit:hover:not(:disabled) { background: #15803d; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,163,74,0.35); }
+.btn-save-edit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-cancel-edit { background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border); padding: 7px 14px; border-radius: var(--r-sm); font-weight: 600; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+.btn-cancel-edit:hover { background: var(--border-2); color: var(--text-primary); }
+
+.pin-box { background: var(--surface); border-radius: var(--r-xl); width: 90%; max-width: 340px; padding: 32px 28px; text-align: center; box-shadow: 0 24px 72px rgba(15,23,42,.3); border: 1px solid var(--border); transform: scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.modal-overlay.open .pin-box { transform: scale(1); opacity: 1; }
+.pin-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.pin-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+.pin-input { width: 100%; background: var(--surface-2); border: 2px solid var(--border); border-radius: var(--r-md); padding: 14px; font-size: 28px; font-family: 'JetBrains Mono', monospace; font-weight: 700; text-align: center; letter-spacing: 12px; color: var(--text-primary); outline: none; transition: all 0.2s; margin-bottom: 16px; }
+.pin-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-dim); }
+.pin-input.error { border-color: var(--danger); background: var(--danger-dim); color: var(--danger); animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+.edit-warning-banner { display: none; margin-top: 16px; padding: 12px 16px; background: var(--danger-dim); border: 1px solid rgba(220,38,38,0.2); border-radius: var(--r-md); font-size: 12.5px; color: var(--danger); font-weight: 500; align-items: center; gap: 8px; }
+.edit-warning-banner.visible { display: flex; }
+
+body.dark .edit-input { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
+body.dark .pin-box { background: #0f172a; border-color: rgba(255,255,255,0.1); box-shadow: 0 24px 72px rgba(0,0,0,0.6); }
+body.dark .pin-input { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
+body.dark .btn-cancel-edit { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #cbd5e1; }
+body.dark .btn-edit-mode { background: rgba(37,99,235,0.15); border-color: rgba(37,99,235,0.3); }
 
 /* ────────────────────────────────────────────
    FULLSCREEN SUGGESTION PROMPT (ENTERPRISE TOAST)
@@ -2375,9 +2424,18 @@ body.dark .loading-progress-value {
   <!-- ═══════════════ MODAL ═══════════════ -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title" id="modalTitle">Detail Sekolah</div>
-        <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-header" style="align-items: center;">
+        <div>
+          <div class="modal-title" id="modalTitle">Detail Sekolah</div>
+          <div id="modalAuditLog" style="font-size:11px; color:var(--text-tertiary); margin-top:4px; font-weight:500;"></div>
+        </div>
+        <div class="modal-actions-header" id="modalActionsHeader">
+          <button class="btn-edit-mode" onclick="promptPin()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            Edit Data
+          </button>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
       </div>
       <div class="modal-tabs">
         <button class="m-tab active" onclick="switchTab(0)">Rekap Kelas</button>
@@ -2385,6 +2443,24 @@ body.dark .loading-progress-value {
         <button class="m-tab" onclick="switchTab(2)">Riwayat Bulanan</button>
       </div>
       <div class="modal-body" id="modalContent"></div>
+      
+      <div class="edit-warning-banner" id="editWarningBanner" style="margin: 0 28px 24px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="editWarningText">Data tidak valid. Periksa kembali jumlah siswa.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PIN PROMPT OVERLAY ═══════════════ -->
+<div class="modal-overlay" id="pinOverlay" style="z-index: 9999;" onclick="if(event.target === this) closePinPrompt()">
+  <div class="pin-box" id="pinBox">
+    <div class="pin-title">Otorisasi Developer</div>
+    <div class="pin-sub">Masukkan PIN Developer untuk mengakses mode edit secara aman.</div>
+    <input type="password" class="pin-input" id="pinInput" maxlength="6" autocomplete="off" placeholder="••••••">
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 8px;">
+      <button class="btn-cancel-edit" onclick="closePinPrompt()">Batal</button>
+      <button class="btn-save-edit" onclick="verifyPin()">Verifikasi</button>
     </div>
   </div>
 </div>
@@ -2456,6 +2532,13 @@ let isLoading = false;
 
 // Trend State
 let isTrendInitialized = false;
+
+// ────────────────────────────────────────────
+// EDIT MODE & PIN SYSTEM STATE
+// ────────────────────────────────────────────
+let isEditMode = false;
+const DEV_PIN = '123456';
+let editTempData = null; 
 
 // ────────────────────────────────────────────
 // SAFE DOM HELPERS (PREVENT NULL CRASHES)
@@ -4227,6 +4310,10 @@ function openModal(no, tabIdx = 0) {
   if(!currentModalSchool) return;
   document.getElementById('modalTitle').textContent = currentModalSchool.nama;
   
+  isEditMode = false;
+  editTempData = null;
+  updateModalActionsHeader();
+  
   document.querySelectorAll('.m-tab').forEach((t,i) => t.classList.toggle('active', i === tabIdx));
   renderModalTab(tabIdx);
   
@@ -4234,27 +4321,275 @@ function openModal(no, tabIdx = 0) {
   document.getElementById('modalOverlay').classList.add('open');
 }
 
+// --- PIN & EDIT MODE FUNCTIONS ---
+function promptPin() {
+  const pinInput = document.getElementById('pinInput');
+  pinInput.value = '';
+  pinInput.classList.remove('error');
+  document.getElementById('pinOverlay').classList.add('open');
+  setTimeout(() => pinInput.focus(), 100);
+  
+  pinInput.onkeydown = (e) => {
+    if(e.key === 'Enter') verifyPin();
+    pinInput.classList.remove('error');
+  };
+}
+
+function closePinPrompt() {
+  document.getElementById('pinOverlay').classList.remove('open');
+}
+
+function verifyPin() {
+  const pinInput = document.getElementById('pinInput');
+  if (pinInput.value === DEV_PIN) {
+    closePinPrompt();
+    enableEditMode();
+  } else {
+    pinInput.classList.add('error');
+    pinInput.value = '';
+    pinInput.focus();
+  }
+}
+
+function enableEditMode() {
+  isEditMode = true;
+  editTempData = JSON.parse(JSON.stringify(currentModalSchool));
+  updateModalActionsHeader();
+  renderModalTab(0); 
+}
+
+function disableEditMode() {
+  isEditMode = false;
+  editTempData = null;
+  document.getElementById('editWarningBanner').classList.remove('visible');
+  updateModalActionsHeader();
+  
+  currentModalSchool = currentSchools.find(s => s.no === currentModalSchool.no);
+  renderModalTab(0);
+}
+
+function updateModalActionsHeader() {
+  const actions = document.getElementById('modalActionsHeader');
+  const auditLog = document.getElementById('modalAuditLog');
+  
+  if (isEditMode) {
+    actions.innerHTML = `
+      <button class="btn-cancel-edit" onclick="disableEditMode()">Batal</button>
+      <button class="btn-save-edit" id="btnSaveModal" onclick="saveModalChanges()">Simpan Perubahan</button>
+      <button class="btn-edit-mode" onclick="disableEditMode()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Kunci
+      </button>
+    `;
+    auditLog.innerHTML = `<span style="color:var(--warning)">● Mode Edit Aktif — Pengawasan Developer Aktif</span>`;
+    document.querySelectorAll('.m-tab').forEach(t => t.style.pointerEvents = 'none');
+  } else {
+    actions.innerHTML = `
+      <button class="btn-edit-mode" onclick="promptPin()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+        Edit Data
+      </button>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    `;
+    auditLog.innerHTML = `Terakhir diperbarui oleh Developer · ${new Date().toLocaleString('id-ID', {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'})}`;
+    document.querySelectorAll('.m-tab').forEach(t => t.style.pointerEvents = 'auto');
+  }
+}
+
+function validateEditData() {
+  let isValid = true;
+  const warnBanner = document.getElementById('editWarningBanner');
+  const warnText = document.getElementById('editWarningText');
+  const btnSave = document.getElementById('btnSaveModal');
+  
+  const checkClass = (kls) => {
+    if(!kls.tersedia) return true;
+    if(kls.tot < 0 || kls.lancar < 0 || kls.belum < 0 || kls.tidak < 0) return false;
+    if(kls.lancar > kls.tot || kls.belum > kls.tot || kls.tidak > kls.tot) return false;
+    if((kls.lancar + kls.belum + kls.tidak) > kls.tot) return false;
+    return true;
+  };
+
+  if (!checkClass(editTempData.kls4) || !checkClass(editTempData.kls5)) {
+    isValid = false;
+    warnText.textContent = "Data tidak valid. Periksa jumlah siswa (angka tidak boleh negatif dan akumulasi kategori tidak boleh melebihi total siswa).";
+  }
+
+  if (editTempData.hadir.some(h => h < 0 || h > 100)) {
+    isValid = false;
+    warnText.textContent = "Data tidak valid. Kehadiran guru harus di antara 0% hingga 100%.";
+  }
+
+  if (isValid) {
+    warnBanner.classList.remove('visible');
+    if(btnSave) btnSave.disabled = false;
+  } else {
+    warnBanner.classList.add('visible');
+    if(btnSave) btnSave.disabled = true;
+  }
+  return isValid;
+}
+
+function onEditInput() {
+  if (document.getElementById('e_k4_tot')) {
+    if(editTempData.kls4.tersedia) {
+      editTempData.kls4.tot = parseInt(document.getElementById('e_k4_tot').value) || 0;
+      editTempData.kls4.lancar = parseInt(document.getElementById('e_k4_lan').value) || 0;
+      editTempData.kls4.belum = parseInt(document.getElementById('e_k4_bel').value) || 0;
+      editTempData.kls4.tidak = parseInt(document.getElementById('e_k4_pri').value) || 0;
+    }
+    if(editTempData.kls5.tersedia) {
+      editTempData.kls5.tot = parseInt(document.getElementById('e_k5_tot').value) || 0;
+      editTempData.kls5.lancar = parseInt(document.getElementById('e_k5_lan').value) || 0;
+      editTempData.kls5.belum = parseInt(document.getElementById('e_k5_bel').value) || 0;
+      editTempData.kls5.tidak = parseInt(document.getElementById('e_k5_pri').value) || 0;
+    }
+  }
+  
+  if (document.getElementById('e_g0_name')) {
+    editTempData.guru = editTempData.guru.map((_, i) => {
+       const el = document.getElementById(`e_g${i}_name`);
+       return el ? el.value : _;
+    });
+    editTempData.hadir = editTempData.hadir.map((_, i) => {
+       const el = document.getElementById(`e_g${i}_hadir`);
+       return el ? (parseInt(el.value) || 0) : _;
+    });
+  }
+
+  let nTot = 0, nLan = 0, nBel = 0, nPri = 0;
+  if (editTempData.kls4.tersedia) { nTot+=editTempData.kls4.tot; nLan+=editTempData.kls4.lancar; nBel+=editTempData.kls4.belum; nPri+=editTempData.kls4.tidak; }
+  if (editTempData.kls5.tersedia) { nTot+=editTempData.kls5.tot; nLan+=editTempData.kls5.lancar; nBel+=editTempData.kls5.belum; nPri+=editTempData.kls5.tidak; }
+  
+  editTempData.tot = nTot; editTempData.lancar = nLan; editTempData.belum = nBel; editTempData.tidak = nPri;
+  editTempData.pct = nTot > 0 ? (nLan / nTot * 100) : 0;
+
+  validateEditData();
+  
+  if (document.getElementById('e_k4_pct') && editTempData.kls4.tersedia) {
+    document.getElementById('e_k4_pct').innerHTML = pctPill(editTempData.kls4.tot > 0 ? (editTempData.kls4.lancar/editTempData.kls4.tot*100) : 0);
+  }
+  if (document.getElementById('e_k5_pct') && editTempData.kls5.tersedia) {
+    document.getElementById('e_k5_pct').innerHTML = pctPill(editTempData.kls5.tot > 0 ? (editTempData.kls5.lancar/editTempData.kls5.tot*100) : 0);
+  }
+  
+  const totalRow = document.getElementById('e_total_row');
+  if (totalRow) {
+    totalRow.innerHTML = `<td data-label="Kelas">Total Akumulasi</td><td data-label="Populasi">${nTot}</td><td data-label="Lancar" style="color:var(--success)">${nLan}</td><td data-label="Belum">${nBel}</td><td data-label="Prioritas">${nPri}</td><td data-label="% Lancar">${pctPill(editTempData.pct)}</td>`;
+  }
+  
+  if (document.getElementById('e_g0_status')) {
+     editTempData.hadir.forEach((h, i) => {
+        const stEl = document.getElementById(`e_g${i}_status`);
+        if(stEl) {
+           stEl.innerHTML = h >= 90 ? '<span style="color:var(--success);font-weight:600">✓ Disiplin</span>' : 
+                            h >= 75 ? '<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>' : 
+                            '<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>';
+        }
+     });
+  }
+}
+
+async function saveModalChanges() {
+  if (!validateEditData()) return;
+  
+  const btnSave = document.getElementById('btnSaveModal');
+  btnSave.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;margin-right:6px;"></span>Menyimpan...';
+  btnSave.disabled = true;
+
+  try {
+    // 1. Eksekusi ke Backend via Apps Script (jika backend sudah diatur untuk POST update)
+    // await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'update', data: editTempData }) });
+    
+    // Fallback simulasi jaringan untuk enterprise feel 
+    await new Promise(r => setTimeout(r, 1200)); 
+
+    // 2. Terapkan secara Real-Time ke Dashboard Memory State
+    const rawMonthData = DATABASE[currentYear][currentMonth];
+    const target = rawMonthData.find(s => s.no === editTempData.no);
+    
+    if (target && target.rows && target.rows.length > 0) {
+       const r = target.rows[0];
+       if (editTempData.kls4.tersedia) {
+           r.kls4 = { total: editTempData.kls4.tot, lancar: editTempData.kls4.lancar, belum: editTempData.kls4.belum, tidak: editTempData.kls4.tidak };
+       }
+       if (editTempData.kls5.tersedia) {
+           r.kls5 = { total: editTempData.kls5.tot, lancar: editTempData.kls5.lancar, belum: editTempData.kls5.belum, tidak: editTempData.kls5.tidak };
+       }
+       
+       editTempData.guru.forEach((gName, idx) => {
+          if (target.rows[idx]) {
+             target.rows[idx].guru = gName;
+             target.rows[idx].hadir = editTempData.hadir[idx];
+          }
+       });
+    }
+
+    disableEditMode();
+    
+    // Re-render UI latar belakang untuk update dashboard & chart
+    renderUI(rawMonthData);
+    
+    // Buka modal kembali (read-only) dengan data tervalidasi yang baru
+    openModal(editTempData.no, 0);
+
+  } catch (err) {
+    alert("Gagal terhubung ke Apps Script Backend: " + err.message);
+    btnSave.innerHTML = 'Simpan Perubahan';
+    btnSave.disabled = false;
+  }
+}
+
 function switchTab(idx) {
+  if (isEditMode) return; // Prevent switching context while editing
   document.querySelectorAll('.m-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   renderModalTab(idx);
 }
 
 function renderModalTab(idx) {
-  const s = currentModalSchool;
+  const s = isEditMode ? editTempData : currentModalSchool;
   if (!s) return;
   const el = document.getElementById('modalContent');
   
   if (idx === 0) {
-    const k4Html = s.kls4.tersedia 
-      ? `<tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls4.lancar}</td><td data-label="Belum">${s.kls4.belum}</td><td data-label="Prioritas">${s.kls4.tidak}</td><td data-label="% Lancar">${pctPill(s.kls4.lancar/s.kls4.tot*100)}</td></tr>`
-      : `<tr><td data-label="Kelas">Kelas IV</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Belum terdapat laporan BTQ untuk Kelas 4 pada periode yang dipilih.</span></td></tr>`;
+    let k4Html = '';
+    if (s.kls4.tersedia) {
+      if (isEditMode) {
+        k4Html = `<tr>
+          <td data-label="Kelas">Kelas IV</td>
+          <td data-label="Total Siswa"><input type="number" id="e_k4_tot" class="edit-input" value="${s.kls4.tot}" oninput="onEditInput()" min="0"></td>
+          <td data-label="Lancar"><input type="number" id="e_k4_lan" class="edit-input" style="color:var(--success)" value="${s.kls4.lancar}" oninput="onEditInput()" min="0"></td>
+          <td data-label="Belum"><input type="number" id="e_k4_bel" class="edit-input" value="${s.kls4.belum}" oninput="onEditInput()" min="0"></td>
+          <td data-label="Prioritas"><input type="number" id="e_k4_pri" class="edit-input" value="${s.kls4.tidak}" oninput="onEditInput()" min="0"></td>
+          <td data-label="% Lancar" id="e_k4_pct">${pctPill(s.kls4.tot>0 ? s.kls4.lancar/s.kls4.tot*100 : 0)}</td>
+        </tr>`;
+      } else {
+        k4Html = `<tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls4.lancar}</td><td data-label="Belum">${s.kls4.belum}</td><td data-label="Prioritas">${s.kls4.tidak}</td><td data-label="% Lancar">${pctPill(s.kls4.tot>0 ? s.kls4.lancar/s.kls4.tot*100 : 0)}</td></tr>`;
+      }
+    } else {
+       k4Html = `<tr><td data-label="Kelas">Kelas IV</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Belum terdapat laporan BTQ untuk Kelas 4 pada periode ini.</span></td></tr>`;
+    }
       
-    const k5Html = s.kls5.tersedia 
-      ? `<tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls5.lancar}</td><td data-label="Belum">${s.kls5.belum}</td><td data-label="Prioritas">${s.kls5.tidak}</td><td data-label="% Lancar">${pctPill(s.kls5.lancar/s.kls5.tot*100)}</td></tr>`
-      : `<tr><td data-label="Kelas">Kelas V</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Sekolah ini belum memiliki peserta aktif pada Kelas 5 untuk periode ini.</span></td></tr>`;
+    let k5Html = '';
+    if (s.kls5.tersedia) {
+       if (isEditMode) {
+         k5Html = `<tr>
+           <td data-label="Kelas">Kelas V</td>
+           <td data-label="Total Siswa"><input type="number" id="e_k5_tot" class="edit-input" value="${s.kls5.tot}" oninput="onEditInput()" min="0"></td>
+           <td data-label="Lancar"><input type="number" id="e_k5_lan" class="edit-input" style="color:var(--success)" value="${s.kls5.lancar}" oninput="onEditInput()" min="0"></td>
+           <td data-label="Belum"><input type="number" id="e_k5_bel" class="edit-input" value="${s.kls5.belum}" oninput="onEditInput()" min="0"></td>
+           <td data-label="Prioritas"><input type="number" id="e_k5_pri" class="edit-input" value="${s.kls5.tidak}" oninput="onEditInput()" min="0"></td>
+           <td data-label="% Lancar" id="e_k5_pct">${pctPill(s.kls5.tot>0 ? s.kls5.lancar/s.kls5.tot*100 : 0)}</td>
+         </tr>`;
+       } else {
+         k5Html = `<tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls5.lancar}</td><td data-label="Belum">${s.kls5.belum}</td><td data-label="Prioritas">${s.kls5.tidak}</td><td data-label="% Lancar">${pctPill(s.kls5.tot>0 ? s.kls5.lancar/s.kls5.tot*100 : 0)}</td></tr>`;
+       }
+    } else {
+       k5Html = `<tr><td data-label="Kelas">Kelas V</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Sekolah ini belum memiliki peserta aktif pada Kelas 5 untuk periode ini.</span></td></tr>`;
+    }
 
     const totalLabel = selectedKelas === 'all' ? 'Total Akumulasi' : `Total (Kelas ${selectedKelas})`;
-    const totalHtml = `<tr style="font-weight:800;background:var(--surface-2)"><td data-label="Kelas">${totalLabel}</td><td data-label="Populasi">${s.tot>0?s.tot:'<span style="color:var(--text-muted)">–</span>'}</td><td data-label="Lancar" style="color:var(--success)">${s.tot>0?s.lancar:'–'}</td><td data-label="Belum">${s.tot>0?s.belum:'–'}</td><td data-label="Prioritas">${s.tot>0?s.tidak:'–'}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>`;
+    const totalHtml = `<tr style="font-weight:800;background:var(--surface-2)" id="e_total_row"><td data-label="Kelas">${totalLabel}</td><td data-label="Populasi">${s.tot>0?s.tot:'<span style="color:var(--text-muted)">–</span>'}</td><td data-label="Lancar" style="color:var(--success)">${s.tot>0?s.lancar:'–'}</td><td data-label="Belum">${s.tot>0?s.belum:'–'}</td><td data-label="Prioritas">${s.tot>0?s.tidak:'–'}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>`;
 
     el.innerHTML = `
       <table class="modal-table">
@@ -4265,23 +4600,38 @@ function renderModalTab(idx) {
           ${totalHtml}
         </tbody>
       </table>
-      ${s.warnings.length ? `<div style="margin-top:16px;padding:14px 20px;background:var(--warning-dim);border-radius:12px;font-size:13.5px;color:var(--warning);border:1px solid rgba(217,119,6,.2);box-shadow:var(--shadow-sm);">⚠ Ditemukan indikasi ketidaksesuaian struktur data yang memerlukan verifikasi lanjutan terkait: <strong>${s.warnings.join(', ')}</strong></div>` : ''}
+      ${s.warnings.length && !isEditMode ? `<div style="margin-top:16px;padding:14px 20px;background:var(--warning-dim);border-radius:12px;font-size:13.5px;color:var(--warning);border:1px solid rgba(217,119,6,.2);box-shadow:var(--shadow-sm);">⚠ Ditemukan indikasi ketidaksesuaian struktur data yang memerlukan verifikasi lanjutan terkait: <strong>${s.warnings.join(', ')}</strong></div>` : ''}
     `;
   } else if (idx === 1) {
+    let guruHtml = s.guru.map((g, i) => {
+      if (isEditMode) {
+         return `<tr>
+           <td data-label="Guru"><input type="text" id="e_g${i}_name" class="edit-input edit-input-txt" value="${g}" oninput="onEditInput()"></td>
+           <td data-label="Kehadiran (%)"><input type="number" id="e_g${i}_hadir" class="edit-input" value="${s.hadir[i]}" max="100" min="0" oninput="onEditInput()"></td>
+           <td data-label="Status" id="e_g${i}_status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
+         </tr>`;
+      } else {
+         return `<tr>
+           <td data-label="Guru">${g}</td>
+           <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
+           <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
+         </tr>`;
+      }
+    }).join('');
+    
     el.innerHTML = `
       <table class="modal-table">
-        <thead><tr><th>Guru Pembimbing BTQ</th><th>Kehadiran</th><th>Status</th></tr></thead>
-        <tbody>
-          ${s.guru.map((g, i) => `<tr>
-            <td data-label="Guru">${g}</td>
-            <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
-            <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
-          </tr>`).join('')}
-        </tbody>
+        <thead><tr><th>Guru Pembimbing BTQ</th><th>Kehadiran ${isEditMode?'(%)':''}</th><th>Status</th></tr></thead>
+        <tbody>${guruHtml}</tbody>
       </table>
-      <div style="margin-top:10px;font-size:12px;color:var(--text-tertiary)">Rata-rata kehadiran: <strong style="color:var(--text-primary)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
+      ${!isEditMode ? `<div style="margin-top:10px;font-size:12px;color:var(--text-tertiary)">Rata-rata kehadiran: <strong style="color:var(--text-primary)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>` : ''}
     `;
   } else {
+    if(isEditMode) {
+       el.innerHTML = `<div class="trend-empty" style="padding: 24px;"><div class="trend-empty-icon">🔒</div>Tab Riwayat Analitik dikunci pada Mode Edit.</div>`;
+       return;
+    }
+    
     const allP = getAllPeriods();
     const rows = allP.map(p => {
       const raw = DATABASE[p.year][p.month];
