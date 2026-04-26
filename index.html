@@ -45,8 +45,6 @@
   --warning-dim:     #fffbeb;
   --danger:          #dc2626;
   --danger-dim:      #fef2f2;
-  --emerald:         #059669;
-  --emerald-hover:   #047857;
 
   /* Radius system */
   --r-xs:  4px;
@@ -151,7 +149,6 @@ a,
 .nav-item,
 .btn-detail,
 .btn-print,
-.btn-import,
 .btn-fs-toggle,
 .ham,
 .modal-close,
@@ -192,7 +189,6 @@ a {
 .clickable:active,
 .nav-item:active,
 .btn-print:active,
-.btn-import:active,
 .btn-fs-toggle:active:not(.hide),
 .ham:active,
 .sort-btn:active,
@@ -296,37 +292,30 @@ a {
 #loginView .input-wrap:focus-within .input-icon { color: var(--log-blue); }
 
 #loginView input[type="text"],
-#loginView input[type="password"],
-.pin-input {
-  width: 100%; padding: 10px 14px 10px 40px; font-family: var(--log-font, 'Plus Jakarta Sans', sans-serif);
-  font-size: 13.5px; font-weight: 500; color: var(--log-ink-1, var(--text-primary));
-  background: var(--log-input-bg, #fafbfc); border: 1.5px solid var(--log-border, var(--border));
+#loginView input[type="password"] {
+  width: 100%; padding: 10px 14px 10px 40px; font-family: var(--log-font);
+  font-size: 13.5px; font-weight: 500; color: var(--log-ink-1);
+  background: var(--log-input-bg, #fafbfc); border: 1.5px solid var(--log-border);
   border-radius: 10px; outline: none; transition: var(--log-transition), background 0.35s ease, border-color 0.35s ease, color 0.35s ease; -webkit-appearance: none;
-}
-body.dark .pin-input {
-  background: rgba(255,255,255,0.03); color: #fff; border-color: rgba(255,255,255,0.1);
 }
 
 #loginView input[type="text"]:focus,
-#loginView input[type="password"]:focus,
-.pin-input:focus {
-  border-color: var(--log-border-focus, var(--primary)); background: var(--log-surface, var(--surface)); box-shadow: var(--log-shadow-focus, var(--shadow-focus));
+#loginView input[type="password"]:focus {
+  border-color: var(--log-border-focus); background: var(--log-surface); box-shadow: var(--log-shadow-focus);
 }
-body.dark .pin-input:focus { background: #1e293b; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(37,99,235,0.3); }
 
 #loginView input[type="text"]::placeholder,
-#loginView input[type="password"]::placeholder,
-.pin-input::placeholder { color: var(--log-ink-4, var(--text-muted)); font-weight: 400; }
-#loginView input.has-toggle, .pin-input.has-toggle { padding-right: 42px; }
+#loginView input[type="password"]::placeholder { color: var(--log-ink-4); font-weight: 400; }
+#loginView input.has-toggle { padding-right: 42px; }
 
-#loginView .toggle-pw, .toggle-pw-pin {
+#loginView .toggle-pw {
   position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; cursor: pointer; color: var(--log-ink-4, var(--text-muted));
+  background: none; border: none; cursor: pointer; color: var(--log-ink-4);
   padding: 4px; display: flex; align-items: center; justify-content: center;
   border-radius: 6px; transition: color .15s, background .15s;
 }
-#loginView .toggle-pw:hover, .toggle-pw-pin:hover { color: var(--log-ink-2, var(--text-secondary)); background: var(--log-bg, var(--surface-2)); }
-#loginView .toggle-pw:focus-visible, .toggle-pw-pin:focus-visible { outline: 2px solid var(--log-blue, var(--primary)); outline-offset: 2px; }
+#loginView .toggle-pw:hover { color: var(--log-ink-2); background: var(--log-bg); }
+#loginView .toggle-pw:focus-visible { outline: 2px solid var(--log-blue); outline-offset: 2px; }
 
 #loginView .error-msg {
   display: none; align-items: center; gap: 7px; margin-top: 16px; padding: 11px 14px;
@@ -338,26 +327,27 @@ body.dark .pin-input:focus { background: #1e293b; border-color: #3b82f6; box-sha
 
 @keyframes fadeInMsg { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
-#loginView .btn-submit, .btn-pin-submit {
-  width: 100%; margin-top: 16px; padding: 11px 20px; background: var(--log-blue, var(--primary));
-  color: #fff; font-family: var(--log-font, 'Plus Jakarta Sans', sans-serif); font-size: 14px; font-weight: 600;
+#loginView .btn-submit {
+  width: 100%; margin-top: 16px; padding: 11px 20px; background: var(--log-blue);
+  color: #fff; font-family: var(--log-font); font-size: 14px; font-weight: 600;
   border: none; border-radius: 10px; cursor: pointer; letter-spacing: 0.1px;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   transition: background .18s, transform .15s, box-shadow .18s;
   box-shadow: 0 2px 8px rgba(26,115,232,0.25), 0 1px 2px rgba(26,115,232,0.15);
   -webkit-appearance: none; position: relative; overflow: hidden;
 }
-#loginView .btn-submit::before, .btn-pin-submit::before {
+#loginView .btn-submit::before {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%); border-radius: inherit;
 }
-#loginView .btn-submit:hover:not(:disabled), .btn-pin-submit:hover:not(:disabled) {
-  background: var(--log-blue-hover, var(--primary-hover)); box-shadow: 0 4px 14px rgba(26,115,232,0.35), 0 2px 4px rgba(26,115,232,0.2); transform: translateY(-1px);
+#loginView .btn-submit:hover:not(:disabled) {
+  background: var(--log-blue-hover); box-shadow: 0 4px 14px rgba(26,115,232,0.35), 0 2px 4px rgba(26,115,232,0.2); transform: translateY(-1px);
 }
-#loginView .btn-submit:active:not(:disabled), .btn-pin-submit:active:not(:disabled) { transform: translateY(0px); box-shadow: 0 2px 6px rgba(26,115,232,0.2); }
-#loginView .btn-submit:disabled, .btn-pin-submit:disabled { opacity: 0.75; cursor: not-allowed; transform: none; }
+#loginView .btn-submit:active:not(:disabled) { transform: translateY(0px); box-shadow: 0 2px 6px rgba(26,115,232,0.2); }
+#loginView .btn-submit:disabled { opacity: 0.75; cursor: not-allowed; transform: none; }
+#loginView .btn-submit:focus-visible { outline: 2px solid var(--log-blue); outline-offset: 3px; }
 
-#loginView .spinner, .spinner-pin {
+#loginView .spinner {
   width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
   border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0;
 }
@@ -368,7 +358,7 @@ body.dark .pin-input:focus { background: #1e293b; border-color: #3b82f6; box-sha
   60% { transform: translateX(5px); } 75% { transform: translateX(-3px); }
   90% { transform: translateX(3px); }
 }
-#loginView .login-card.shake, .shake-anim { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+#loginView .login-card.shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
 
 /* Premium Legal Footer */
 #loginView .login-footer { 
@@ -650,20 +640,6 @@ body.dark .sel:focus {
 }
 .btn-print:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.35); }
 .btn-print svg { width: 14px; height: 14px; }
-
-/* Premium Import Button (Emerald / Primary Action) */
-.btn-import {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--emerald); color: #fff; border: none; border-radius: var(--r-md);
-  padding: 8px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer;
-  transition: var(--transition-base); box-shadow: 0 2px 6px rgba(5,150,105,.25);
-  white-space: nowrap; letter-spacing: 0.1px;
-}
-.btn-import:hover { background: var(--emerald-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,.35); }
-.btn-import svg { width: 14px; height: 14px; }
-
-body.dark .btn-import { background: #10b981; }
-body.dark .btn-import:hover { background: #059669; box-shadow: 0 4px 12px rgba(16,185,129,.3); }
 
 /* Premium Fullscreen Button */
 .btn-fs-toggle {
@@ -1265,7 +1241,7 @@ body.dark .page-btn.top-btn:hover:not(:disabled) { background: rgba(22, 163, 74,
 body.dark .page-btn.bot-btn:hover:not(:disabled) { background: rgba(220, 38, 38, 0.15); color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
 
 /* ────────────────────────────────────────────
-   MODAL (BASE & DEVELOPER PIN)
+   MODAL (BASE)
 ──────────────────────────────────────────── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.55); backdrop-filter: blur(6px); z-index: 600; align-items: center; justify-content: center; }
 .modal-overlay.open { display: flex; }
@@ -1291,64 +1267,6 @@ body.dark .page-btn.bot-btn:hover:not(:disabled) { background: rgba(220, 38, 38,
 .hist-period { font-weight: 500; font-size: 13px; color: var(--text-primary); }
 .hist-pct { font-size: 13px; font-weight: 700; }
 .hist-diff { font-size: 11.5px; font-weight: 500; }
-
-/* Developer PIN Modal Specific Styles */
-.dev-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
-.dev-note { font-size: 11px; color: var(--text-tertiary); margin-top: 16px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 4px; }
-
-/* ────────────────────────────────────────────
-   PREMIUM TOAST NOTIFICATION
-──────────────────────────────────────────── */
-.toast-container {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 999999;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  pointer-events: none;
-}
-.toast {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px 20px;
-  border-radius: var(--r-md);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
-  width: 320px;
-  transform: translateX(120%);
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: auto;
-}
-.toast.show { transform: translateX(0); opacity: 1; }
-.toast-icon { flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-.toast-content { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-.toast-title { font-size: 13.5px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.2px; }
-.toast-msg { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
-
-.toast.success { border-left: 4px solid var(--success); }
-.toast.success .toast-icon { background: var(--success-dim); color: var(--success); }
-.toast.error { border-left: 4px solid var(--danger); }
-.toast.error .toast-icon { background: var(--danger-dim); color: var(--danger); }
-.toast.info { border-left: 4px solid var(--primary); }
-.toast.info .toast-icon { background: var(--primary-dim); color: var(--primary); }
-
-body.dark .toast { background: #1e293b; border-color: rgba(255,255,255,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-body.dark .toast-title { color: #f8fafc; }
-body.dark .toast-msg { color: #cbd5e1; }
-
-@media (max-width: 480px) {
-  .toast-container { top: auto; bottom: 24px; left: 24px; right: 24px; align-items: center; }
-  .toast { width: 100%; transform: translateY(120%); }
-  .toast.show { transform: translateY(0); }
-  .btn-import .btn-text { display: none; }
-  .btn-import { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: var(--r-md); }
-  .btn-import svg { margin: 0; width: 18px; height: 18px; }
-}
 
 /* ────────────────────────────────────────────
    18. DQ BANNER
@@ -1639,73 +1557,6 @@ body.dark .fs-btn-accept {
 }
 
 /* ────────────────────────────────────────────
-   21. ENTERPRISE DARK MODE: MOBILE + DESKTOP
-──────────────────────────────────────────── */
-body.dark tbody tr:hover { background: rgba(255,255,255,.03); }
-body.dark .exec-banner { color: var(--text-secondary); }
-body.dark .chart-card, body.dark .kpi-card, body.dark .hero-metric, body.dark .table-surface, body.dark .conclusion-card, body.dark .analysis-card { border-color: var(--border); }
-body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .hero-stat { background: var(--surface-2); }
-body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
-body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
-body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
-
-body.dark .modal-overlay { background: rgba(2, 6, 23, 0.75); backdrop-filter: blur(8px); }
-body.dark .modal-box { background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2); }
-body.dark .modal-header { background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-body.dark .modal-title { color: #f8fafc; font-weight: 700; }
-body.dark .modal-close { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; }
-body.dark .modal-close:hover { background: rgba(220, 38, 38, 0.2); border-color: rgba(220, 38, 38, 0.5); color: #fca5a5; }
-body.dark .modal-tabs { background: #162032; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-body.dark .m-tab { color: #94a3b8; }
-body.dark .m-tab:hover { color: #e2e8f0; }
-body.dark .m-tab.active { color: #60a5fa; border-bottom-color: #60a5fa; }
-body.dark .modal-table th { background: #1e293b; border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: #94a3b8; }
-body.dark .modal-table td { border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
-body.dark .hist-row { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); }
-
-body.dark .pct-pill.pill-high { background: rgba(22, 163, 74, 0.15); color: #4ade80; box-shadow: 0 0 10px rgba(22, 163, 74, 0.25); border: 1px solid rgba(74, 222, 128, 0.2); }
-body.dark .pct-pill.pill-mid { background: rgba(217, 119, 6, 0.15); color: #fbbf24; box-shadow: 0 0 10px rgba(217, 119, 6, 0.25); border: 1px solid rgba(251, 191, 36, 0.2); }
-body.dark .pct-pill.pill-low { background: rgba(220, 38, 38, 0.15); color: #f87171; box-shadow: 0 0 10px rgba(220, 38, 38, 0.25); border: 1px solid rgba(248, 113, 113, 0.2); }
-
-@media (max-width: 768px) {
-  body.dark .header { background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
-  body.dark .ham span { background: #cbd5e1; }
-  body.dark .btn-print { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; }
-  body.dark .btn-print:hover { background: rgba(255, 255, 255, 0.1); }
-  body.dark .btn-print[title="Keluar"] { background: rgba(220, 38, 38, 0.15); border-color: rgba(220, 38, 38, 0.3); color: #fca5a5; }
-  body.dark .btn-fs-toggle { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; }
-  body.dark .btn-fs-toggle:hover:not(.hide) { background: rgba(255, 255, 255, 0.1); }
-  
-  body.dark .hero-metric, body.dark .kpi-card, body.dark .chart-card, body.dark .analysis-card, body.dark .conclusion-card { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); }
-  body.dark .hero-stat { background: #162032; border: 1px solid rgba(255, 255, 255, 0.05); }
-  
-  body.dark tbody tr { background: #162032; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); }
-  body.dark tbody td { border-bottom: 1px dashed rgba(255, 255, 255, 0.04); color: #f8fafc; }
-  body.dark tbody td[data-label="Sekolah"] { border-bottom: 2px solid rgba(255, 255, 255, 0.08); }
-  body.dark tfoot tr { background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.2); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-  body.dark tfoot td { border-bottom: 1px dashed rgba(37, 99, 235, 0.15); }
-  body.dark tfoot td[data-label="Sekolah"] { border-bottom: 2px solid rgba(37, 99, 235, 0.3); color: #60a5fa; }
-  
-  body.dark .modal-table tr { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); }
-  body.dark .modal-table td { border-bottom: 1px dashed rgba(255, 255, 255, 0.06); color: #e2e8f0; }
-  body.dark .modal-table td::before { color: #94a3b8; }
-  
-  body.dark .hist-row { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
-  body.dark .hist-period { border-bottom: 1px dashed rgba(255, 255, 255, 0.06); color: #f8fafc; }
-
-  body.dark .insight-item { background: #162032; border: 1px solid rgba(255, 255, 255, 0.05); }
-  body.dark .duo-card { background: #162032; border: 1px solid rgba(255, 255, 255, 0.06); }
-  body.dark .duo-card.best { background: rgba(22, 163, 74, 0.1); border-color: rgba(22, 163, 74, 0.2); }
-  body.dark .duo-card.worst { background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.2); }
-  
-  body.dark .sort-btn { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; }
-  body.dark .sort-btn.active { background: #2563eb; border-color: #3b82f6; color: #fff; }
-  
-  body.dark .trend-controls { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); }
-}
-
-
-/* ────────────────────────────────────────────
    22. GLOBAL OVERLAY LOCK SYSTEM (ENTERPRISE UX)
 ──────────────────────────────────────────── */
 html.overlay-lock,
@@ -1735,8 +1586,7 @@ body.overlay-lock .main {
 .sidebar.open,
 #loginView,
 .fs-prompt,
-.global-loading,
-#pinModalOverlay {
+.global-loading {
   pointer-events: auto !important;
 }
 
@@ -1895,7 +1745,7 @@ body.dark .loading-progress-value {
 @media print {
   .shell { display: block; }
   .header { position: relative; }
-  .sidebar, .ham, .table-toolbar .sort-group, .btn-print, .btn-import, .modal-overlay, .btn-fs-toggle, .fs-prompt { display: none !important; }
+  .sidebar, .ham, .table-toolbar .sort-group, .btn-print, .modal-overlay, .btn-fs-toggle, .fs-prompt { display: none !important; }
   .view { display: block !important; margin-bottom: 24px; }
   .chart-card, .kpi-card, .table-surface { break-inside: avoid; }
   body { background: white !important; }
@@ -1904,18 +1754,60 @@ body.dark .loading-progress-value {
   #loginView { display: none !important; }
   .global-loading { display: none !important; }
   .log-theme-switch { display: none !important; }
-  #toastContainer { display: none !important; }
 }
+
+/* ────────────────────────────────────────────
+   NEW PREMIUM FILTER SECTION (LABEL-LESS DESIGN)
+──────────────────────────────────────────── */
+.premium-filter-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease;
+}
+body.dark .premium-filter-section {
+  background: #162032; /* Sesuai dengan referensi gambar dark mode */
+  border-color: rgba(255,255,255,0.06);
+}
+
+/* Segmented Control Premium */
+.segmented-control { display: flex; background: var(--surface-2); padding: 4px; border-radius: var(--r-md); border: 1px solid var(--border); width: fit-content; margin: 0 auto 20px; }
+.seg-btn { flex: 1; padding: 8px 24px; font-size: 13px; font-weight: 600; color: var(--text-secondary); background: transparent; border: none; border-radius: var(--r-sm); cursor: pointer; transition: var(--transition-fast); }
+.seg-btn.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); }
+body.dark .seg-btn { color: var(--text-secondary); }
+body.dark .seg-btn.active { background: var(--surface); color: #60a5fa; border: 1px solid rgba(255,255,255,0.05); }
+
+/* Preset Group Premium */
+.preset-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-2); }
+.preset-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-size: 11.5px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: var(--transition-fast); }
+.preset-btn:hover { background: var(--primary-dim); color: var(--primary); border-color: rgba(37,99,235,0.3); transform: translateY(-1px); }
+.preset-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
+body.dark .preset-group { border-top-color: var(--border); }
+body.dark .preset-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
+body.dark .preset-btn:hover { background: rgba(37,99,235,0.15); color: #60a5fa; border-color: rgba(37,99,235,0.4); }
+body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #3b82f6; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+/* Validation Alert */
+.validation-alert { display: none; align-items: center; gap: 8px; padding: 10px 14px; border-radius: var(--r-sm); font-size: 12px; font-weight: 500; background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.2); margin-top: 12px; animation: fadeInMsg 0.25s ease-out; }
+.validation-alert.show { display: flex; }
 
 </style>
 </head>
 <body>
 
+<!-- ═══════════════ VIEW: LOGIN ═══════════════ -->
 <div id="loginView" style="display: none;">
   
   <div class="login-wrapper">
     <div class="login-card" id="loginCard">
 
+      <!-- Premium Dynamic Theme Switch -->
       <button class="log-theme-toggle" id="loginThemeToggle" aria-label="Ganti Tema" type="button">
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -1926,6 +1818,7 @@ body.dark .loading-progress-value {
         <span class="toggle-text">Mode Gelap</span>
       </button>
 
+      <!-- Brand -->
       <div class="brand">
         <div class="brand-logo" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1943,6 +1836,7 @@ body.dark .loading-progress-value {
 
       <div class="divider" aria-hidden="true"></div>
 
+      <!-- Form -->
       <form id="loginForm" novalidate autocomplete="off">
 
         <div class="form-group">
@@ -1990,6 +1884,7 @@ body.dark .loading-progress-value {
 
       </form>
 
+      <!-- Dipindahkan ke dalam card dengan Premium Branding -->
       <div class="login-footer" aria-label="Informasi hak cipta dan sistem">
         <div class="owner-name">© Hak Cipta Fazry Irawan</div>
         <div class="owner-role">Guru BTQ</div>
@@ -2001,10 +1896,12 @@ body.dark .loading-progress-value {
 </div>
 
 
+<!-- ═══════════════ VIEW: DASHBOARD ═══════════════ -->
 <div id="dashboardView" style="display: none;">
   
   <div class="shell">
 
+    <!-- ═══════════════ HEADER ═══════════════ -->
     <header class="header">
       <button class="ham" id="hamBtn" onclick="openSidebar()">
         <span></span><span></span><span></span>
@@ -2017,17 +1914,10 @@ body.dark .loading-progress-value {
 
       <div class="header-sep"></div>
 
+      <!-- ACTION BUTTONS -->
       <div class="header-right">
         
-        <button class="btn-import" onclick="openPinModal()" title="Masukkan Data Otomatis">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          <span class="btn-text">Masukkan Data</span>
-        </button>
-
+        <!-- Fullscreen Premium Toggle -->
         <button class="btn-fs-toggle" id="fsToggleBtn" onclick="toggleFullscreen()" title="Layar Penuh">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
@@ -2035,6 +1925,7 @@ body.dark .loading-progress-value {
           <span class="btn-text">Layar Penuh</span>
         </button>
 
+        <!-- Dark mode toggle is dynamically injected here via JS -->
         <button class="btn-print" onclick="window.print()" title="Cetak PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           <span class="btn-text">Cetak PDF</span>
@@ -2050,10 +1941,12 @@ body.dark .loading-progress-value {
       </div>
     </header>
 
+    <!-- ═══════════════ FULLSCREEN SIDEBAR MENU ═══════════════ -->
     <aside class="sidebar" id="sidebar" onclick="if(event.target === this) closeSidebar()">
       <div class="fs-overlay-bg" onclick="closeSidebar()"></div>
       
       <div class="sidebar-inner">
+        <!-- Close Button -->
         <button class="btn-close-fs" onclick="closeSidebar()" title="Tutup Menu (ESC)">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
@@ -2081,15 +1974,18 @@ body.dark .loading-progress-value {
           </button>
         </nav>
 
+        <!-- ══ FILTER WILAYAH & PERIODE DIPINDAHKAN KE SINI (HAMBURGER MENU) ══ -->
         <div class="premium-filter-section" id="masterFilterSection" style="margin-top: 16px; margin-bottom: 0; width: 100%; max-width: 100%;">
           <div class="tc-label" style="text-align:center; display:block; margin-bottom:20px; letter-spacing:1.5px;">FILTER WILAYAH & PERIODE</div>
           
+          <!-- Premium Segmented Control -->
           <div class="segmented-control" style="margin-bottom: 20px;">
              <button class="seg-btn active" id="modeSingleBtn" onclick="setPeriodMode('single')">1 Bulan</button>
              <button class="seg-btn" id="modeRangeBtn" onclick="setPeriodMode('range')">Rentang Waktu</button>
           </div>
 
           <div style="display:flex; flex-direction:column; gap:16px;">
+             <!-- Wilayah & Kelas -->
              <select class="sel" id="mfKecamatan" onchange="resetPresets()">
                 <option value="all">Semua Kecamatan</option>
                 <option value="Langensari">Langensari</option>
@@ -2104,18 +2000,21 @@ body.dark .loading-progress-value {
                 <option value="5">Hanya Kelas 5</option>
              </select>
 
+             <!-- Periode Awal -->
              <div id="groupAwalLabel" style="display:none; font-size:11px; color:var(--text-tertiary); text-align:center; font-weight:600; letter-spacing: 0.5px;">DARI PERIODE</div>
              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" id="groupAwal">
                 <select class="sel" id="mfAwalTahun" onchange="validateFilter(); resetPresets()"></select>
                 <select class="sel" id="mfAwalBulan" onchange="validateFilter(); resetPresets()"></select>
              </div>
 
+             <!-- Periode Akhir -->
              <div id="groupAkhirLabel" style="display: none; font-size:11px; color:var(--text-tertiary); text-align:center; font-weight:600; letter-spacing: 0.5px;">SAMPAI DENGAN</div>
              <div style="display: none; grid-template-columns: 1fr 1fr; gap: 12px;" id="groupAkhir">
                 <select class="sel" id="mfAkhirTahun" onchange="validateFilter(); resetPresets()"></select>
                 <select class="sel" id="mfAkhirBulan" onchange="validateFilter(); resetPresets()"></select>
              </div>
              
+             <!-- Validation Alert -->
              <div class="validation-alert" id="filterValidationMsg">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <span>Periode awal tidak boleh lebih besar dari periode akhir.</span>
@@ -2125,6 +2024,7 @@ body.dark .loading-progress-value {
                 Terapkan Filter
              </button>
 
+             <!-- Quick Preset -->
              <div class="preset-group">
                 <button class="preset-btn active" id="preset1" onclick="setPreset(1)">1 Bulan</button>
                 <button class="preset-btn" id="preset3" onclick="setPreset(3)">3 Bulan</button>
@@ -2137,12 +2037,15 @@ body.dark .loading-progress-value {
       </div>
     </aside>
 
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
     <main class="main" id="mainContentArea">
 
+      <!-- DQ Banner -->
       <div class="dq-banner hidden" id="dqBanner">
         ⚠ Ditemukan inkonsistensi data pada beberapa catatan. Verifikasi ke sekolah terkait disarankan.
       </div>
 
+      <!-- ══ VIEW: RINGKASAN ══ -->
       <div id="view-ringkasan" class="view active">
         <div class="page-header">
           <div>
@@ -2152,6 +2055,7 @@ body.dark .loading-progress-value {
           <span id="r-trend-chip"></span>
         </div>
 
+        <!-- Hero Metric -->
         <div class="hero-metric">
           <div class="hero-main">
             <div class="hero-label" id="hero-label">Tingkat Kelancaran BTQ</div>
@@ -2190,6 +2094,7 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
+        <!-- KPI Grid -->
         <div class="kpi-grid">
           <div class="kpi-card accent-blue">
             <div class="kpi-label">Cakupan Wilayah</div>
@@ -2224,6 +2129,7 @@ body.dark .loading-progress-value {
         </div>
       </div>
 
+      <!-- ══ VIEW: TABEL ══ -->
       <div id="view-tabel" class="view">
         <div class="page-header">
           <div>
@@ -2270,6 +2176,7 @@ body.dark .loading-progress-value {
         </div>
       </div>
 
+      <!-- ══ VIEW: GRAFIK ══ -->
       <div id="view-grafik" class="view">
         <div class="page-header">
           <div>
@@ -2278,6 +2185,7 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
+        <!-- Kecamatan Comparison -->
         <div class="chart-card" id="kec-chart-card">
           <div class="chart-card-header">
             <div>
@@ -2291,6 +2199,7 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
+        <!-- Pie + Bar Top -->
         <div class="charts-2col">
           <div class="chart-card" style="margin-bottom:0">
             <div class="chart-card-header">
@@ -2318,6 +2227,7 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
+        <!-- Stacked -->
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
@@ -2339,6 +2249,7 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
+        <!-- Analysis Cards -->
         <div class="section-heading">
           Temuan Analitis Utama
           <span class="section-heading-badge" id="analysis-period-badge">–</span>
@@ -2347,6 +2258,7 @@ body.dark .loading-progress-value {
         <div class="exec-banner" id="exec-banner"></div>
       </div>
 
+      <!-- ══ VIEW: TREND (NEW EXECUTIVE STYLE) ══ -->
       <div id="view-trend" class="view">
         <div class="page-header">
           <div>
@@ -2355,6 +2267,7 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
+        <!-- NEW: Executive Summary KPI Grid -->
         <div class="trend-kpi-grid" id="trendKpiGrid" style="display: none;">
             <div class="trend-kpi-card tk-card-blue">
                 <div class="tk-label">Total Sekolah Aktif</div>
@@ -2378,10 +2291,12 @@ body.dark .loading-progress-value {
             </div>
         </div>
 
+        <!-- NEW: Validation Banner -->
         <div id="trendValidationBanner" class="highlight-callout" style="display:none; border-left-color: var(--warning); background: var(--warning-dim); margin-bottom: 24px;">
             <strong>Status Validasi Data:</strong> <span id="trendValidationText"></span>
         </div>
 
+        <!-- Main Chart -->
         <div class="chart-card">
           <div class="chart-card-header">
             <div>
@@ -2394,6 +2309,7 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
+        <!-- School Progress Tracking (Grid with Pagination) -->
         <div class="charts-2col" id="trendProgressGrid" style="display: none; margin-top: 24px;">
           <div class="chart-card" style="margin-bottom:0;">
             <div class="chart-card-header" style="border-top: 3px solid var(--success);">
@@ -2420,16 +2336,19 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
+        <!-- NEW: Executive Conclusion -->
         <div class="chart-card" id="trendConclusionCard" style="display: none; margin-top: 24px; border-left: 4px solid var(--primary);">
             <div class="chart-card-body" style="padding: 24px 28px;">
                 <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Kesimpulan Eksekutif Otomatis</div>
                 <div id="trendConclusionText" style="font-size: 14.5px; color: var(--text-primary); line-height: 1.6; font-weight: 500;">
-                    </div>
+                    <!-- Auto generated text -->
+                </div>
             </div>
         </div>
 
       </div>
 
+      <!-- ══ VIEW: KESIMPULAN ══ -->
       <div id="view-kesimpulan" class="view">
         <div class="page-header">
           <div>
@@ -2447,56 +2366,7 @@ body.dark .loading-progress-value {
     </main>
   </div>
 
-  <div class="modal-overlay" id="pinModalOverlay" onclick="closePinModal(event)">
-    <div class="modal-box" style="max-width: 400px;">
-      <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
-        <div class="modal-title">Akses Developer</div>
-        <button class="modal-close" onclick="closePinModal()">✕</button>
-      </div>
-      <div class="modal-body" style="padding-top: 8px;">
-        <div class="dev-sub">Masukkan PIN Developer untuk melanjutkan proses import data otomatis ke Google Spreadsheet.</div>
-        
-        <form id="pinForm" onsubmit="verifyDevPin(event)">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label for="devPin" style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">PIN Developer</label>
-            <div class="input-wrap">
-              <span class="input-icon">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </span>
-              <input type="password" id="devPin" class="pin-input has-toggle" placeholder="••••••" autocomplete="off" required>
-              <button type="button" class="toggle-pw-pin" id="togglePwPin" title="Tampilkan/sembunyikan PIN">
-                <svg id="pinIconShow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                </svg>
-                <svg id="pinIconHide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
-                </svg>
-              </button>
-            </div>
-            
-            <div class="error-msg" id="pinErrorMsg" style="margin-top: 8px; font-size: 12px; padding: 8px 12px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              PIN Developer salah. Silakan coba kembali.
-            </div>
-
-            <button type="submit" class="btn-pin-submit" id="btnPinSubmit" style="margin-top: 16px;">
-              <span id="btnPinText">Otorisasi & Lanjutkan</span>
-            </button>
-            
-            <div class="dev-note">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              Akses ini hanya untuk administrator sistem Fazry Irawan.
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
+  <!-- ═══════════════ MODAL ═══════════════ -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal-box">
       <div class="modal-header">
@@ -2513,8 +2383,7 @@ body.dark .loading-progress-value {
   </div>
 </div>
 
-<div id="toastContainer" class="toast-container"></div>
-
+<!-- ═══════════════ FULLSCREEN SUGGESTION PROMPT ═══════════════ -->
 <div class="fs-prompt" id="fsPrompt">
   <div class="fs-prompt-icon">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -2531,6 +2400,7 @@ body.dark .loading-progress-value {
   </div>
 </div>
 
+<!-- ═══════════════ GLOBAL LOADING OVERLAY ═══════════════ -->
 <div id="globalLoadingOverlay" class="global-loading">
   <div class="loading-card">
     <div class="loading-spinner-box">
@@ -2548,6 +2418,7 @@ body.dark .loading-progress-value {
   </div>
 </div>
 
+<!-- ═══════════════ SCRIPT YG SUDAH DIPERBAIKI (REFACTORED) ═══════════════ -->
 <script>
 // ────────────────────────────────────────────
 // GLOBAL STATE & CONSTANTS
@@ -2696,185 +2567,6 @@ function showLoginView() {
 function doLogout() {
   localStorage.removeItem('isLogin');
   window.location.reload(); 
-}
-
-// ────────────────────────────────────────────
-// NEW: PREMIUM TOAST NOTIFICATION
-// ────────────────────────────────────────────
-function showToast(type, title, message) {
-  const container = document.getElementById('toastContainer');
-  if (!container) return;
-
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  
-  let iconSvg = '';
-  if (type === 'success') {
-    iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
-  } else if (type === 'error') {
-    iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
-  } else {
-    // info / loading
-    iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
-  }
-
-  toast.innerHTML = `
-    <div class="toast-icon">${iconSvg}</div>
-    <div class="toast-content">
-      <div class="toast-title">${title}</div>
-      <div class="toast-msg">${message}</div>
-    </div>
-  `;
-
-  container.appendChild(toast);
-
-  // Trigger animation
-  requestAnimationFrame(() => {
-    toast.classList.add('show');
-  });
-
-  // Auto remove after 4s
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => {
-      if (toast.parentNode === container) {
-        container.removeChild(toast);
-      }
-    }, 300);
-  }, 4000);
-}
-
-// ────────────────────────────────────────────
-// NEW: DEVELOPER PIN MODAL & IMPORT LOGIC
-// ────────────────────────────────────────────
-// developer access modal
-function openPinModal() {
-  if (isLoading) return; // Anti click spam
-  const pinInput = document.getElementById('devPin');
-  const errorMsg = document.getElementById('pinErrorMsg');
-  
-  if (pinInput) pinInput.value = '';
-  if (errorMsg) errorMsg.classList.remove('visible');
-  
-  document.getElementById('pinModalOverlay').classList.add('open');
-  lockOverlayBackground();
-  
-  // Focus after animation
-  setTimeout(() => {
-    if (pinInput) pinInput.focus();
-  }, 100);
-}
-
-function closePinModal(e) {
-  if(e && e.target !== document.getElementById('pinModalOverlay')) return;
-  document.getElementById('pinModalOverlay').classList.remove('open');
-  unlockOverlayBackground();
-}
-
-// Toggle password visibility for PIN
-const togglePwPinBtn = document.getElementById('togglePwPin');
-if (togglePwPinBtn) {
-  togglePwPinBtn.addEventListener('click', function() {
-    const pinEl = document.getElementById('devPin');
-    const iconShow = document.getElementById('pinIconShow');
-    const iconHide = document.getElementById('pinIconHide');
-    const isHidden = pinEl.type === 'password';
-    
-    pinEl.type = isHidden ? 'text' : 'password';
-    iconShow.style.display = isHidden ? 'none' : '';
-    iconHide.style.display = isHidden ? '' : 'none';
-    this.setAttribute('aria-label', isHidden ? 'Sembunyikan PIN' : 'Tampilkan PIN');
-    pinEl.focus();
-  });
-}
-
-// Hide error on PIN typing
-const devPinInput = document.getElementById('devPin');
-if (devPinInput) {
-  devPinInput.addEventListener('input', function () {
-    const errorMsg = document.getElementById('pinErrorMsg');
-    if (errorMsg && errorMsg.classList.contains('visible')) {
-      errorMsg.classList.remove('visible');
-    }
-  });
-}
-
-// pin validation
-function verifyDevPin(e) {
-  e.preventDefault();
-  const pinInput = document.getElementById('devPin');
-  const errorMsg = document.getElementById('pinErrorMsg');
-  const btnPinSubmit = document.getElementById('btnPinSubmit');
-  const btnPinText = document.getElementById('btnPinText');
-  const pin = pinInput.value;
-
-  if (pin === '123456') { // PIN Fazry Irawan
-    // Success
-    closePinModal();
-    handleAutoImport();
-  } else {
-    // Error
-    errorMsg.classList.add('visible');
-    
-    // Shake animation
-    pinInput.classList.remove('shake-anim');
-    void pinInput.offsetWidth; // trigger reflow
-    pinInput.classList.add('shake-anim');
-    
-    pinInput.value = '';
-    pinInput.focus();
-  }
-}
-
-// secure import trigger
-async function handleAutoImport() {
-  if (isLoading) return;
-  
-  // Set UI to loading state specifically for Import
-  isLoading = true;
-  lockOverlayBackground();
-  
-  const overlay = document.getElementById('globalLoadingOverlay');
-  safeSetText('loadingContextTitle', "Menyinkronkan Database");
-  safeSetText('loadingContextSub', "Mengimpor data terbaru ke Google Spreadsheet...");
-  if(overlay) overlay.classList.add('active');
-
-  showToast('info', 'Memproses Import', 'Data sedang dikirim ke Spreadsheet...');
-
-  try {
-    // Memanggil endpoint import json tanpa perlu file uploader
-    const url = new URL(API_URL);
-    url.searchParams.append('action', 'import_json');
-    
-    // Timeout fallback (opsional tapi best practice)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
-
-    const response = await fetch(url.toString(), {
-       method: 'GET', // Atur ke POST jika backend mengharapkan POST
-       signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    const result = await response.json();
-
-    if (result.status === 'success' || response.ok) {
-        showToast('success', 'Import Berhasil', 'Data telah berhasil ditambahkan ke Spreadsheet.');
-        // auto refresh dashboard using the centralized filter sync
-        await applyMasterFilter();
-    } else {
-        throw new Error(result.message || 'Respons server tidak mengindikasikan sukses.');
-    }
-
-  } catch (error) {
-    console.error("Import Error:", error);
-    showToast('error', 'Import Gagal', 'Pastikan koneksi stabil dan API valid.');
-  } finally {
-    // Unlock and hide loading
-    isLoading = false;
-    if(overlay) overlay.classList.remove('active');
-    unlockOverlayBackground();
-  }
 }
 
 // ────────────────────────────────────────────
@@ -4187,7 +3879,7 @@ function renderTrend(cakupan) {
 
           execSum = { total_sekolah: tSekolah, total_siswa_aktif: tSiswa, progress_positif: pPositif, perlu_pendampingan: pEvaluasi };
           
-          // Mempersiapkan list data utuh untuk Pagination UI, tanpa diiris menjadi 10 (Single Source of Truth)
+          // Mempersiapkan list data utuh untuk Pagination UI, tanpa diiris menjadi 10
           topList = [...dynamicProgress]; 
           botList = [...dynamicProgress];
       } else {
