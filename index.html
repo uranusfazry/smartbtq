@@ -2458,6 +2458,19 @@ let isLoading = false;
 let isTrendInitialized = false;
 
 // ────────────────────────────────────────────
+// SAFE DOM HELPERS (PREVENT NULL CRASHES)
+// ────────────────────────────────────────────
+function safeSetText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function safeSetHTML(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+// ────────────────────────────────────────────
 // GLOBAL OVERLAY LOCK SYSTEM
 // ────────────────────────────────────────────
 let scrollPosition = 0;
@@ -2863,8 +2876,8 @@ function showLoading(titleText, subText) {
   lockOverlayBackground(); 
   
   const overlay = document.getElementById('globalLoadingOverlay');
-  if(titleText) document.getElementById('loadingContextTitle').textContent = titleText;
-  if(subText) document.getElementById('loadingContextSub').textContent = subText;
+  safeSetText('loadingContextTitle', titleText || '');
+  safeSetText('loadingContextSub', subText || '');
   
   if(overlay) overlay.classList.add('active');
 
@@ -2892,21 +2905,16 @@ function triggerLocalLoading(title, subtitle, callback) {
 function renderSkeletonUI() {
     const skelBox = (w, h, r = '6px') => `<div class="skeleton-box" style="width:${w}; height:${h}; border-radius:${r};"></div>`;
     
-    const heroPct = document.getElementById('hero-pct');
-    if (heroPct) heroPct.innerHTML = skelBox('120px', '64px');
-    const heroDesc = document.getElementById('hero-desc');
-    if (heroDesc) heroDesc.innerHTML = skelBox('80%', '20px');
-    const progBar = document.getElementById('hero-prog');
-    if (progBar) progBar.innerHTML = skelBox('100%', '8px', '8px');
+    safeSetHTML('hero-pct', skelBox('120px', '64px'));
+    safeSetHTML('hero-desc', skelBox('80%', '20px'));
+    safeSetHTML('hero-prog', skelBox('100%', '8px', '8px'));
 
     ['hs-sekolah', 'hs-siswa', 'hs-lancar', 'hs-belum', 'hs-tidak'].forEach(id => {
-       const el = document.getElementById(id);
-       if (el) el.innerHTML = skelBox('40px', '26px');
+       safeSetHTML(id, skelBox('40px', '26px'));
     });
 
     ['kpi-sekolah', 'kpi-lancar', 'kpi-belum', 'kpi-tidak', 'kpi-hadir'].forEach(id => {
-       const el = document.getElementById(id);
-       if (el) el.innerHTML = skelBox('60px', '32px');
+       safeSetHTML(id, skelBox('60px', '32px'));
     });
 
     const tBody = document.getElementById('tableBody');
@@ -2951,19 +2959,19 @@ async function loadData(year, month) {
 }
 
 function showError() {
-  document.getElementById("r-title").textContent = "Tidak dapat mengambil data dari server";
-  document.getElementById("r-subtitle").textContent = "Terjadi masalah koneksi atau konfigurasi API.";
-  document.getElementById("hero-pct").innerHTML = `Err`;
-  document.getElementById("hero-desc").innerHTML = "Data gagal dimuat.";
-  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--danger)">Gagal mengambil data dari server. Pastikan API responsif.</td></tr>`;
+  safeSetText("r-title", "Tidak dapat mengambil data dari server");
+  safeSetText("r-subtitle", "Terjadi masalah koneksi atau konfigurasi API.");
+  safeSetHTML("hero-pct", `Err`);
+  safeSetHTML("hero-desc", "Data gagal dimuat.");
+  safeSetHTML("tableBody", `<tr><td colspan="9" class="c" style="color:var(--danger)">Gagal mengambil data dari server. Pastikan API responsif.</td></tr>`);
 }
 
 function showEmpty() {
-  document.getElementById("r-title").textContent = "Data belum tersedia pada periode ini";
-  document.getElementById("r-subtitle").textContent = `Data kosong untuk ${currentMonth} ${currentYear}`;
-  document.getElementById("hero-pct").innerHTML = `-<sup>%</sup>`;
-  document.getElementById("hero-desc").innerHTML = "Silakan pilih bulan atau tahun lain pada menu.";
-  document.getElementById("tableBody").innerHTML = `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di periode tersebut</td></tr>`;
+  safeSetText("r-title", "Data belum tersedia pada periode ini");
+  safeSetText("r-subtitle", `Data kosong untuk ${currentMonth} ${currentYear}`);
+  safeSetHTML("hero-pct", `-<sup>%</sup>`);
+  safeSetHTML("hero-desc", "Silakan pilih bulan atau tahun lain pada menu.");
+  safeSetHTML("tableBody", `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di periode tersebut</td></tr>`);
 }
 
 // ────────────────────────────────────────────
@@ -3154,125 +3162,139 @@ function closeSidebar() {
 // RENDER UI (Pemisahan Logika)
 // ────────────────────────────────────────────
 function renderUI(data) {
-  document.getElementById('tableBody').innerHTML = '';
+  try {
+    const tableBody = document.getElementById('tableBody');
+    if (tableBody) tableBody.innerHTML = '';
 
-  const rawMaster = data;
-  const allSchoolsAggr = aggregateSchools(rawMaster);
+    const rawMaster = data;
+    const allSchoolsAggr = aggregateSchools(rawMaster);
 
-  let rawArr = rawMaster;
-  if(selectedKecamatan !== 'all') rawArr = rawArr.filter(s => s.kecamatan === selectedKecamatan);
-  currentSchools = aggregateSchools(rawArr);
-  filteredSchools = [...currentSchools];
+    let rawArr = rawMaster;
+    if(selectedKecamatan !== 'all') rawArr = rawArr.filter(s => s.kecamatan === selectedKecamatan);
+    currentSchools = aggregateSchools(rawArr);
+    filteredSchools = [...currentSchools];
 
-  const T = computeTotals(currentSchools);
-  const pct = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
-  const periodStr = `${currentMonth} ${currentYear}`;
-  const isAll = selectedKecamatan === 'all';
-  const cakupan = isAll ? 'Kota Banjar' : `Kec. ${selectedKecamatan}`;
-  const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
+    const T = computeTotals(currentSchools);
+    const pct = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
+    const periodStr = `${currentMonth} ${currentYear}`;
+    const isAll = selectedKecamatan === 'all';
+    const cakupan = isAll ? 'Kota Banjar' : `Kec. ${selectedKecamatan}`;
+    const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
 
-  document.getElementById('r-title').textContent = `Ringkasan — ${cakupan}`;
-  document.getElementById('r-subtitle').textContent = `Periode ${periodStr} · ${currentSchools.length} Sekolah Dasar Negeri · ${classStr}`;
-  document.getElementById('g-title').textContent = `Grafik & Analisis — ${cakupan}`;
-  document.getElementById('g-sub').textContent = `Periode ${periodStr} · ${classStr}`;
-  document.getElementById('k-subtitle').textContent = `${cakupan} · ${periodStr} · ${classStr}`;
-  document.getElementById('tabel-sub').textContent = `${cakupan} · ${periodStr} · ${classStr}`;
-  document.getElementById('tabel-count-badge').textContent = `${currentSchools.length} sekolah`;
-  document.getElementById('analysis-period-badge').textContent = periodStr;
+    safeSetText('r-title', `Ringkasan — ${cakupan}`);
+    safeSetText('r-subtitle', `Periode ${periodStr} · ${currentSchools.length} Sekolah Dasar Negeri · ${classStr}`);
+    safeSetText('g-title', `Grafik & Analisis — ${cakupan}`);
+    safeSetText('g-sub', `Periode ${periodStr} · ${classStr}`);
+    safeSetText('k-subtitle', `${cakupan} · ${periodStr} · ${classStr}`);
+    safeSetText('tabel-sub', `${cakupan} · ${periodStr} · ${classStr}`);
+    safeSetText('tabel-count-badge', `${currentSchools.length} sekolah`);
+    safeSetText('analysis-period-badge', periodStr);
+    safeSetText('hero-label', `Tingkat Kelancaran BTQ (${classStr})`);
 
-  document.getElementById('hero-label').textContent = `Tingkat Kelancaran BTQ (${classStr})`;
-
-  const isCurrentIncomplete = checkIncompleteData(rawArr);
-  const hasWarn = currentSchools.some(s => s.warnings.length > 0);
-  const dqBanner = document.getElementById('dqBanner');
-  
-  if (isCurrentIncomplete) {
-    dqBanner.innerHTML = "⚠ <strong>Status Data:</strong> Terdapat laporan kelas yang belum tersedia atau belum lengkap. Analisis disesuaikan secara otomatis dengan data tervalidasi yang ada.";
-    dqBanner.className = "dq-banner"; 
-    dqBanner.style.background = "var(--warning-dim)";
-    dqBanner.style.color = "var(--warning)";
-    dqBanner.style.borderColor = "rgba(217,119,6,.2)";
-  } else if (hasWarn) {
-    dqBanner.innerHTML = "⚠ Ditemukan inkonsistensi perhitungan data pada beberapa catatan. Verifikasi ke sekolah terkait disarankan.";
-    dqBanner.className = "dq-banner";
-    dqBanner.style.background = "var(--danger-dim)";
-    dqBanner.style.color = "var(--danger)";
-    dqBanner.style.borderColor = "rgba(220,38,38,.2)";
-  } else {
-    dqBanner.className = "dq-banner hidden";
-  }
-
-  const prev = getPrevPeriod(currentYear, currentMonth);
-  let chipHTML = '';
-  
-  if(prev) {
-    let pRaw = DATABASE[prev.year][prev.month];
-    if(!isAll) pRaw = pRaw.filter(s => s.kecamatan === selectedKecamatan);
+    const isCurrentIncomplete = checkIncompleteData(rawArr);
+    const hasWarn = currentSchools.some(s => s.warnings.length > 0);
+    const dqBanner = document.getElementById('dqBanner');
     
-    const isPrevIncomplete = checkIncompleteData(pRaw);
-    
-    if (isCurrentIncomplete !== isPrevIncomplete) {
-      chipHTML = `<span class="trend-chip" style="background:var(--warning-dim);color:var(--warning);" title="Periode ini tidak sebanding dengan bulan sebelumnya karena kelengkapan data yang berbeda">⚠ Data Tidak Sebanding</span>`;
-    } else {
-      const pT = computeTotals(aggregateSchools(pRaw));
-      const pPct = pT.tot > 0 ? (pT.lancar / pT.tot * 100) : 0;
-      const diff = pct - pPct;
-      if(diff > 0.05) chipHTML = `<span class="trend-chip chip-up">▲ +${n2(diff)}% dari ${prev.month}</span>`;
-      else if(diff < -0.05) chipHTML = `<span class="trend-chip chip-down">▼ ${n2(diff)}% dari ${prev.month}</span>`;
-      else chipHTML = `<span class="trend-chip chip-flat">→ Stabil</span>`;
+    if (dqBanner) {
+      if (isCurrentIncomplete) {
+        dqBanner.innerHTML = "⚠ <strong>Status Data:</strong> Terdapat laporan kelas yang belum tersedia atau belum lengkap. Analisis disesuaikan secara otomatis dengan data tervalidasi yang ada.";
+        dqBanner.className = "dq-banner"; 
+        dqBanner.style.background = "var(--warning-dim)";
+        dqBanner.style.color = "var(--warning)";
+        dqBanner.style.borderColor = "rgba(217,119,6,.2)";
+      } else if (hasWarn) {
+        dqBanner.innerHTML = "⚠ Ditemukan inkonsistensi perhitungan data pada beberapa catatan. Verifikasi ke sekolah terkait disarankan.";
+        dqBanner.className = "dq-banner";
+        dqBanner.style.background = "var(--danger-dim)";
+        dqBanner.style.color = "var(--danger)";
+        dqBanner.style.borderColor = "rgba(220,38,38,.2)";
+      } else {
+        dqBanner.className = "dq-banner hidden";
+      }
     }
+
+    const prev = getPrevPeriod(currentYear, currentMonth);
+    let chipHTML = '';
+    
+    if(prev) {
+      let pRaw = DATABASE[prev.year][prev.month];
+      if(!isAll) pRaw = pRaw.filter(s => s.kecamatan === selectedKecamatan);
+      
+      const isPrevIncomplete = checkIncompleteData(pRaw);
+      
+      if (isCurrentIncomplete !== isPrevIncomplete) {
+        chipHTML = `<span class="trend-chip" style="background:var(--warning-dim);color:var(--warning);" title="Periode ini tidak sebanding dengan bulan sebelumnya karena kelengkapan data yang berbeda">⚠ Data Tidak Sebanding</span>`;
+      } else {
+        const pT = computeTotals(aggregateSchools(pRaw));
+        const pPct = pT.tot > 0 ? (pT.lancar / pT.tot * 100) : 0;
+        const diff = pct - pPct;
+        if(diff > 0.05) chipHTML = `<span class="trend-chip chip-up">▲ +${n2(diff)}% dari ${prev.month}</span>`;
+        else if(diff < -0.05) chipHTML = `<span class="trend-chip chip-down">▼ ${n2(diff)}% dari ${prev.month}</span>`;
+        else chipHTML = `<span class="trend-chip chip-flat">→ Stabil</span>`;
+      }
+    }
+    safeSetHTML('r-trend-chip', chipHTML);
+
+    safeSetHTML('hero-pct', `${n2(pct)}<sup>%</sup>`);
+    const pctL = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
+    const pctB = T.tot > 0 ? (T.belum / T.tot * 100) : 0;
+    const pctK = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
+    safeSetHTML('hero-prog', `
+      <div class="prog-segment" style="width:${pctL}%;background:var(--success)"></div>
+      <div class="prog-segment" style="width:${pctB}%;background:var(--warning)"></div>
+      <div class="prog-segment" style="width:${pctK}%;background:var(--danger)"></div>
+    `);
+    
+    const sorted = currentSchools.filter(s => s.tot > 0).sort((a,b) => b.pct - a.pct);
+    const best = sorted[0], worst = sorted[sorted.length-1];
+    let desc = '';
+    if(best && worst && best.no !== worst.no) {
+      desc = `<strong>${best.nama}</strong> terbaik (${n2(best.pct)}%) · <strong>${worst.nama}</strong> butuh perhatian (${n2(worst.pct)}%)`;
+    }
+    safeSetHTML('hero-desc', desc);
+
+    safeSetText('hs-sekolah', currentSchools.length);
+    safeSetText('hs-siswa', fmt(T.tot));
+    safeSetText('hs-lancar', fmt(T.lancar));
+    safeSetText('hs-belum', fmt(T.belum));
+    safeSetText('hs-tidak', fmt(T.tidak));
+
+    safeSetText('kpi-sekolah', currentSchools.length);
+    safeSetText('kpi-sekolah-sub', `SD Negeri di ${cakupan}`);
+    safeSetText('kpi-lancar', fmt(T.lancar));
+    safeSetText('kpi-pct-lancar', n2(pctL) + '% dari total');
+    
+    const kpiPctLancar = document.getElementById('kpi-pct-lancar');
+    if (kpiPctLancar) kpiPctLancar.className = 'kpi-badge ' + (pctL >= 60 ? 'valid' : 'check');
+    
+    safeSetText('kpi-belum', fmt(T.belum));
+    safeSetText('kpi-pct-belum', n2(pctB) + '% dari total');
+    
+    const kpiPctBelum = document.getElementById('kpi-pct-belum');
+    if (kpiPctBelum) kpiPctBelum.className = 'kpi-badge partial';
+    
+    safeSetText('kpi-tidak', fmt(T.tidak));
+    safeSetText('kpi-pct-tidak', n2(pctK) + '% dari total');
+    safeSetText('kpi-hadir', n2(T.avgHadir) + '%');
+    
+    const qH = T.avgHadir >= 90 ? 'valid' : T.avgHadir >= 75 ? 'partial' : 'check';
+    safeSetText('kpi-q-hadir', T.avgHadir >= 90 ? '● Baik' : T.avgHadir >= 75 ? '● Menengah' : '● Optimalisasi Kehadiran');
+    
+    const kpiQHadir = document.getElementById('kpi-q-hadir');
+    if (kpiQHadir) kpiQHadir.className = 'kpi-badge ' + qH;
+
+    renderTable();
+    renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
+    
+    if(document.getElementById('view-trend') && document.getElementById('view-trend').classList.contains('active')) {
+        if(!isTrendInitialized) initTrendControls();
+        renderTrend(cakupan);
+    }
+
+    renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll);
+  } catch(err) {
+    console.error("Critical error in renderUI:", err);
   }
-  document.getElementById('r-trend-chip').innerHTML = chipHTML;
-
-  document.getElementById('hero-pct').innerHTML = `${n2(pct)}<sup>%</sup>`;
-  const pctL = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
-  const pctB = T.tot > 0 ? (T.belum / T.tot * 100) : 0;
-  const pctK = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
-  document.getElementById('hero-prog').innerHTML = `
-    <div class="prog-segment" style="width:${pctL}%;background:var(--success)"></div>
-    <div class="prog-segment" style="width:${pctB}%;background:var(--warning)"></div>
-    <div class="prog-segment" style="width:${pctK}%;background:var(--danger)"></div>
-  `;
-  
-  const sorted = currentSchools.filter(s => s.tot > 0).sort((a,b) => b.pct - a.pct);
-  const best = sorted[0], worst = sorted[sorted.length-1];
-  let desc = '';
-  if(best && worst && best.no !== worst.no) {
-    desc = `<strong>${best.nama}</strong> terbaik (${n2(best.pct)}%) · <strong>${worst.nama}</strong> butuh perhatian (${n2(worst.pct)}%)`;
-  }
-  document.getElementById('hero-desc').innerHTML = desc;
-
-  document.getElementById('hs-sekolah').textContent = currentSchools.length;
-  document.getElementById('hs-siswa').textContent = fmt(T.tot);
-  document.getElementById('hs-lancar').textContent = fmt(T.lancar);
-  document.getElementById('hs-belum').textContent = fmt(T.belum);
-  document.getElementById('hs-tidak').textContent = fmt(T.tidak);
-
-  document.getElementById('kpi-sekolah').textContent = currentSchools.length;
-  document.getElementById('kpi-sekolah-sub').textContent = `SD Negeri di ${cakupan}`;
-  document.getElementById('kpi-lancar').textContent = fmt(T.lancar);
-  document.getElementById('kpi-pct-lancar').textContent = n2(pctL) + '% dari total';
-  document.getElementById('kpi-pct-lancar').className = 'kpi-badge ' + (pctL >= 60 ? 'valid' : 'check');
-  document.getElementById('kpi-belum').textContent = fmt(T.belum);
-  document.getElementById('kpi-pct-belum').textContent = n2(pctB) + '% dari total';
-  document.getElementById('kpi-pct-belum').className = 'kpi-badge partial';
-  document.getElementById('kpi-tidak').textContent = fmt(T.tidak);
-  document.getElementById('kpi-pct-tidak').textContent = n2(pctK) + '% dari total';
-  document.getElementById('kpi-hadir').textContent = n2(T.avgHadir) + '%';
-  const qH = T.avgHadir >= 90 ? 'valid' : T.avgHadir >= 75 ? 'partial' : 'check';
-  document.getElementById('kpi-q-hadir').textContent = T.avgHadir >= 90 ? '● Baik' : T.avgHadir >= 75 ? '● Menengah' : '● Optimalisasi Kehadiran';
-  document.getElementById('kpi-q-hadir').className = 'kpi-badge ' + qH;
-
-  renderTable();
-  renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
-  
-  // Jika menu Trend sedang aktif, perbarui secara background
-  if(document.getElementById('view-trend').classList.contains('active')) {
-      if(!isTrendInitialized) initTrendControls();
-      renderTrend(cakupan);
-  }
-
-  renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll);
 }
 
 // ────────────────────────────────────────────
@@ -3371,270 +3393,294 @@ function setStackMode(mode) {
 }
 
 function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
-  Chart.defaults.font.family = "'Sora', system-ui, sans-serif";
-  Chart.defaults.color = document.body.classList.contains('dark') ? '#94a3b8' : '#94a3b8';
+  try {
+    Chart.defaults.font.family = "'Sora', system-ui, sans-serif";
+    Chart.defaults.color = document.body.classList.contains('dark') ? '#94a3b8' : '#94a3b8';
 
-  const gridColorConfig = document.body.classList.contains('dark') ? '#334155' : '#e2e8f0';
+    const gridColorConfig = document.body.classList.contains('dark') ? '#334155' : '#e2e8f0';
 
-  // ── 1. KECAMATAN OVERVIEW ──
-  destroyChart('kec');
-  const kecNames = ["Langensari","Purwaharja","Pataruman","Banjar"];
-  const kecStats = kecNames.map(k => {
-    const ks = allSchoolsAggr.filter(s => s.kecamatan === k);
-    const t = computeTotals(ks);
-    return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
-  });
-  const kecSorted = [...kecStats].sort((a,b) => b.pct - a.pct);
-  const bestKec = kecSorted[0], worstKec = kecSorted[kecSorted.length-1];
-  const kecGap = bestKec.pct - worstKec.pct;
+    // ── 1. KECAMATAN OVERVIEW ──
+    destroyChart('kec');
+    const kecNames = ["Langensari","Purwaharja","Pataruman","Banjar"];
+    const kecStats = kecNames.map(k => {
+      const ks = allSchoolsAggr.filter(s => s.kecamatan === k);
+      const t = computeTotals(ks);
+      return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
+    });
+    const kecSorted = [...kecStats].sort((a,b) => b.pct - a.pct);
+    const bestKec = kecSorted[0], worstKec = kecSorted[kecSorted.length-1];
+    const kecGap = bestKec.pct - worstKec.pct;
 
-  charts['kec'] = new Chart(document.getElementById('kecamatanChart'), {
-    type: 'bar',
-    data: {
-      labels: kecStats.map(k => k.name),
-      datasets: [{
-        data: kecStats.map(k => parseFloat(n2(k.pct))),
-        backgroundColor: kecStats.map(k => {
-          if(!isAll && k.name === selectedKecamatan) return 'rgba(37,99,235,1)';
-          return k.pct >= 80 ? 'rgba(22,163,74,1)' : k.pct >= 60 ? 'rgba(217,119,6,1)' : 'rgba(220,38,38,1)';
-        }),
-        borderRadius: 6,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: {
-        y: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:11}}, border:{display:false} },
-        x: { grid: {display: false}, ticks: {font:{size:12, weight:'600'}}, border:{display:false} }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
-          padding: 10, cornerRadius: 8,
-          callbacks: { label: ctx => ` Capaian: ${ctx.raw}%` }
-        }
-      }
-    }
-  });
-
-  let kecInsightHTML = '';
-  if(isAll){
-    kecInsightHTML = `
-      <div class="insight-item green">
-        <div class="ii-label">Terbaik</div>
-        <div class="ii-text"><strong>Kec. ${bestKec.name}</strong> unggul dengan rata-rata <strong>${n2(bestKec.pct)}%</strong>. Jadikan referensi.</div>
-      </div>
-      <div class="insight-item red">
-        <div class="ii-label">Perhatian</div>
-        <div class="ii-text"><strong>Kec. ${worstKec.name}</strong> paling rendah <strong>${n2(worstKec.pct)}%</strong>. Butuh program khusus.</div>
-      </div>
-      <div class="insight-item amber">
-        <div class="ii-label">Kesenjangan</div>
-        <div class="ii-text">Gap antar kecamatan mencapai <strong>${n2(kecGap)}%</strong> menunjukkan ketidakmerataan mutu.</div>
-      </div>
-    `;
-  } else {
-    const self = kecStats.find(k => k.name === selectedKecamatan);
-    const rank = kecSorted.findIndex(k => k.name === selectedKecamatan) + 1;
-    kecInsightHTML = `
-      <div class="insight-item blue">
-        <div class="ii-label">Peringkat Kota</div>
-        <div class="ii-text"><strong>Kec. ${selectedKecamatan}</strong> berada di posisi ke-<strong>${rank}</strong> dari 4 kecamatan dengan capaian <strong>${n2(self.pct)}%</strong>.</div>
-      </div>
-      <div class="insight-item amber">
-        <div class="ii-label">Gap ke Terbaik</div>
-        <div class="ii-text">Diperlukan peningkatan <strong>${n2(Math.abs(self.pct - bestKec.pct))}%</strong> untuk menyamai Kec. ${bestKec.name} (${n2(bestKec.pct)}%).</div>
-      </div>
-    `;
-  }
-  document.getElementById('kec-insight').innerHTML = kecInsightHTML;
-
-  // ── 2. PIE ──
-  destroyChart('pie');
-  const pL = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
-  const pB = T.tot > 0 ? (T.belum / T.tot * 100) : 0;
-  const pK = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
-  charts['pie'] = new Chart(document.getElementById('pieChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Lancar','Belum Lancar','Tidak Bisa'],
-      datasets: [{
-        data: [T.lancar, T.belum, T.tidak],
-        backgroundColor: ['rgba(22,163,74,1)', 'rgba(217,119,6,1)', 'rgba(220,38,38,1)'],
-        borderWidth: 0, hoverOffset: 6,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      cutout: '68%',
-      plugins: {
-        legend: { display: true, position:'bottom', labels: { font:{size:11}, padding:14, usePointStyle:true, pointStyle:'circle' } },
-        tooltip: {
-          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
-          padding: 10, cornerRadius: 8,
-          callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.parsed)} (${T.tot > 0 ? n2(ctx.parsed / T.tot * 100) : 0}%)` }
-        }
-      }
-    }
-  });
-  document.getElementById('pie-insight').innerHTML = `
-    <div class="insight-strip pie-insight-grid">
-      <div class="insight-item green"><div class="ii-label">Lancar</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--success)">${n2(pL)}%</div><div class="ii-text">${fmt(T.lancar)} siswa</div></div>
-      <div class="insight-item amber"><div class="ii-label">Belum</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--warning)">${n2(pB)}%</div><div class="ii-text">${fmt(T.belum)} siswa</div></div>
-      <div class="insight-item red"><div class="ii-label">Tidak Bisa</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--danger)">${n2(pK)}%</div><div class="ii-text">${fmt(T.tidak)} siswa</div></div>
-    </div>
-  `;
-
-  // ── 3. BAR TOP 10 ──
-  destroyChart('bar');
-  const valid = currentSchools.filter(s => s.tot > 0);
-  const top10 = [...valid].sort((a,b) => b.pct - a.pct).slice(0,10);
-  const bot1 = [...valid].sort((a,b) => a.pct - b.pct)[0];
-  barChartActiveData = top10;
-  charts['bar'] = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
-      labels: top10.map(s => s.nama.replace('SDN ','')),
-      datasets: [{
-        data: top10.map(s => parseFloat(n2(s.pct))),
-        backgroundColor: top10.map(s => s.pct >= 80 ? 'rgba(22,163,74,1)' : s.pct >= 60 ? 'rgba(217,119,6,1)' : 'rgba(220,38,38,1)'),
-        borderRadius: 4, borderSkipped: false,
-      }]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].no); },
-      scales: {
-        x: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:10}}, border:{display:false} },
-        y: { grid: {display: false}, ticks: {font:{size:10.5}}, border:{display:false} }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
-          padding: 10, cornerRadius: 8,
-          callbacks: {
-            title: ctx => barChartActiveData[ctx[0].dataIndex].nama,
-            label: ctx => {
-              const s = barChartActiveData[ctx.dataIndex];
-              return [` ${n2(s.pct)}% lancar`, ` ${fmt(s.lancar)} dari ${fmt(s.tot)} siswa`];
+    const kecChartCanvas = document.getElementById('kecamatanChart');
+    if (kecChartCanvas) {
+      charts['kec'] = new Chart(kecChartCanvas, {
+        type: 'bar',
+        data: {
+          labels: kecStats.map(k => k.name),
+          datasets: [{
+            data: kecStats.map(k => parseFloat(n2(k.pct))),
+            backgroundColor: kecStats.map(k => {
+              if(!isAll && k.name === selectedKecamatan) return 'rgba(37,99,235,1)';
+              return k.pct >= 80 ? 'rgba(22,163,74,1)' : k.pct >= 60 ? 'rgba(217,119,6,1)' : 'rgba(220,38,38,1)';
+            }),
+            borderRadius: 6,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            y: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:11}}, border:{display:false} },
+            x: { grid: {display: false}, ticks: {font:{size:12, weight:'600'}}, border:{display:false} }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+              padding: 10, cornerRadius: 8,
+              callbacks: { label: ctx => ` Capaian: ${ctx.raw}%` }
             }
           }
         }
-      }
+      });
     }
-  });
-  
-  if(top10.length > 0 && bot1) {
-    document.getElementById('bar-insight').innerHTML = `
-      <div class="duo-grid">
-        <div class="duo-card best" onclick="openModal(${top10[0].no})">
-          <div class="duo-lbl">🏆 Terbaik</div>
-          <div class="duo-name">${top10[0].nama}</div>
-          <div class="duo-pct">${n2(top10[0].pct)}%</div>
-          <div class="duo-meta">Kec. ${top10[0].kecamatan} · ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)} siswa</div>
-        </div>
-        <div class="duo-card worst" onclick="openModal(${bot1.no})">
-          <div class="duo-lbl">⚠ Perhatian</div>
-          <div class="duo-name">${bot1.nama}</div>
-          <div class="duo-pct">${n2(bot1.pct)}%</div>
-          <div class="duo-meta">Kec. ${bot1.kecamatan} · ${fmt(bot1.lancar)}/${fmt(bot1.tot)} siswa</div>
-        </div>
-      </div>
-    `;
-  }
 
-  // ── 4. STACKED ──
-  destroyChart('stack');
-  let stackData = [...valid];
-  if(stackDisplayMode === 'top20') {
-    stackData = stackData.sort((a,b) => b.pct - a.pct);
-    if(isAll && stackData.length > 20) stackData = stackData.slice(0, 20);
-  }
-  
-  document.getElementById('stackCanvasContainer').style.width = '100%';
-  
-  stackChartActiveData = stackData;
-  charts['stack'] = new Chart(document.getElementById('stackChart'), {
-    type: 'bar',
-    data: {
-      labels: stackData.map(s => s.nama.replace('SDN ','').split(' ').slice(0,2).join(' ')),
-      datasets: [
-        {label:'Lancar', data: stackData.map(s=>s.lancar), backgroundColor: 'rgba(22,163,74,1)', borderRadius: 2, borderSkipped: false},
-        {label:'Belum', data: stackData.map(s=>s.belum), backgroundColor: 'rgba(217,119,6,1)', borderRadius: 0},
-        {label:'Tidak', data: stackData.map(s=>s.tidak), backgroundColor: 'rgba(220,38,38,1)', borderRadius: 0},
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no); },
-      scales: {
-        x: { stacked: true, grid: {display: false}, ticks: {font:{size:9.5}, maxRotation:45}, border:{display:false} },
-        y: { stacked: true, grid: {color: gridColorConfig}, border:{display:false} }
-      },
-      plugins: {
-        legend: { display: true, position:'bottom', labels: {font:{size:11}, padding:14, usePointStyle:true, pointStyle:'circle'} },
-        tooltip: {
-          backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
-          padding: 10, cornerRadius: 8,
-          callbacks: {
-            title: ctx => stackChartActiveData[ctx[0].dataIndex].nama,
-            label: ctx => {
-              const s = stackChartActiveData[ctx.dataIndex];
-              const p = s.tot > 0 ? n2(ctx.raw / s.tot * 100) : 0;
-              return ` ${ctx.dataset.label}: ${ctx.raw} (${p}%)`;
+    let kecInsightHTML = '';
+    if(isAll){
+      kecInsightHTML = `
+        <div class="insight-item green">
+          <div class="ii-label">Terbaik</div>
+          <div class="ii-text"><strong>Kec. ${bestKec.name}</strong> unggul dengan rata-rata <strong>${n2(bestKec.pct)}%</strong>. Jadikan referensi.</div>
+        </div>
+        <div class="insight-item red">
+          <div class="ii-label">Perhatian</div>
+          <div class="ii-text"><strong>Kec. ${worstKec.name}</strong> paling rendah <strong>${n2(worstKec.pct)}%</strong>. Butuh program khusus.</div>
+        </div>
+        <div class="insight-item amber">
+          <div class="ii-label">Kesenjangan</div>
+          <div class="ii-text">Gap antar kecamatan mencapai <strong>${n2(kecGap)}%</strong> menunjukkan ketidakmerataan mutu.</div>
+        </div>
+      `;
+    } else {
+      const self = kecStats.find(k => k.name === selectedKecamatan);
+      const rank = kecSorted.findIndex(k => k.name === selectedKecamatan) + 1;
+      kecInsightHTML = `
+        <div class="insight-item blue">
+          <div class="ii-label">Peringkat Kota</div>
+          <div class="ii-text"><strong>Kec. ${selectedKecamatan}</strong> berada di posisi ke-<strong>${rank}</strong> dari 4 kecamatan dengan capaian <strong>${n2(self.pct)}%</strong>.</div>
+        </div>
+        <div class="insight-item amber">
+          <div class="ii-label">Gap ke Terbaik</div>
+          <div class="ii-text">Diperlukan peningkatan <strong>${n2(Math.abs(self.pct - bestKec.pct))}%</strong> untuk menyamai Kec. ${bestKec.name} (${n2(bestKec.pct)}%).</div>
+        </div>
+      `;
+    }
+    safeSetHTML('kec-insight', kecInsightHTML);
+
+    // ── 2. PIE ──
+    destroyChart('pie');
+    const pL = T.tot > 0 ? (T.lancar / T.tot * 100) : 0;
+    const pB = T.tot > 0 ? (T.belum / T.tot * 100) : 0;
+    const pK = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
+    
+    const pieChartCanvas = document.getElementById('pieChart');
+    if (pieChartCanvas) {
+      charts['pie'] = new Chart(pieChartCanvas, {
+        type: 'doughnut',
+        data: {
+          labels: ['Lancar','Belum Lancar','Tidak Bisa'],
+          datasets: [{
+            data: [T.lancar, T.belum, T.tidak],
+            backgroundColor: ['rgba(22,163,74,1)', 'rgba(217,119,6,1)', 'rgba(220,38,38,1)'],
+            borderWidth: 0, hoverOffset: 6,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: '68%',
+          plugins: {
+            legend: { display: true, position:'bottom', labels: { font:{size:11}, padding:14, usePointStyle:true, pointStyle:'circle' } },
+            tooltip: {
+              backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+              padding: 10, cornerRadius: 8,
+              callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.parsed)} (${T.tot > 0 ? n2(ctx.parsed / T.tot * 100) : 0}%)` }
             }
           }
         }
-      }
+      });
     }
-  });
+    
+    safeSetHTML('pie-insight', `
+      <div class="insight-strip pie-insight-grid">
+        <div class="insight-item green"><div class="ii-label">Lancar</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--success)">${n2(pL)}%</div><div class="ii-text">${fmt(T.lancar)} siswa</div></div>
+        <div class="insight-item amber"><div class="ii-label">Belum</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--warning)">${n2(pB)}%</div><div class="ii-text">${fmt(T.belum)} siswa</div></div>
+        <div class="insight-item red"><div class="ii-label">Tidak Bisa</div><div class="ii-text" style="font-size:16px;font-weight:700;color:var(--danger)">${n2(pK)}%</div><div class="ii-text">${fmt(T.tidak)} siswa</div></div>
+      </div>
+    `);
 
-  const highC = valid.filter(s => s.pct >= 80).length;
-  const midC = valid.filter(s => s.pct >= 60 && s.pct < 80).length;
-  const lowC = valid.filter(s => s.pct < 60).length;
-  document.getElementById('stackToggle').style.display = (valid.length > 20 && isAll) ? 'flex' : 'none';
-  
-  document.getElementById('stack-insight').innerHTML = `
-    <div class="insight-strip">
-      <div class="insight-item green"><div class="ii-label">Tinggi ≥80%</div><div class="ii-text"><strong>${highC} sekolah</strong> sudah memenuhi standar kelancaran BTQ.</div></div>
-      <div class="insight-item amber"><div class="ii-label">Sedang 60–79%</div><div class="ii-text"><strong>${midC} sekolah</strong> dalam zona perlu peningkatan.</div></div>
-      <div class="insight-item red"><div class="ii-label">Rendah &lt;60%</div><div class="ii-text"><strong>${lowC} sekolah</strong> memerlukan pendampingan intensif segera.</div></div>
-    </div>
-  `;
+    // ── 3. BAR TOP 10 ──
+    destroyChart('bar');
+    const valid = currentSchools.filter(s => s.tot > 0);
+    const top10 = [...valid].sort((a,b) => b.pct - a.pct).slice(0,10);
+    const bot1 = [...valid].sort((a,b) => a.pct - b.pct)[0];
+    barChartActiveData = top10;
+    
+    const barChartCanvas = document.getElementById('barChart');
+    if (barChartCanvas) {
+      charts['bar'] = new Chart(barChartCanvas, {
+        type: 'bar',
+        data: {
+          labels: top10.map(s => s.nama.replace('SDN ','')),
+          datasets: [{
+            data: top10.map(s => parseFloat(n2(s.pct))),
+            backgroundColor: top10.map(s => s.pct >= 80 ? 'rgba(22,163,74,1)' : s.pct >= 60 ? 'rgba(217,119,6,1)' : 'rgba(220,38,38,1)'),
+            borderRadius: 4, borderSkipped: false,
+          }]
+        },
+        options: {
+          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+          onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].no); },
+          scales: {
+            x: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:10}}, border:{display:false} },
+            y: { grid: {display: false}, ticks: {font:{size:10.5}}, border:{display:false} }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+              padding: 10, cornerRadius: 8,
+              callbacks: {
+                title: ctx => barChartActiveData[ctx[0].dataIndex].nama,
+                label: ctx => {
+                  const s = barChartActiveData[ctx.dataIndex];
+                  return [` ${n2(s.pct)}% lancar`, ` ${fmt(s.lancar)} dari ${fmt(s.tot)} siswa`];
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    if(top10.length > 0 && bot1) {
+      safeSetHTML('bar-insight', `
+        <div class="duo-grid">
+          <div class="duo-card best" onclick="openModal(${top10[0].no})">
+            <div class="duo-lbl">🏆 Terbaik</div>
+            <div class="duo-name">${top10[0].nama}</div>
+            <div class="duo-pct">${n2(top10[0].pct)}%</div>
+            <div class="duo-meta">Kec. ${top10[0].kecamatan} · ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)} siswa</div>
+          </div>
+          <div class="duo-card worst" onclick="openModal(${bot1.no})">
+            <div class="duo-lbl">⚠ Perhatian</div>
+            <div class="duo-name">${bot1.nama}</div>
+            <div class="duo-pct">${n2(bot1.pct)}%</div>
+            <div class="duo-meta">Kec. ${bot1.kecamatan} · ${fmt(bot1.lancar)}/${fmt(bot1.tot)} siswa</div>
+          </div>
+        </div>
+      `);
+    }
 
-  // ── Analysis Cards ──
-  const lowHadir = currentSchools.flatMap(s => s.hadir).filter(h => h < 80).length;
-  const totalGuru = currentSchools.flatMap(s => s.hadir).length;
-  const pKota = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
+    // ── 4. STACKED ──
+    destroyChart('stack');
+    let stackData = [...valid];
+    if(stackDisplayMode === 'top20') {
+      stackData = stackData.sort((a,b) => b.pct - a.pct);
+      if(isAll && stackData.length > 20) stackData = stackData.slice(0, 20);
+    }
+    
+    const stackContainer = document.getElementById('stackCanvasContainer');
+    if (stackContainer) stackContainer.style.width = '100%';
+    
+    stackChartActiveData = stackData;
+    const stackChartCanvas = document.getElementById('stackChart');
+    if (stackChartCanvas) {
+      charts['stack'] = new Chart(stackChartCanvas, {
+        type: 'bar',
+        data: {
+          labels: stackData.map(s => s.nama.replace('SDN ','').split(' ').slice(0,2).join(' ')),
+          datasets: [
+            {label:'Lancar', data: stackData.map(s=>s.lancar), backgroundColor: 'rgba(22,163,74,1)', borderRadius: 2, borderSkipped: false},
+            {label:'Belum', data: stackData.map(s=>s.belum), backgroundColor: 'rgba(217,119,6,1)', borderRadius: 0},
+            {label:'Tidak', data: stackData.map(s=>s.tidak), backgroundColor: 'rgba(220,38,38,1)', borderRadius: 0},
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no); },
+          scales: {
+            x: { stacked: true, grid: {display: false}, ticks: {font:{size:9.5}, maxRotation:45}, border:{display:false} },
+            y: { stacked: true, grid: {color: gridColorConfig}, border:{display:false} }
+          },
+          plugins: {
+            legend: { display: true, position:'bottom', labels: {font:{size:11}, padding:14, usePointStyle:true, pointStyle:'circle'} },
+            tooltip: {
+              backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
+              padding: 10, cornerRadius: 8,
+              callbacks: {
+                title: ctx => stackChartActiveData[ctx[0].dataIndex].nama,
+                label: ctx => {
+                  const s = stackChartActiveData[ctx.dataIndex];
+                  const p = s.tot > 0 ? n2(ctx.raw / s.tot * 100) : 0;
+                  return ` ${ctx.dataset.label}: ${ctx.raw} (${p}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
 
-  document.getElementById('analysis-grid').innerHTML = `
-    <div class="analysis-card ac-blue">
-      <div class="ac-eyebrow">Capaian Utama</div>
-      <div class="ac-title">Kelancaran ${cakupan}</div>
-      <div class="ac-body">Rata-rata BTQ berada di <strong>${n2(pct)}%</strong>. ${highC} sekolah sudah di level tinggi, ${midC} sedang, dan ${lowC} masih rendah.</div>
-    </div>
-    <div class="analysis-card ${isAll ? 'ac-blue' : 'ac-amber'}">
-      <div class="ac-eyebrow">${isAll ? 'Peta Wilayah' : 'Konteks Internal'}</div>
-      <div class="ac-title">${isAll ? 'Disparitas Antar Kecamatan' : 'Rentang Kualitas Sekolah'}</div>
-      <div class="ac-body">${isAll ? `Gap <strong>${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} dan Kec. ${worstKec.name} menunjukkan ketidakmerataan.` : `Sekolah terbaik <strong>${top10[0] ? top10[0].nama : '-'}</strong> vs terendah <strong>${bot1 ? bot1.nama : '-'}</strong>: gap <strong>${top10[0] && bot1 ? n2(top10[0].pct - bot1.pct) : 0}%</strong>.`}</div>
-    </div>
-    <div class="analysis-card ac-red">
-      <div class="ac-eyebrow">Isu Kritis</div>
-      <div class="ac-title">Titik Intervensi Prioritas</div>
-      <div class="ac-body"><strong>${fmt(T.tidak)} siswa (${n2(pKota)}%)</strong> sama sekali belum kenal huruf hijaiyah. <strong>${lowHadir}/${totalGuru} guru</strong> kehadirannya di bawah 80%.</div>
-    </div>
-    <div class="analysis-card ac-green">
-      <div class="ac-eyebrow">Potensi Akselerasi</div>
-      <div class="ac-title">Peluang Strategis</div>
-      <div class="ac-body">Fokuskan pendampingan ke <strong>${lowC} sekolah merah</strong>. Gunakan <strong>${top10[0] ? top10[0].nama : '-'}</strong> sebagai sekolah percontohan metodologi BTQ.</div>
-    </div>
-  `;
-  document.getElementById('exec-banner').innerHTML = `
-    <strong>Konklusi Eksekutif —</strong> Dengan capaian saat ini <strong>${n2(pct)}%</strong>, kebijakan seragam tidak lagi cukup. Diperlukan pendekatan asimetris: <strong>penguatan intensif ke sekolah kategori rendah</strong> dan <strong>apresiasi serta peran model rujukan ke sekolah berprestasi</strong>.
-  `;
+    const highC = valid.filter(s => s.pct >= 80).length;
+    const midC = valid.filter(s => s.pct >= 60 && s.pct < 80).length;
+    const lowC = valid.filter(s => s.pct < 60).length;
+    
+    const stackToggle = document.getElementById('stackToggle');
+    if (stackToggle) stackToggle.style.display = (valid.length > 20 && isAll) ? 'flex' : 'none';
+    
+    safeSetHTML('stack-insight', `
+      <div class="insight-strip">
+        <div class="insight-item green"><div class="ii-label">Tinggi ≥80%</div><div class="ii-text"><strong>${highC} sekolah</strong> sudah memenuhi standar kelancaran BTQ.</div></div>
+        <div class="insight-item amber"><div class="ii-label">Sedang 60–79%</div><div class="ii-text"><strong>${midC} sekolah</strong> dalam zona perlu peningkatan.</div></div>
+        <div class="insight-item red"><div class="ii-label">Rendah &lt;60%</div><div class="ii-text"><strong>${lowC} sekolah</strong> memerlukan pendampingan intensif segera.</div></div>
+      </div>
+    `);
+
+    // ── Analysis Cards ──
+    const lowHadir = currentSchools.flatMap(s => s.hadir).filter(h => h < 80).length;
+    const totalGuru = currentSchools.flatMap(s => s.hadir).length;
+    const pKota = T.tot > 0 ? (T.tidak / T.tot * 100) : 0;
+
+    safeSetHTML('analysis-grid', `
+      <div class="analysis-card ac-blue">
+        <div class="ac-eyebrow">Capaian Utama</div>
+        <div class="ac-title">Kelancaran ${cakupan}</div>
+        <div class="ac-body">Rata-rata BTQ berada di <strong>${n2(pct)}%</strong>. ${highC} sekolah sudah di level tinggi, ${midC} sedang, dan ${lowC} masih rendah.</div>
+      </div>
+      <div class="analysis-card ${isAll ? 'ac-blue' : 'ac-amber'}">
+        <div class="ac-eyebrow">${isAll ? 'Peta Wilayah' : 'Konteks Internal'}</div>
+        <div class="ac-title">${isAll ? 'Disparitas Antar Kecamatan' : 'Rentang Kualitas Sekolah'}</div>
+        <div class="ac-body">${isAll ? `Gap <strong>${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} dan Kec. ${worstKec.name} menunjukkan ketidakmerataan.` : `Sekolah terbaik <strong>${top10[0] ? top10[0].nama : '-'}</strong> vs terendah <strong>${bot1 ? bot1.nama : '-'}</strong>: gap <strong>${top10[0] && bot1 ? n2(top10[0].pct - bot1.pct) : 0}%</strong>.`}</div>
+      </div>
+      <div class="analysis-card ac-red">
+        <div class="ac-eyebrow">Isu Kritis</div>
+        <div class="ac-title">Titik Intervensi Prioritas</div>
+        <div class="ac-body"><strong>${fmt(T.tidak)} siswa (${n2(pKota)}%)</strong> sama sekali belum kenal huruf hijaiyah. <strong>${lowHadir}/${totalGuru} guru</strong> kehadirannya di bawah 80%.</div>
+      </div>
+      <div class="analysis-card ac-green">
+        <div class="ac-eyebrow">Potensi Akselerasi</div>
+        <div class="ac-title">Peluang Strategis</div>
+        <div class="ac-body">Fokuskan pendampingan ke <strong>${lowC} sekolah merah</strong>. Gunakan <strong>${top10[0] ? top10[0].nama : '-'}</strong> sebagai sekolah percontohan metodologi BTQ.</div>
+      </div>
+    `);
+    
+    safeSetHTML('exec-banner', `
+      <strong>Konklusi Eksekutif —</strong> Dengan capaian saat ini <strong>${n2(pct)}%</strong>, kebijakan seragam tidak lagi cukup. Diperlukan pendekatan asimetris: <strong>penguatan intensif ke sekolah kategori rendah</strong> dan <strong>apresiasi serta peran model rujukan ke sekolah berprestasi</strong>.
+    `);
+
+  } catch (err) {
+    console.error("Critical error in renderCharts:", err);
+  }
 }
 
 // ────────────────────────────────────────────
@@ -3698,485 +3744,478 @@ function updateTrendView() {
 function renderTrend(cakupan) {
   if (!window.MASTER_PAYLOAD || !DATABASE) return;
 
-  const allP = getAllPeriods();
-  const tEl = document.getElementById('trendContent');
-  const summaryTitle = document.getElementById('tsbTitle');
-  const summaryDesc = document.getElementById('tsbDesc');
-  const gridColorConfig = document.body.classList.contains('dark') ? '#334155' : '#e2e8f0';
-  const isDark = document.body.classList.contains('dark');
-  const mode = document.getElementById('trendMode').value;
-  const warningEl = document.getElementById('trendWarning');
-  const progressGrid = document.getElementById('trendProgressGrid');
-  const kpiGrid = document.getElementById('trendKpiGrid');
-  const valBanner = document.getElementById('trendValidationBanner');
-  const conclusionCard = document.getElementById('trendConclusionCard');
+  try {
+      const allP = getAllPeriods();
+      const tEl = document.getElementById('trendContent');
+      const progressGrid = document.getElementById('trendProgressGrid');
+      const kpiGrid = document.getElementById('trendKpiGrid');
+      const valBanner = document.getElementById('trendValidationBanner');
+      const conclusionCard = document.getElementById('trendConclusionCard');
+      
+      const modeSelect = document.getElementById('trendMode');
+      const mode = modeSelect ? modeSelect.value : 'seluruh';
+      const isDark = document.body.classList.contains('dark');
+      const gridColorConfig = isDark ? '#334155' : '#e2e8f0';
+      const warningEl = document.getElementById('trendWarning');
 
-  if (allP.length === 0) {
-    tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data belum tersedia.</div>`;
-    summaryTitle.textContent = "Data Kosong";
-    summaryDesc.textContent = "-";
-    progressGrid.style.display = 'none';
-    kpiGrid.style.display = 'none';
-    valBanner.style.display = 'none';
-    conclusionCard.style.display = 'none';
-    return;
-  }
-  
-  allP.sort((a,b) => getPeriodValue(a.year, a.month) - getPeriodValue(b.year, b.month));
-  
-  let validPeriods = [];
-  let isBarChart = false;
-  
-  // LOGIC MODE: SELURUH WAKTU
-  if (mode === 'seluruh') {
-      validPeriods = [...allP];
-      summaryTitle.textContent = `Menampilkan Seluruh Waktu`;
-      summaryDesc.textContent = `Perkembangan historis lengkap dari ${allP[0].month} ${allP[0].year} sampai ${allP[allP.length-1].month} ${allP[allP.length-1].year}.`;
-  } 
-  // LOGIC MODE: TAHUNAN
-  else if (mode === 'tahunan') {
-      isBarChart = true;
-      const years = [...new Set(allP.map(p => p.year))].sort();
-      validPeriods = years.map(yr => {
-          let tLancar=0, tTot=0;
-          allP.filter(p => p.year === yr).forEach(p => {
-              let raw = DATABASE[p.year][p.month] || [];
+      if (allP.length === 0) {
+        if(tEl) tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data belum tersedia.</div>`;
+        safeSetText('tsbTitle', "Data Kosong");
+        safeSetText('tsbDesc', "-");
+        if (progressGrid) progressGrid.style.display = 'none';
+        if (kpiGrid) kpiGrid.style.display = 'none';
+        if (valBanner) valBanner.style.display = 'none';
+        if (conclusionCard) conclusionCard.style.display = 'none';
+        return;
+      }
+      
+      allP.sort((a,b) => getPeriodValue(a.year, a.month) - getPeriodValue(b.year, b.month));
+      
+      let validPeriods = [];
+      let isBarChart = false;
+      
+      // LOGIC MODE: SELURUH WAKTU
+      if (mode === 'seluruh') {
+          validPeriods = [...allP];
+          safeSetText('tsbTitle', `Menampilkan Seluruh Waktu`);
+          safeSetText('tsbDesc', `Perkembangan historis lengkap dari ${allP[0].month} ${allP[0].year} sampai ${allP[allP.length-1].month} ${allP[allP.length-1].year}.`);
+      } 
+      // LOGIC MODE: TAHUNAN
+      else if (mode === 'tahunan') {
+          isBarChart = true;
+          const years = [...new Set(allP.map(p => p.year))].sort();
+          validPeriods = years.map(yr => {
+              let tLancar=0, tTot=0;
+              allP.filter(p => p.year === yr).forEach(p => {
+                  let raw = DATABASE[p.year]?.[p.month] || [];
+                  if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
+                  const T = computeTotals(aggregateSchools(raw));
+                  tLancar += T.lancar;
+                  tTot += T.tot;
+              });
+              return { label: `Tahun ${yr}`, pct: tTot > 0 ? (tLancar/tTot*100) : 0, year: yr };
+          });
+          
+          safeSetText('tsbTitle', `Agregat Performa Tahunan`);
+          safeSetText('tsbDesc', `Analisis rata-rata capaian BTQ dari tahun ke tahun untuk memetakan progres jangka panjang.`);
+      }
+      // LOGIC MODE: RENTANG KUSTOM
+      else if (mode === 'kustom') {
+          const elDM = document.getElementById('tDariBulan');
+          const elDY = document.getElementById('tDariTahun');
+          const elSM = document.getElementById('tSampaiBulan');
+          const elSY = document.getElementById('tSampaiTahun');
+          
+          const dM = elDM ? elDM.value : allP[0].month;
+          const dY = elDY ? elDY.value : allP[0].year;
+          const sM = elSM ? elSM.value : allP[allP.length-1].month;
+          const sY = elSY ? elSY.value : allP[allP.length-1].year;
+          
+          const vDari = getPeriodValue(dY, dM);
+          const vSampai = getPeriodValue(sY, sM);
+          
+          if (vSampai < vDari) {
+              if(warningEl) warningEl.style.display = 'flex';
+              if(tEl) tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">⚠</div>Menunggu rentang waktu yang valid...</div>`;
+              safeSetText('tsbTitle', "Rentang Waktu Terbalik");
+              safeSetText('tsbDesc', "Silakan perbaiki pilihan bulan dan tahun agar proses analitik dapat berjalan.");
+              if(progressGrid) progressGrid.style.display = 'none';
+              if(kpiGrid) kpiGrid.style.display = 'none';
+              if(valBanner) valBanner.style.display = 'none';
+              if(conclusionCard) conclusionCard.style.display = 'none';
+              return;
+          }
+          if(warningEl) warningEl.style.display = 'none';
+          
+          validPeriods = allP.filter(p => {
+              const v = getPeriodValue(p.year, p.month);
+              return v >= vDari && v <= vSampai;
+          });
+          
+          if(validPeriods.length === 0) {
+              if(tEl) tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📂</div>Tidak ada data yang terekam pada rentang kustom tersebut.</div>`;
+              safeSetText('tsbTitle', "Data Tidak Ditemukan");
+              safeSetText('tsbDesc', `Periode ${dM} ${dY} s.d. ${sM} ${sY} kosong.`);
+              if(progressGrid) progressGrid.style.display = 'none';
+              if(kpiGrid) kpiGrid.style.display = 'none';
+              if(valBanner) valBanner.style.display = 'none';
+              if(conclusionCard) conclusionCard.style.display = 'none';
+              return;
+          }
+          
+          safeSetText('tsbTitle', `Analisis Rentang Kustom`);
+          safeSetText('tsbDesc', `Memantau perkembangan dari ${dM} ${dY} sampai dengan ${sM} ${sY}.`);
+      }
+
+      // --- 1. DATA EXTRACTION (BACKEND API vs DYNAMIC CALCULATION) ---
+      let execSum = {};
+      let topList = [];
+      let botList = [];
+      let hasStructuralChange = false;
+      const payload = window.MASTER_PAYLOAD;
+
+      const useBackendFully = mode === 'seluruh' && selectedKecamatan === 'all' && payload && payload.executive_summary;
+
+      if (useBackendFully) {
+          execSum = payload.executive_summary || {};
+          topList = payload.top_progress || [];
+          botList = payload.need_attention || [];
+          
+          const pm = payload.progress_monitoring || [];
+          hasStructuralChange = pm.some(i => i.validation && i.validation.changed === true);
+      } else {
+          if (!isBarChart && validPeriods.length >= 2) {
+              const pStart = validPeriods[0];
+              const pEnd = validPeriods[validPeriods.length - 1];
+
+              let rawStart = DATABASE[pStart.year]?.[pStart.month] || [];
+              let rawEnd = DATABASE[pEnd.year]?.[pEnd.month] || [];
+              if (selectedKecamatan !== 'all') {
+                  rawStart = rawStart.filter(s => s.kecamatan === selectedKecamatan);
+                  rawEnd = rawEnd.filter(s => s.kecamatan === selectedKecamatan);
+              }
+
+              const schStart = aggregateSchools(rawStart);
+              const schEnd = aggregateSchools(rawEnd);
+
+              let dynamicProgress = [];
+              let tSekolah = 0, tSiswa = 0, pPositif = 0, pEvaluasi = 0;
+
+              schEnd.forEach(eSch => {
+                  const sSch = schStart.find(s => s.no === eSch.no);
+                  if(sSch && sSch.tot > 0 && eSch.tot > 0) {
+                      tSekolah++;
+                      tSiswa += eSch.tot;
+
+                      let awalLancar = 0, akhirLancar = 0;
+                      let awalTot = 0, akhirTot = 0;
+                      let changed = false;
+
+                      if (sSch.kls4.tersedia && eSch.kls4.tersedia) {
+                          awalLancar += sSch.kls4.lancar; akhirLancar += eSch.kls4.lancar;
+                          awalTot += sSch.kls4.tot; akhirTot += eSch.kls4.tot;
+                      } else if (sSch.kls4.tersedia !== eSch.kls4.tersedia) changed = true;
+
+                      if (sSch.kls5.tersedia && eSch.kls5.tersedia) {
+                          awalLancar += sSch.kls5.lancar; akhirLancar += eSch.kls5.lancar;
+                          awalTot += sSch.kls5.tot; akhirTot += eSch.kls5.tot;
+                      } else if (sSch.kls5.tersedia !== eSch.kls5.tersedia) changed = true;
+
+                      if (changed) hasStructuralChange = true;
+
+                      let pctAwal = awalTot > 0 ? (awalLancar / awalTot * 100) : 0;
+                      let pctAkhir = akhirTot > 0 ? (akhirLancar / akhirTot * 100) : 0;
+                      let diff = pctAkhir - pctAwal; 
+
+                      let status = "Stabil";
+                      if (diff > 0) { status = "Progress Positif"; pPositif++; }
+                      else if (diff < 0) { status = "Perlu Evaluasi"; pEvaluasi++; }
+
+                      dynamicProgress.push({
+                          no: eSch.no,
+                          nama: eSch.nama,
+                          validation: { changed: changed, note: changed ? "Perubahan Struktur Data" : "Comparable Data Valid" },
+                          progress: { total_siswa_latest: eSch.tot, awal_lancar: awalLancar, akhir_lancar: akhirLancar, awal_pct: pctAwal, akhir_pct: pctAkhir, persen: diff, status: status },
+                          awal: sSch, akhir: eSch
+                      });
+                  }
+              });
+
+              execSum = { total_sekolah: tSekolah, total_siswa_aktif: tSiswa, progress_positif: pPositif, perlu_pendampingan: pEvaluasi };
+              dynamicProgress.sort((a,b) => (b.progress?.persen || 0) - (a.progress?.persen || 0));
+              topList = dynamicProgress.slice(0, 10);
+              botList = [...dynamicProgress].reverse().slice(0, 10);
+          }
+      }
+
+      // --- 2. RENDER KPI GRIDS ---
+      if (execSum && Object.keys(execSum).length > 0) {
+          if(kpiGrid) kpiGrid.style.display = 'grid';
+          safeSetText('tkTotalSekolah', fmt(execSum.total_sekolah || 0));
+          safeSetText('tkTotalSiswa', fmt(execSum.total_siswa_aktif || 0));
+          safeSetText('tkProgressPositif', fmt(execSum.progress_positif || 0));
+          safeSetText('tkPendampingan', fmt(execSum.perlu_pendampingan || 0));
+      } else {
+          if(kpiGrid) kpiGrid.style.display = 'none';
+      }
+
+      // --- 3. RENDER VALIDATION BANNER ---
+      if (!isBarChart && validPeriods.length >= 2) {
+          if(valBanner) {
+              valBanner.style.display = 'block';
+              if (hasStructuralChange) {
+                  valBanner.style.background = 'var(--warning-dim)';
+                  valBanner.style.borderLeftColor = 'var(--warning)';
+                  safeSetHTML('trendValidationText', "<strong>Status Data:</strong> Terdapat perubahan struktur data antar periode. Analisis menggunakan <em>comparable data</em> untuk menjaga akurasi.");
+              } else {
+                  valBanner.style.background = 'var(--success-dim)';
+                  valBanner.style.borderLeftColor = 'var(--success)';
+                  safeSetHTML('trendValidationText', "<strong>Comparable Data Valid:</strong> Tidak ada anomali atau perubahan struktur antar periode.");
+              }
+          }
+      } else {
+          if(valBanner) valBanner.style.display = 'none';
+      }
+
+      // --- 4. PREPARE CHART DATA ---
+      if(tEl) {
+        tEl.innerHTML = '<canvas id="trendChartCanvas"></canvas>';
+      }
+      
+      destroyChart('trend');
+      
+      let labels = [];
+      let pctData = [];
+
+      if (isBarChart) {
+          labels = validPeriods.map(p => p.label);
+          pctData = validPeriods.map(p => parseFloat(n2(p.pct)));
+          safeSetText('trendChartSub', "Pencapaian agregat rata-rata setiap tahunnya");
+      } else {
+          labels = validPeriods.map(p => `${p.month.substring(0,3)} ${p.year}`);
+          pctData = validPeriods.map(p => {
+              let raw = DATABASE[p.year]?.[p.month] || [];
               if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
               const T = computeTotals(aggregateSchools(raw));
-              tLancar += T.lancar;
-              tTot += T.tot;
+              return T.tot > 0 ? parseFloat(n2(T.lancar / T.tot * 100)) : 0;
           });
-          return { label: `Tahun ${yr}`, pct: tTot > 0 ? (tLancar/tTot*100) : 0, year: yr };
-      });
-      
-      summaryTitle.textContent = `Agregat Performa Tahunan`;
-      summaryDesc.textContent = `Analisis rata-rata capaian BTQ dari tahun ke tahun untuk memetakan progres jangka panjang.`;
-  }
-  // LOGIC MODE: RENTANG KUSTOM
-  else if (mode === 'kustom') {
-      const dM = document.getElementById('tDariBulan').value;
-      const dY = document.getElementById('tDariTahun').value;
-      const sM = document.getElementById('tSampaiBulan').value;
-      const sY = document.getElementById('tSampaiTahun').value;
-      
-      const vDari = getPeriodValue(dY, dM);
-      const vSampai = getPeriodValue(sY, sM);
-      
-      if (vSampai < vDari) {
-          warningEl.style.display = 'flex';
-          tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">⚠</div>Menunggu rentang waktu yang valid...</div>`;
-          summaryTitle.textContent = "Rentang Waktu Terbalik";
-          summaryDesc.textContent = "Silakan perbaiki pilihan bulan dan tahun agar proses analitik dapat berjalan.";
-          progressGrid.style.display = 'none';
-          kpiGrid.style.display = 'none';
-          valBanner.style.display = 'none';
-          conclusionCard.style.display = 'none';
-          return;
+          safeSetText('trendChartSub', "Perkembangan capaian rata-rata dari seluruh sekolah");
       }
-      warningEl.style.display = 'none';
-      
-      validPeriods = allP.filter(p => {
-          const v = getPeriodValue(p.year, p.month);
-          return v >= vDari && v <= vSampai;
-      });
-      
-      if(validPeriods.length === 0) {
-          tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📂</div>Tidak ada data yang terekam pada rentang kustom tersebut.</div>`;
-          summaryTitle.textContent = "Data Tidak Ditemukan";
-          summaryDesc.textContent = `Periode ${dM} ${dY} s.d. ${sM} ${sY} kosong.`;
-          progressGrid.style.display = 'none';
-          kpiGrid.style.display = 'none';
-          valBanner.style.display = 'none';
-          conclusionCard.style.display = 'none';
-          return;
-      }
-      
-      summaryTitle.textContent = `Analisis Rentang Kustom`;
-      summaryDesc.textContent = `Memantau perkembangan dari ${dM} ${dY} sampai dengan ${sM} ${sY}.`;
-  }
 
-  // --- 1. DATA EXTRACTION (BACKEND API vs DYNAMIC CALCULATION) ---
-  let execSum = {};
-  let topList = [];
-  let botList = [];
-  let hasStructuralChange = false;
-
-  // Jika mode SELURUH WAKTU dan tidak ada filter kecamatan, kita MENGGUNAKAN DATA API BACKEND SEPENUHNYA!
-  if (mode === 'seluruh' && selectedKecamatan === 'all' && window.MASTER_PAYLOAD.executive_summary) {
-      execSum = window.MASTER_PAYLOAD.executive_summary || {};
-      topList = window.MASTER_PAYLOAD.top_progress || [];
-      botList = window.MASTER_PAYLOAD.need_attention || [];
-      
-      // Cek apakah ada perubahan struktur dari keseluruhan backend data
-      const pm = window.MASTER_PAYLOAD.progress_monitoring || [];
-      hasStructuralChange = pm.some(i => i.validation?.changed === true);
-  } else {
-      // DYNAMIC CALCULATION: Jika rentang Kustom / Tahunan / Filter Kecamatan Aktif
-      // Kita menghitung ulang di frontend menggunakan logika yang 100% sama dengan backend
-      if (!isBarChart && validPeriods.length >= 2) {
-          const pStart = validPeriods[0];
-          const pEnd = validPeriods[validPeriods.length - 1];
-
-          let rawStart = DATABASE[pStart.year]?.[pStart.month] || [];
-          let rawEnd = DATABASE[pEnd.year]?.[pEnd.month] || [];
-          if (selectedKecamatan !== 'all') {
-              rawStart = rawStart.filter(s => s.kecamatan === selectedKecamatan);
-              rawEnd = rawEnd.filter(s => s.kecamatan === selectedKecamatan);
+      const canvas = document.getElementById('trendChartCanvas');
+      if (canvas) {
+          const ctx = canvas.getContext('2d');
+          let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          if (isDark) {
+              gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+              gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+          } else {
+              gradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
+              gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
           }
 
-          const schStart = aggregateSchools(rawStart);
-          const schEnd = aggregateSchools(rawEnd);
-
-          let dynamicProgress = [];
-          let tSekolah = 0, tSiswa = 0, pPositif = 0, pEvaluasi = 0;
-
-          schEnd.forEach(eSch => {
-              const sSch = schStart.find(s => s.no === eSch.no);
-              if(sSch && sSch.tot > 0 && eSch.tot > 0) {
-                  tSekolah++;
-                  tSiswa += eSch.tot;
-
-                  // Hitung nilai setara (Comparable Data Only)
-                  let awalLancar = 0, akhirLancar = 0;
-                  let awalTot = 0, akhirTot = 0;
-                  let changed = false;
-
-                  if (sSch.kls4.tersedia && eSch.kls4.tersedia) {
-                      awalLancar += sSch.kls4.lancar; akhirLancar += eSch.kls4.lancar;
-                      awalTot += sSch.kls4.tot; akhirTot += eSch.kls4.tot;
-                  } else if (sSch.kls4.tersedia !== eSch.kls4.tersedia) changed = true;
-
-                  if (sSch.kls5.tersedia && eSch.kls5.tersedia) {
-                      awalLancar += sSch.kls5.lancar; akhirLancar += eSch.kls5.lancar;
-                      awalTot += sSch.kls5.tot; akhirTot += eSch.kls5.tot;
-                  } else if (sSch.kls5.tersedia !== eSch.kls5.tersedia) changed = true;
-
-                  if (changed) hasStructuralChange = true;
-
-                  let pctAwal = awalTot > 0 ? (awalLancar / awalTot * 100) : 0;
-                  let pctAkhir = akhirTot > 0 ? (akhirLancar / akhirTot * 100) : 0;
-                  let diff = pctAkhir - pctAwal; // Progress growth (selisih persentase)
-
-                  let status = "Stabil";
-                  if (diff > 0) { status = "Progress Positif"; pPositif++; }
-                  else if (diff < 0) { status = "Perlu Evaluasi"; pEvaluasi++; }
-
-                  // Bentuk struktur objek yang menyamai data backend
-                  dynamicProgress.push({
-                      no: eSch.no,
-                      nama: eSch.nama,
-                      validation: {
-                          changed: changed,
-                          note: changed ? "Perubahan Struktur Data" : "Comparable Data Valid"
-                      },
-                      progress: {
-                          total_siswa_latest: eSch.tot,
-                          awal_lancar: awalLancar,
-                          akhir_lancar: akhirLancar,
-                          awal_pct: pctAwal, // Field kustom bantuan frontend
-                          akhir_pct: pctAkhir, // Field kustom bantuan frontend
-                          persen: diff, 
-                          status: status
-                      },
-                      awal: sSch,
-                      akhir: eSch
-                  });
+          charts['trend'] = new Chart(canvas, {
+            type: isBarChart ? 'bar' : 'line',
+            data: {
+              labels,
+              datasets: [{
+                label: '% Lancar', data: pctData,
+                borderColor: isDark ? '#60a5fa' : '#2563eb', 
+                backgroundColor: isBarChart ? (isDark ? '#3b82f6' : '#2563eb') : gradient, 
+                pointBackgroundColor: isDark ? '#60a5fa' : '#2563eb',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: isBarChart ? 0 : 5, 
+                pointHoverRadius: isBarChart ? 0 : 7, 
+                borderWidth: isBarChart ? 0 : 3, 
+                borderRadius: isBarChart ? 6 : 0,
+                fill: !isBarChart, 
+                tension: 0.35
+              }]
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              scales: {
+                y: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:11, weight: '500'}}, border:{display:false} },
+                x: { grid: {display: false}, ticks: {font:{size:11, weight: '600'}}, border:{display:false} }
+              },
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: isDark ? 'rgba(15,23,42,.95)' : 'rgba(15,23,42,.9)', 
+                  titleColor: '#fff', bodyColor: 'rgba(255,255,255,.8)',
+                  padding: 12, cornerRadius: 8,
+                  titleFont: { size: 13, family: "'Plus Jakarta Sans', sans-serif" },
+                  bodyFont: { size: 12, family: "'Plus Jakarta Sans', sans-serif" },
+                  callbacks: { label: ctx => ` Kinerja: ${ctx.raw}%` }
+                }
               }
+            }
           });
-
-          execSum = {
-              total_sekolah: tSekolah,
-              total_siswa_aktif: tSiswa,
-              progress_positif: pPositif,
-              perlu_pendampingan: pEvaluasi
-          };
-
-          // Sort descending for Top 10, Ascending for Bottom 10
-          dynamicProgress.sort((a,b) => (b.progress?.persen || 0) - (a.progress?.persen || 0));
-          topList = dynamicProgress.slice(0, 10);
-          botList = [...dynamicProgress].reverse().slice(0, 10);
-      }
-  }
-
-  // --- 2. RENDER KPI GRIDS ---
-  if (execSum && Object.keys(execSum).length > 0) {
-      kpiGrid.style.display = 'grid';
-      document.getElementById('tkTotalSekolah').textContent = fmt(execSum.total_sekolah || 0);
-      document.getElementById('tkTotalSiswa').textContent = fmt(execSum.total_siswa_aktif || 0);
-      document.getElementById('tkProgressPositif').textContent = fmt(execSum.progress_positif || 0);
-      document.getElementById('tkPendampingan').textContent = fmt(execSum.perlu_pendampingan || 0);
-  } else {
-      kpiGrid.style.display = 'none';
-  }
-
-  // --- 3. RENDER VALIDATION BANNER ---
-  if (!isBarChart && validPeriods.length >= 2) {
-      valBanner.style.display = 'block';
-      if (hasStructuralChange) {
-          valBanner.style.background = 'var(--warning-dim)';
-          valBanner.style.borderLeftColor = 'var(--warning)';
-          document.getElementById('trendValidationText').innerHTML = "Terdapat perubahan struktur data antar periode. Analisis disesuaikan secara otomatis menggunakan <em>comparable data</em> agar tetap valid.";
-      } else {
-          valBanner.style.background = 'var(--success-dim)';
-          valBanner.style.borderLeftColor = 'var(--success)';
-          document.getElementById('trendValidationText').innerHTML = "Comparable Data Valid. Tidak ada anomali atau perubahan struktur antar periode.";
-      }
-  } else {
-      valBanner.style.display = 'none';
-  }
-
-  // --- 4. PREPARE CHART DATA ---
-  tEl.innerHTML = '<canvas id="trendChart"></canvas>';
-  destroyChart('trend');
-  
-  let labels = [];
-  let pctData = [];
-
-  if (isBarChart) {
-      labels = validPeriods.map(p => p.label);
-      pctData = validPeriods.map(p => parseFloat(n2(p.pct)));
-      document.getElementById('trendChartSub').textContent = "Pencapaian agregat rata-rata setiap tahunnya";
-  } else {
-      labels = validPeriods.map(p => `${p.month.substring(0,3)} ${p.year}`);
-      pctData = validPeriods.map(p => {
-          let raw = DATABASE[p.year][p.month] || [];
-          if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
-          const T = computeTotals(aggregateSchools(raw));
-          return T.tot > 0 ? parseFloat(n2(T.lancar / T.tot * 100)) : 0;
-      });
-      document.getElementById('trendChartSub').textContent = "Perkembangan capaian rata-rata dari seluruh sekolah";
-  }
-
-  // Custom Chart Plugin for premium gradient fill
-  const canvas = document.getElementById('trendChart');
-  const ctx = canvas.getContext('2d');
-  let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  if (isDark) {
-      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
-      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-  } else {
-      gradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
-      gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
-  }
-
-  charts['trend'] = new Chart(document.getElementById('trendChart'), {
-    type: isBarChart ? 'bar' : 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: '% Lancar', data: pctData,
-        borderColor: isDark ? '#60a5fa' : '#2563eb', 
-        backgroundColor: isBarChart ? (isDark ? '#3b82f6' : '#2563eb') : gradient, 
-        pointBackgroundColor: isDark ? '#60a5fa' : '#2563eb',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: isBarChart ? 0 : 5, 
-        pointHoverRadius: isBarChart ? 0 : 7, 
-        borderWidth: isBarChart ? 0 : 3, 
-        borderRadius: isBarChart ? 6 : 0,
-        fill: !isBarChart, 
-        tension: 0.35 // smooth curve
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: {
-        y: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:11, weight: '500'}}, border:{display:false} },
-        x: { grid: {display: false}, ticks: {font:{size:11, weight: '600'}}, border:{display:false} }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: isDark ? 'rgba(15,23,42,.95)' : 'rgba(15,23,42,.9)', 
-          titleColor: '#fff', bodyColor: 'rgba(255,255,255,.8)',
-          padding: 12, cornerRadius: 8,
-          titleFont: { size: 13, family: "'Plus Jakarta Sans', sans-serif" },
-          bodyFont: { size: 12, family: "'Plus Jakarta Sans', sans-serif" },
-          callbacks: { label: ctx => ` Kinerja: ${ctx.raw}%` }
-        }
-      }
-    }
-  });
-
-  // --- 5. SCHOOL PROGRESS TRACKING (Premium Executive Cards) ---
-  if (isBarChart || validPeriods.length < 2) {
-      progressGrid.style.display = 'none';
-      conclusionCard.style.display = 'none';
-      return;
-  }
-  
-  progressGrid.style.display = 'grid';
-
-  const renderPremiumCard = (item, isTop) => {
-      // Null-safety read backend properties
-      const prog = item.progress || {};
-      const val = item.validation || {};
-      
-      const latestTot = prog.total_siswa_latest || 0;
-      const statusText = prog.status || "Stabil";
-      const valNote = val.note || "Comparable Data Valid";
-      const valChanged = val.changed === true;
-      
-      // Menghitung/mengambil persen mutlak Awal & Akhir 
-      let pctAwal = prog.awal_pct;
-      let pctAkhir = prog.akhir_pct;
-      
-      // Jika datang dari backend langsung (dimana awal_pct tidak di-export), kita harus hitung manual agar bisa tampilkan 20% -> 45%
-      if (pctAwal === undefined && item.awal) {
-          const aT = (item.awal.kls4?.total || 0) + (item.awal.kls5?.total || 0);
-          const aL = (item.awal.kls4?.lancar || 0) + (item.awal.kls5?.lancar || 0);
-          pctAwal = aT > 0 ? (aL/aT*100) : 0;
-      }
-      if (pctAkhir === undefined && item.akhir) {
-          const eT = (item.akhir.kls4?.total || 0) + (item.akhir.kls5?.total || 0);
-          const eL = (item.akhir.kls4?.lancar || 0) + (item.akhir.kls5?.lancar || 0);
-          pctAkhir = eT > 0 ? (eL/eT*100) : 0;
       }
 
-      // Kita ambil absolute delta untuk rendering UI
-      const absoluteDiff = (pctAkhir || 0) - (pctAwal || 0);
-      const displayDiff = absoluteDiff > 0 ? `+${absoluteDiff.toFixed(1)}%` : `${absoluteDiff.toFixed(1)}%`;
+      // --- 5. SCHOOL PROGRESS TRACKING (Premium Executive Cards) ---
+      if (isBarChart || validPeriods.length < 2) {
+          if(progressGrid) progressGrid.style.display = 'none';
+          if(conclusionCard) conclusionCard.style.display = 'none';
+          return;
+      }
       
-      let badgeCls = absoluteDiff > 0 ? 'up' : (absoluteDiff < 0 ? 'down' : 'flat');
+      if(progressGrid) progressGrid.style.display = 'grid';
 
-      // Setup Priority & Evaluasi
-      let prioHtml = '';
-      let reasonHtml = '';
-      
-      if (!isTop && absoluteDiff <= 0) {
-          let prio = 'C';
-          if (absoluteDiff < -10 || (pctAkhir && pctAkhir < 40)) prio = 'A';
-          else if (absoluteDiff < 0 || (pctAkhir && pctAkhir < 60)) prio = 'B';
+      const renderPremiumCard = (item, isTop) => {
+          if (!item) return '';
+          const prog = item.progress || {};
+          const val = item.validation || {};
           
-          prioHtml = `<span class="badge-prio badge-prio-${prio.toLowerCase()}" style="margin-left:8px;">Priority Level ${prio}</span>`;
+          const latestTot = prog.total_siswa_latest || 0;
+          const statusText = prog.status || "Stabil";
+          const valNote = val.note || val.label || "Comparable Data Valid";
+          const valChanged = val.changed === true;
           
-          let reason = "Stagnasi capaian kelancaran";
-          if (absoluteDiff < 0 && item.awal && item.akhir) {
-             const awal4 = item.awal.kls4?.total > 0 ? (item.awal.kls4.lancar/item.awal.kls4.total) : 0;
-             const akhir4 = item.akhir.kls4?.total > 0 ? (item.akhir.kls4.lancar/item.akhir.kls4.total) : 0;
-             const awal5 = item.awal.kls5?.total > 0 ? (item.awal.kls5.lancar/item.awal.kls5.total) : 0;
-             const akhir5 = item.akhir.kls5?.total > 0 ? (item.akhir.kls5.lancar/item.akhir.kls5.total) : 0;
-             
-             if (akhir4 < awal4 && akhir5 >= awal5) reason = "Penurunan dominan bersumber pada evaluasi Kelas 4";
-             else if (akhir5 < awal5 && akhir4 >= awal4) reason = "Penurunan dominan bersumber pada evaluasi Kelas 5";
-             else reason = "Penurunan performa terjadi secara merata di seluruh kelas";
+          let pctAwal = prog.awal_pct;
+          let pctAkhir = prog.akhir_pct;
+          
+          if (pctAwal === undefined && item.awal) {
+              const aT = (item.awal.kls4?.total || 0) + (item.awal.kls5?.total || 0);
+              const aL = (item.awal.kls4?.lancar || 0) + (item.awal.kls5?.lancar || 0);
+              pctAwal = aT > 0 ? (aL/aT*100) : 0;
           }
+          if (pctAkhir === undefined && item.akhir) {
+              const eT = (item.akhir.kls4?.total || 0) + (item.akhir.kls5?.total || 0);
+              const eL = (item.akhir.kls4?.lancar || 0) + (item.akhir.kls5?.lancar || 0);
+              pctAkhir = eT > 0 ? (eL/eT*100) : 0;
+          }
+
+          const absoluteDiff = typeof prog.persen === 'number' ? prog.persen : ((pctAkhir || 0) - (pctAwal || 0));
+          const displayDiff = absoluteDiff > 0 ? `+${absoluteDiff.toFixed(1)}%` : `${absoluteDiff.toFixed(1)}%`;
           
-          reasonHtml = `
-            <div style="grid-column: 1 / -1; font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--danger);">
-              <em>Catatan Dinas: ${reason}</em>
-            </div>
+          let badgeCls = absoluteDiff > 0 ? 'up' : (absoluteDiff < 0 ? 'down' : 'flat');
+
+          let prioHtml = '';
+          let reasonHtml = '';
+          
+          if (!isTop && absoluteDiff <= 0) {
+              let prio = 'C';
+              if (absoluteDiff < -10 || (pctAkhir !== undefined && pctAkhir < 40)) prio = 'A';
+              else if (absoluteDiff < 0 || (pctAkhir !== undefined && pctAkhir < 60)) prio = 'B';
+              
+              prioHtml = `<span class="badge-prio badge-prio-${prio.toLowerCase()}" style="margin-left:8px;">Priority Level ${prio}</span>`;
+              
+              let reason = statusText;
+              if (reason === "Stabil") reason = "Stagnasi capaian kelancaran";
+
+              reasonHtml = `
+                <div style="grid-column: 1 / -1; font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--danger);">
+                  <em>Catatan Dinas: ${reason}</em>
+                </div>
+              `;
+          }
+
+          return `
+          <div class="premium-row-card clickable" onclick="openModal('${item.no}', 2)">
+              <div class="pr-header">
+                  <div class="pr-name-group">
+                      <div class="pr-name">${item.nama || '-'}</div>
+                      <div class="pr-students">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                          Total Siswa Aktif: ${fmt(latestTot)}
+                      </div>
+                  </div>
+                  <div class="pr-diff-badge ${badgeCls}">${displayDiff}</div>
+              </div>
+              <div class="pr-body">
+                  <div class="pr-stat">
+                      <span class="pr-stat-lbl">Progress Mutlak</span>
+                      <span class="pr-stat-val">${(pctAwal||0).toFixed(1)}% → ${(pctAkhir||0).toFixed(1)}%</span>
+                  </div>
+                  <div class="pr-stat">
+                      <span class="pr-stat-lbl">Status Evaluasi</span>
+                      <span class="pr-stat-val" style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+                        ${statusText} ${prioHtml}
+                      </span>
+                  </div>
+                  <div class="pr-validation ${valChanged ? 'warning' : 'success'}" style="${!valChanged && !document.body.classList.contains('dark') ? 'color:var(--success); background:var(--success-dim)' : ''}">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                      Validasi: ${valNote}
+                  </div>
+                  ${reasonHtml}
+              </div>
+          </div>
           `;
+      };
+
+      const topEl = document.getElementById('trendTopList');
+      const botEl = document.getElementById('trendBotList');
+
+      if (topEl) {
+          const realTopList = topList.filter(s => (s.progress?.persen || 0) > 0);
+          if (realTopList.length > 0) topEl.innerHTML = realTopList.map(s => renderPremiumCard(s, true)).join('');
+          else topEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📈</div>Belum ada sekolah yang mencatat tren progres positif di rentang ini.</div>`;
       }
 
-      return `
-      <div class="premium-row-card clickable" onclick="openModal('${item.no}', 2)">
-          <div class="pr-header">
-              <div class="pr-name-group">
-                  <div class="pr-name">${item.nama || '-'}</div>
-                  <div class="pr-students">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                      Total Siswa Aktif: ${fmt(latestTot)}
-                  </div>
-              </div>
-              <div class="pr-diff-badge ${badgeCls}">${displayDiff}</div>
-          </div>
-          <div class="pr-body">
-              <div class="pr-stat">
-                  <span class="pr-stat-lbl">Progress Mutlak</span>
-                  <span class="pr-stat-val">${(pctAwal||0).toFixed(1)}% → ${(pctAkhir||0).toFixed(1)}%</span>
-              </div>
-              <div class="pr-stat">
-                  <span class="pr-stat-lbl">Status Evaluasi</span>
-                  <span class="pr-stat-val" style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
-                    ${statusText} ${prioHtml}
-                  </span>
-              </div>
-              <div class="pr-validation ${valChanged ? 'warning' : 'success'}" style="${!valChanged && !isDark ? 'color:var(--success); background:var(--success-dim)' : ''}">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                  Validasi: ${valNote}
-              </div>
-              ${reasonHtml}
-          </div>
-      </div>
-      `;
-  };
+      if (botEl) {
+          const realBotList = botList.filter(s => (s.progress?.persen || 0) <= 0);
+          if (realBotList.length > 0) botEl.innerHTML = realBotList.map(s => renderPremiumCard(s, false)).join('');
+          else botEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">🏆</div>Seluruh sekolah berhasil mempertahankan atau meningkatkan performanya.</div>`;
+      }
 
-  const topEl = document.getElementById('trendTopList');
-  const botEl = document.getElementById('trendBotList');
+      // --- 6. EXECUTIVE CONCLUSION AUTO GENERATION ---
+      if(conclusionCard) conclusionCard.style.display = 'block';
+      
+      let backendNote = "";
+      if (useBackendFully && payload.summary && payload.summary.note) {
+          backendNote = payload.summary.note;
+      }
 
-  // Filter hanya yang positif untuk list atas, dan negatif/nol untuk list bawah
-  const realTopList = topList.filter(s => (s.progress?.persen || 0) > 0);
-  const realBotList = botList.filter(s => (s.progress?.persen || 0) <= 0);
+      let concHtml = "";
+      if (backendNote) {
+          concHtml = `<strong>Ringkasan Eksekutif:</strong> ${backendNote}`;
+      } else {
+          const dStart = pctData[0] || 0;
+          const dEnd = pctData[pctData.length-1] || 0;
+          const dTot = dEnd - dStart;
+          
+          concHtml = `Berdasarkan pengolahan data analitik dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif Dinas Pendidikan `;
+          
+          if(dTot > 0) {
+              concHtml += `menunjukkan tren <strong>peningkatan agregat sebesar +${n2(dTot)}%</strong>. `;
+          } else if (dTot < 0) {
+              concHtml += `mengalami kemunduran dengan <strong>penurunan agregat sebesar ${n2(Math.abs(dTot))}%</strong>. `;
+          } else {
+              concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
+          }
 
-  if(realTopList.length > 0) {
-      topEl.innerHTML = realTopList.map(s => renderPremiumCard(s, true)).join('');
-  } else {
-      topEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📈</div>Belum ada sekolah yang mencatat tren progres positif di rentang ini.</div>`;
+          concHtml += `Secara spesifik, dari total ${execSum.total_sekolah || 0} sekolah aktif, mayoritas (${execSum.progress_positif || 0} sekolah) berhasil mengukir progres positif berkat efektivitas pembelajaran BTQ. Namun, sistem mendeteksi keberadaan <strong>${execSum.perlu_pendampingan || 0} sekolah</strong> yang membutuhkan atensi khusus dan evaluasi metodologi (termasuk pada Level Prioritas A dan B) guna mencegah terjadinya penurunan mutu akademis yang lebih luas.`;
+      }
+
+      safeSetHTML('trendConclusionText', concHtml);
+
+  } catch(error) {
+      console.error("Critical Error during Trend Render:", error);
+      safeSetHTML('trendContent', `<div class="trend-empty" style="color:var(--danger)"><div class="trend-empty-icon">⚠</div>Terjadi kesalahan saat memuat analitik. Silakan muat ulang.</div>`);
   }
-
-  if(realBotList.length > 0) {
-      botEl.innerHTML = realBotList.map(s => renderPremiumCard(s, false)).join('');
-  } else {
-      botEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">🏆</div>Luar biasa! Seluruh sekolah berhasil mempertahankan atau meningkatkan performanya.</div>`;
-  }
-
-  // --- 6. EXECUTIVE CONCLUSION AUTO GENERATION ---
-  conclusionCard.style.display = 'block';
-  const concText = document.getElementById('trendConclusionText');
-  const dStart = pctData[0];
-  const dEnd = pctData[pctData.length-1];
-  const dTot = dEnd - dStart;
-  
-  let concHtml = `Berdasarkan pengolahan data analitik dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif Dinas Pendidikan `;
-  
-  if(dTot > 0) {
-      concHtml += `menunjukkan tren <strong>peningkatan agregat sebesar +${n2(dTot)}%</strong>. `;
-  } else if (dTot < 0) {
-      concHtml += `mengalami kemunduran dengan <strong>penurunan agregat sebesar ${n2(Math.abs(dTot))}%</strong>. `;
-  } else {
-      concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
-  }
-
-  concHtml += `Secara spesifik, dari total ${execSum.total_sekolah || 0} sekolah aktif, mayoritas (${execSum.progress_positif || 0} sekolah) berhasil mengukir progres positif berkat efektivitas pembelajaran BTQ. Namun, sistem mendeteksi keberadaan <strong>${execSum.perlu_pendampingan || 0} sekolah</strong> yang membutuhkan atensi khusus dan evaluasi metodologi (termasuk pada Level Prioritas A dan B) guna mencegah terjadinya penurunan mutu akademis yang lebih luas.`;
-
-  concText.innerHTML = concHtml;
 }
 
 // ────────────────────────────────────────────
 // KESIMPULAN & REKOMENDASI
 // ────────────────────────────────────────────
 function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
-  const sorted = currentSchools.filter(s => s.tot > 0).sort((a,b) => b.pct - a.pct);
-  const lowC = sorted.filter(s => s.pct < 60).length;
-  const pL = T.tot > 0 ? n2(T.lancar / T.tot * 100) : 0;
-  const pB = T.tot > 0 ? n2(T.belum / T.tot * 100) : 0;
-  const pK = T.tot > 0 ? n2(T.tidak / T.tot * 100) : 0;
+  try {
+    const sorted = currentSchools.filter(s => s.tot > 0).sort((a,b) => b.pct - a.pct);
+    const lowC = sorted.filter(s => s.pct < 60).length;
+    const pL = T.tot > 0 ? n2(T.lancar / T.tot * 100) : 0;
+    const pB = T.tot > 0 ? n2(T.belum / T.tot * 100) : 0;
+    const pK = T.tot > 0 ? n2(T.tidak / T.tot * 100) : 0;
 
-  let callout = '';
-  if (isAll) {
-    const kr = ["Langensari","Purwaharja","Pataruman","Banjar"].map(k => {
-      const ks = allSchoolsAggr.filter(s => s.kecamatan === k);
-      const t = computeTotals(ks);
-      return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
-    }).sort((a,b) => b.pct - a.pct);
-    callout = `Pusat orbit prestasi saat ini ada pada Kec. <strong>${kr[0].name}</strong> dengan realisasi ideal (${n2(kr[0].pct)}%). Fokus intervensi diarahkan secara institusional ke Kec. <strong>${kr[kr.length-1].name}</strong> sebagai sektor prioritas pembinaan (${n2(kr[kr.length-1].pct)}%).`;
-  } else {
-    callout = `Sorotan Regional <strong>${cakupan}</strong> — Ekosistem belajar <strong>${best ? best.nama : '-'}</strong> diposisikan sebagai prototipe rujukan (${n2(best ? best.pct : 0)}%). Peringatan: <strong>${lowC} sekolah dasar</strong> dilaporkan berada di bawah standar kelayakan (60%).`;
+    let callout = '';
+    if (isAll) {
+      const kr = ["Langensari","Purwaharja","Pataruman","Banjar"].map(k => {
+        const ks = allSchoolsAggr.filter(s => s.kecamatan === k);
+        const t = computeTotals(ks);
+        return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
+      }).sort((a,b) => b.pct - a.pct);
+      callout = `Pusat orbit prestasi saat ini ada pada Kec. <strong>${kr[0].name}</strong> dengan realisasi ideal (${n2(kr[0].pct)}%). Fokus intervensi diarahkan secara institusional ke Kec. <strong>${kr[kr.length-1].name}</strong> sebagai sektor prioritas pembinaan (${n2(kr[kr.length-1].pct)}%).`;
+    } else {
+      callout = `Sorotan Regional <strong>${cakupan}</strong> — Ekosistem belajar <strong>${best ? best.nama : '-'}</strong> diposisikan sebagai prototipe rujukan (${n2(best ? best.pct : 0)}%). Peringatan: <strong>${lowC} sekolah dasar</strong> dilaporkan berada di bawah standar kelayakan (60%).`;
+    }
+    
+    safeSetHTML('k-callout', callout);
+    
+    const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
+    safeSetHTML('k-body', `
+      Asesmen formal dari ekstraksi data matriks <strong>${classStr}</strong> per <strong>${currentMonth} ${currentYear}</strong> dalam area komputasi <strong>${cakupan}</strong> mengkalkulasi kumpulan <strong>${fmt(T.tot)} jejak digital valid</strong> dari total ${currentSchools.length} klaster unit dasar. Nilai valuasi capaian di ekuilibrium angka <strong>${n2(pct)}%</strong>. Menjabarkan rincian teknis: <strong>${pL}%</strong> SDM telah terklasifikasi mapan secara alfabetikal bahasa Al-Qur'an, diiringi <strong>${pB}%</strong> pada ambang fase medium, sekaligus menyisakan celah berat pada <strong>${pK}%</strong> demografi siswa tanpa pengenalan struktur huruf yang paling minimal sekalipun.
+    `);
+    
+    safeSetHTML('k-reco', [
+      `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
+      `Investigasi guru dengan kehadiran di bawah 80% oleh Dinas Pendidikan untuk memastikan hak siswa atas pembelajaran agama terpenuhi.`,
+      `Kembangkan program "Tutor Sebaya Al-Qur'an" secara struktural di kelas IV–V untuk mempercepat penurunan angka ketidaklancaran.`,
+      `Pastikan kedisiplinan input data sekolah (mencegah data kosong) dengan melibatkan operator wilayah pada rapat koordinasi kepala sekolah bulanan.`
+    ].map((r, i) => `<li><span class="reco-num">${i+1}</span><span>${r}</span></li>`).join(''));
+  } catch(err) {
+    console.error("Kesimpulan Error:", err);
   }
-  
-  document.getElementById('k-callout').innerHTML = callout;
-  
-  const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
-  document.getElementById('k-body').innerHTML = `
-    Asesmen formal dari ekstraksi data matriks <strong>${classStr}</strong> per <strong>${currentMonth} ${currentYear}</strong> dalam area komputasi <strong>${cakupan}</strong> mengkalkulasi kumpulan <strong>${fmt(T.tot)} jejak digital valid</strong> dari total ${currentSchools.length} klaster unit dasar. Nilai valuasi capaian di ekuilibrium angka <strong>${n2(pct)}%</strong>. Menjabarkan rincian teknis: <strong>${pL}%</strong> SDM telah terklasifikasi mapan secara alfabetikal bahasa Al-Qur'an, diiringi <strong>${pB}%</strong> pada ambang fase medium, sekaligus menyisakan celah berat pada <strong>${pK}%</strong> demografi siswa tanpa pengenalan struktur huruf yang paling minimal sekalipun.
-  `;
-  document.getElementById('k-reco').innerHTML = [
-    `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
-    `Investigasi guru dengan kehadiran di bawah 80% oleh Dinas Pendidikan untuk memastikan hak siswa atas pembelajaran agama terpenuhi.`,
-    `Kembangkan program "Tutor Sebaya Al-Qur'an" secara struktural di kelas IV–V untuk mempercepat penurunan angka ketidaklancaran.`,
-    `Pastikan kedisiplinan input data sekolah (mencegah data kosong) dengan melibatkan operator wilayah pada rapat koordinasi kepala sekolah bulanan.`
-  ].map((r, i) => `<li><span class="reco-num">${i+1}</span><span>${r}</span></li>`).join('');
 }
 
 // ────────────────────────────────────────────
