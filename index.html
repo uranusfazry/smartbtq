@@ -3095,65 +3095,72 @@ const n2 = n => parseFloat(n).toFixed(1);
 const fmt = n => n.toLocaleString('id-ID');
 
 function isValidClass(kls) {
-  return kls && kls.total && kls.total > 0;
+  return kls && typeof kls === 'object' && typeof kls.total === 'number' && kls.total > 0;
 }
 
 function checkIncompleteData(schools) {
+  if (!schools || !Array.isArray(schools)) return false;
   return schools.some(s =>
-    s.rows.some(r => !isValidClass(r.kls4) || !isValidClass(r.kls5))
+    s?.rows?.some(r => !isValidClass(r?.kls4) || !isValidClass(r?.kls5))
   );
 }
 
 function aggregateSchools(rawArr) {
-  return rawArr.map(s => {
+  if (!rawArr || !Array.isArray(rawArr)) return [];
+  
+  return rawArr.map((s, idx) => {
+    // PROTEKSI NULL: Buat ID yang aman jika backend tidak mengirim 'no'
+    const safeId = s.no ? String(s.no) : String(s.nama).replace(/\s+/g, '_') + '_' + idx;
+    
     let tot=0, lancar=0, belum=0, tidak=0;
     let k4t=0,k4l=0,k4b=0,k4k=0, k5t=0,k5l=0,k5b=0,k5k=0;
     let hadirArr=[], guruArr=[], warnings=[];
     let hasKls4 = false, hasKls5 = false;
     
-    s.rows.forEach(r => {
-      const isK4Valid = isValidClass(r.kls4);
-      const isK5Valid = isValidClass(r.kls5);
+    if (s.rows && Array.isArray(s.rows)) {
+      s.rows.forEach(r => {
+        if (!r) return; // Skip baris null
+        const isK4Valid = isValidClass(r.kls4);
+        const isK5Valid = isValidClass(r.kls5);
 
-      if (isK4Valid) {
-        hasKls4 = true;
-        const k4s = r.kls4.lancar + r.kls4.belum + r.kls4.tidak;
-        if(Math.abs(k4s - r.kls4.total) > 1) warnings.push(`Kls4 ${r.guru}`);
-        
-        k4t += r.kls4.total; k4l += r.kls4.lancar; k4b += r.kls4.belum; k4k += r.kls4.tidak;
+        if (isK4Valid) {
+          hasKls4 = true;
+          const k4s = (r.kls4.lancar || 0) + (r.kls4.belum || 0) + (r.kls4.tidak || 0);
+          if(Math.abs(k4s - r.kls4.total) > 1) warnings.push(`Kls4 ${r.guru || 'Unknown'}`);
+          
+          k4t += r.kls4.total; k4l += r.kls4.lancar || 0; k4b += r.kls4.belum || 0; k4k += r.kls4.tidak || 0;
 
-        if (selectedKelas === 'all' || selectedKelas === '4') {
-          tot += r.kls4.total;
-          lancar += r.kls4.lancar;
-          belum += r.kls4.belum;
-          tidak += r.kls4.tidak;
+          if (selectedKelas === 'all' || selectedKelas === '4') {
+            tot += r.kls4.total; lancar += r.kls4.lancar || 0; belum += r.kls4.belum || 0; tidak += r.kls4.tidak || 0;
+          }
         }
-      }
-      
-      if (isK5Valid) {
-        hasKls5 = true;
-        const k5s = r.kls5.lancar + r.kls5.belum + r.kls5.tidak;
-        if(Math.abs(k5s - r.kls5.total) > 1) warnings.push(`Kls5 ${r.guru}`);
         
-        k5t += r.kls5.total; k5l += r.kls5.lancar; k5b += r.kls5.belum; k5k += r.kls5.tidak;
+        if (isK5Valid) {
+          hasKls5 = true;
+          const k5s = (r.kls5.lancar || 0) + (r.kls5.belum || 0) + (r.kls5.tidak || 0);
+          if(Math.abs(k5s - r.kls5.total) > 1) warnings.push(`Kls5 ${r.guru || 'Unknown'}`);
+          
+          k5t += r.kls5.total; k5l += r.kls5.lancar || 0; k5b += r.kls5.belum || 0; k5k += r.kls5.tidak || 0;
 
-        if (selectedKelas === 'all' || selectedKelas === '5') {
-          tot += r.kls5.total;
-          lancar += r.kls5.lancar;
-          belum += r.kls5.belum;
-          tidak += r.kls5.tidak;
+          if (selectedKelas === 'all' || selectedKelas === '5') {
+            tot += r.kls5.total; lancar += r.kls5.lancar || 0; belum += r.kls5.belum || 0; tidak += r.kls5.tidak || 0;
+          }
         }
-      }
-      
-      hadirArr.push(r.hadir); guruArr.push(r.guru);
-    });
+        
+        if (r.hadir !== undefined) hadirArr.push(r.hadir);
+        if (r.guru) guruArr.push(r.guru);
+      });
+    }
     
     return {
-      idx:s.no, no:s.no, nama:s.nama, kecamatan:s.kecamatan,
+      id: safeId, no: safeId, // Sinkronisasi identifier aman
+      idx: s.no || idx, 
+      nama: s.nama || 'Tanpa Nama', 
+      kecamatan: s.kecamatan || 'Tidak Diketahui',
       tot, lancar, belum, tidak, pct:tot > 0 ? (lancar / tot * 100) : 0,
       kls4:{tot:k4t, lancar:k4l, belum:k4b, tidak:k4k, tersedia:hasKls4},
       kls5:{tot:k5t, lancar:k5l, belum:k5b, tidak:k5k, tersedia:hasKls5},
-      guru:guruArr, hadir:hadirArr, rows:s.rows, warnings
+      guru:guruArr, hadir:hadirArr, rows:s.rows || [], warnings
     };
   });
 }
@@ -3391,6 +3398,7 @@ function pctPill(pct) {
 function renderTable() {
   const tbody = document.getElementById('tableBody');
   const tfoot = document.getElementById('tableFoot');
+  if (!tbody || !tfoot) return;
   tbody.innerHTML = '';
   
   let display = [...filteredSchools];
@@ -3398,6 +3406,7 @@ function renderTable() {
   if(sortMode === 'worst') display.sort((a,b) => a.pct - b.pct);
   
   display.forEach((s, i) => {
+    if (!s) return;
     const q = dataQuality(s);
     const qLabel = q === 'valid' ? '<span class="q-dot q-green" title="Data Valid"></span> Valid' :
                    q === 'partial' ? '<span class="q-dot q-amber" title="Perlu Periksa"></span> Partial' :
@@ -3417,7 +3426,7 @@ function renderTable() {
       <td data-label="Tidak Bisa" class="c" style="color:var(--danger)">${fmt(s.tidak)}</td>
       <td data-label="Kualitas" class="c" style="font-size:12px;white-space:nowrap">${qLabel}</td>
       <td data-label="Aksi" class="c" style="padding-top:12px;">
-        <button class="btn-detail" onclick="openModal(${s.no})">Detail Sekolah</button>
+        <button class="btn-detail" onclick="openModal('${s.id}')">Detail Sekolah</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -3622,7 +3631,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
         },
         options: {
           indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-          onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].no); },
+          onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].id); },
           scales: {
             x: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:10}}, border:{display:false} },
             y: { grid: {display: false}, ticks: {font:{size:10.5}}, border:{display:false} }
@@ -3648,13 +3657,13 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     if(top10.length > 0 && bot1) {
       safeSetHTML('bar-insight', `
         <div class="duo-grid">
-          <div class="duo-card best" onclick="openModal(${top10[0].no})">
+          <div class="duo-card best" onclick="openModal('${top10[0].id}')">
             <div class="duo-lbl">🏆 Terbaik</div>
             <div class="duo-name">${top10[0].nama}</div>
             <div class="duo-pct">${n2(top10[0].pct)}%</div>
             <div class="duo-meta">Kec. ${top10[0].kecamatan} · ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)} siswa</div>
           </div>
-          <div class="duo-card worst" onclick="openModal(${bot1.no})">
+          <div class="duo-card worst" onclick="openModal('${bot1.id}')">
             <div class="duo-lbl">⚠ Perhatian</div>
             <div class="duo-name">${bot1.nama}</div>
             <div class="duo-pct">${n2(bot1.pct)}%</div>
@@ -3690,7 +3699,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no); },
+          onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].id); },
           scales: {
             x: { stacked: true, grid: {display: false}, ticks: {font:{size:9.5}, maxRotation:45}, border:{display:false} },
             y: { stacked: true, grid: {color: gridColorConfig}, border:{display:false} }
@@ -3861,7 +3870,7 @@ function renderTrend(cakupan) {
       if (mode === 'seluruh') {
           validPeriods = [...allP];
           safeSetText('tsbTitle', `Menampilkan Seluruh Waktu`);
-          safeSetText('tsbDesc', `Perkembangan historis lengkap dari ${allP[0].month} ${allP[0].year} sampai ${allP[allP.length-1].month} ${allP[allP.length-1].year}.`);
+          safeSetText('tsbDesc', `Perkembangan historis lengkap dari ${allP[0]?.month} ${allP[0]?.year} sampai ${allP[allP.length-1]?.month} ${allP[allP.length-1]?.year}.`);
       } 
       // LOGIC MODE: TAHUNAN
       else if (mode === 'tahunan') {
@@ -3940,6 +3949,7 @@ function renderTrend(cakupan) {
       const useBackendFully = mode === 'seluruh' && selectedKecamatan === 'all' && payload && payload.executive_summary;
 
       if (useBackendFully) {
+          // Strict Sinkronisasi dengan properti backend baru
           execSum = payload.executive_summary || {};
           topList = payload.top_progress || [];
           botList = payload.need_attention || [];
@@ -4176,7 +4186,7 @@ function renderTrend(cakupan) {
           }
 
           return `
-          <div class="premium-row-card clickable" onclick="openModal('${item.no}', 2)">
+          <div class="premium-row-card clickable" onclick="openModal('${item.no || item.id}', 2)">
               <div class="pr-header">
                   <div class="pr-name-group">
                       <div class="pr-name">${item.nama || '-'}</div>
@@ -4304,11 +4314,18 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
 // ────────────────────────────────────────────
 // MODAL DETAIL SEKOLAH
 // ────────────────────────────────────────────
-function openModal(no, tabIdx = 0) {
-  lastSchoolCardId = `school-row-${no}`; 
-  currentModalSchool = currentSchools.find(s => s.no === no);
-  if(!currentModalSchool) return;
-  document.getElementById('modalTitle').textContent = currentModalSchool.nama;
+function openModal(id, tabIdx = 0) {
+  // Mendukung ID String untuk Null Safety
+  lastSchoolCardId = `school-row-${id}`; 
+  currentModalSchool = currentSchools.find(s => String(s.id) === String(id) || String(s.no) === String(id));
+  
+  if(!currentModalSchool) {
+      console.warn("Sekolah tidak ditemukan untuk ID:", id);
+      return;
+  }
+  
+  const modalTitle = document.getElementById('modalTitle');
+  if (modalTitle) modalTitle.textContent = currentModalSchool.nama;
   
   isEditMode = false;
   editTempData = null;
@@ -4318,7 +4335,8 @@ function openModal(no, tabIdx = 0) {
   renderModalTab(tabIdx);
   
   lockOverlayBackground();
-  document.getElementById('modalOverlay').classList.add('open');
+  const modalOverlay = document.getElementById('modalOverlay');
+  if(modalOverlay) modalOverlay.classList.add('open');
 }
 
 // --- PIN & EDIT MODE FUNCTIONS ---
@@ -4494,47 +4512,92 @@ async function saveModalChanges() {
   if (!validateEditData()) return;
   
   const btnSave = document.getElementById('btnSaveModal');
+  if(!btnSave) return;
+  
   btnSave.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;margin-right:6px;"></span>Menyimpan...';
   btnSave.disabled = true;
 
   try {
-    // 1. Eksekusi ke Backend via Apps Script (jika backend sudah diatur untuk POST update)
-    // await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'update', data: editTempData }) });
+    // 1. Eksekusi Aktual ke Google Apps Script doPost()
+    const targetRow = editTempData.rows && editTempData.rows[0] ? editTempData.rows[0] : {};
+    const enteredPin = document.getElementById('pinInput') ? document.getElementById('pinInput').value : DEV_PIN;
     
-    // Fallback simulasi jaringan untuk enterprise feel 
-    await new Promise(r => setTimeout(r, 1200)); 
+    const requestPayload = {
+      action: 'update',
+      pin: enteredPin,
+      Tahun: currentYear,
+      Bulan: currentMonth,
+      Sekolah: editTempData.nama,
+      Guru: targetRow.guru || (editTempData.guru && editTempData.guru[0]) || "",
+      Hadir: parseInt(targetRow.hadir !== undefined ? targetRow.hadir : (editTempData.hadir && editTempData.hadir[0])) || 0,
+      Total4: parseInt(editTempData.kls4.tot) || 0,
+      Lancar4: parseInt(editTempData.kls4.lancar) || 0,
+      Belum4: parseInt(editTempData.kls4.belum) || 0,
+      Tidak4: parseInt(editTempData.kls4.tidak) || 0,
+      Total5: parseInt(editTempData.kls5.tot) || 0,
+      Lancar5: parseInt(editTempData.kls5.lancar) || 0,
+      Belum5: parseInt(editTempData.kls5.belum) || 0,
+      Tidak5: parseInt(editTempData.kls5.tidak) || 0
+    };
 
-    // 2. Terapkan secara Real-Time ke Dashboard Memory State
-    const rawMonthData = DATABASE[currentYear][currentMonth];
-    const target = rawMonthData.find(s => s.no === editTempData.no);
+    const response = await fetch(API_URL, { 
+        method: 'POST', 
+        headers: {
+            // Karena Apps Script terkadang memblokir Content-Type JSON via CORS,
+            // Mode "text/plain" aman digunakan jika backend men-handle JSON.parse(e.postData.contents)
+            "Content-Type": "text/plain;charset=utf-8", 
+        },
+        body: JSON.stringify(requestPayload) 
+    });
     
-    if (target && target.rows && target.rows.length > 0) {
-       const r = target.rows[0];
-       if (editTempData.kls4.tersedia) {
-           r.kls4 = { total: editTempData.kls4.tot, lancar: editTempData.kls4.lancar, belum: editTempData.kls4.belum, tidak: editTempData.kls4.tidak };
-       }
-       if (editTempData.kls5.tersedia) {
-           r.kls5 = { total: editTempData.kls5.tot, lancar: editTempData.kls5.lancar, belum: editTempData.kls5.belum, tidak: editTempData.kls5.tidak };
-       }
-       
-       editTempData.guru.forEach((gName, idx) => {
-          if (target.rows[idx]) {
-             target.rows[idx].guru = gName;
-             target.rows[idx].hadir = editTempData.hadir[idx];
-          }
-       });
+    let result = {};
+    try {
+        result = await response.json();
+    } catch (e) {
+        throw new Error("Respon server bukan JSON yang valid. Pastikan doPost() mereturn JSON stringified.");
+    }
+    
+    if (result.status !== 'success' && !result.success) {
+        throw new Error(result.message || "Gagal menyimpan ke database server.");
     }
 
-    disableEditMode();
-    
-    // Re-render UI latar belakang untuk update dashboard & chart
-    renderUI(rawMonthData);
-    
-    // Buka modal kembali (read-only) dengan data tervalidasi yang baru
-    openModal(editTempData.no, 0);
+    // 2. Terapkan secara Real-Time ke Dashboard Memory State (Optimistic UI)
+    if (DATABASE && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+        const rawMonthData = DATABASE[currentYear][currentMonth];
+        const target = rawMonthData.find(s => String(s.no) === String(editTempData.no) || String(s.nama) === String(editTempData.nama));
+        
+        if (target) {
+           if (!target.rows || target.rows.length === 0) target.rows = [{}];
+           const r = target.rows[0];
+           
+           if (editTempData.kls4.tersedia) {
+               r.kls4 = { total: requestPayload.Total4, lancar: requestPayload.Lancar4, belum: requestPayload.Belum4, tidak: requestPayload.Tidak4 };
+           }
+           if (editTempData.kls5.tersedia) {
+               r.kls5 = { total: requestPayload.Total5, lancar: requestPayload.Lancar5, belum: requestPayload.Belum5, tidak: requestPayload.Tidak5 };
+           }
+           
+           if (editTempData.guru && editTempData.guru.length > 0) {
+              editTempData.guru.forEach((gName, idx) => {
+                  if (!target.rows[idx]) target.rows[idx] = {};
+                  target.rows[idx].guru = gName;
+                  target.rows[idx].hadir = editTempData.hadir[idx];
+              });
+           }
+        }
+        
+        disableEditMode();
+        renderUI(rawMonthData);
+        openModal(editTempData.id || editTempData.no, 0);
+    } else {
+        // Fallback jika memory state berantakan, reload full data
+        await loadData(currentYear, currentMonth);
+        disableEditMode();
+        closeModal();
+    }
 
   } catch (err) {
-    alert("Gagal terhubung ke Apps Script Backend: " + err.message);
+    alert("Gagal memperbarui data: " + err.message);
     btnSave.innerHTML = 'Simpan Perubahan';
     btnSave.disabled = false;
   }
@@ -4550,46 +4613,49 @@ function renderModalTab(idx) {
   const s = isEditMode ? editTempData : currentModalSchool;
   if (!s) return;
   const el = document.getElementById('modalContent');
+  if (!el) return;
   
   if (idx === 0) {
     let k4Html = '';
-    if (s.kls4.tersedia) {
+    // Null safety cek untuk kls4
+    if (s.kls4 && s.kls4.tersedia) {
       if (isEditMode) {
         k4Html = `<tr>
           <td data-label="Kelas">Kelas IV</td>
-          <td data-label="Total Siswa"><input type="number" id="e_k4_tot" class="edit-input" value="${s.kls4.tot}" oninput="onEditInput()" min="0"></td>
-          <td data-label="Lancar"><input type="number" id="e_k4_lan" class="edit-input" style="color:var(--success)" value="${s.kls4.lancar}" oninput="onEditInput()" min="0"></td>
-          <td data-label="Belum"><input type="number" id="e_k4_bel" class="edit-input" value="${s.kls4.belum}" oninput="onEditInput()" min="0"></td>
-          <td data-label="Prioritas"><input type="number" id="e_k4_pri" class="edit-input" value="${s.kls4.tidak}" oninput="onEditInput()" min="0"></td>
-          <td data-label="% Lancar" id="e_k4_pct">${pctPill(s.kls4.tot>0 ? s.kls4.lancar/s.kls4.tot*100 : 0)}</td>
+          <td data-label="Total Siswa"><input type="number" id="e_k4_tot" class="edit-input" value="${s.kls4.tot || 0}" oninput="onEditInput()" min="0"></td>
+          <td data-label="Lancar"><input type="number" id="e_k4_lan" class="edit-input" style="color:var(--success)" value="${s.kls4.lancar || 0}" oninput="onEditInput()" min="0"></td>
+          <td data-label="Belum"><input type="number" id="e_k4_bel" class="edit-input" value="${s.kls4.belum || 0}" oninput="onEditInput()" min="0"></td>
+          <td data-label="Prioritas"><input type="number" id="e_k4_pri" class="edit-input" value="${s.kls4.tidak || 0}" oninput="onEditInput()" min="0"></td>
+          <td data-label="% Lancar" id="e_k4_pct">${pctPill(s.kls4.tot>0 ? (s.kls4.lancar || 0)/s.kls4.tot*100 : 0)}</td>
         </tr>`;
       } else {
-        k4Html = `<tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls4.lancar}</td><td data-label="Belum">${s.kls4.belum}</td><td data-label="Prioritas">${s.kls4.tidak}</td><td data-label="% Lancar">${pctPill(s.kls4.tot>0 ? s.kls4.lancar/s.kls4.tot*100 : 0)}</td></tr>`;
+        k4Html = `<tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot || 0}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls4.lancar || 0}</td><td data-label="Belum">${s.kls4.belum || 0}</td><td data-label="Prioritas">${s.kls4.tidak || 0}</td><td data-label="% Lancar">${pctPill(s.kls4.tot>0 ? (s.kls4.lancar || 0)/s.kls4.tot*100 : 0)}</td></tr>`;
       }
     } else {
        k4Html = `<tr><td data-label="Kelas">Kelas IV</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Belum terdapat laporan BTQ untuk Kelas 4 pada periode ini.</span></td></tr>`;
     }
       
     let k5Html = '';
-    if (s.kls5.tersedia) {
+    // Null safety cek untuk kls5
+    if (s.kls5 && s.kls5.tersedia) {
        if (isEditMode) {
          k5Html = `<tr>
            <td data-label="Kelas">Kelas V</td>
-           <td data-label="Total Siswa"><input type="number" id="e_k5_tot" class="edit-input" value="${s.kls5.tot}" oninput="onEditInput()" min="0"></td>
-           <td data-label="Lancar"><input type="number" id="e_k5_lan" class="edit-input" style="color:var(--success)" value="${s.kls5.lancar}" oninput="onEditInput()" min="0"></td>
-           <td data-label="Belum"><input type="number" id="e_k5_bel" class="edit-input" value="${s.kls5.belum}" oninput="onEditInput()" min="0"></td>
-           <td data-label="Prioritas"><input type="number" id="e_k5_pri" class="edit-input" value="${s.kls5.tidak}" oninput="onEditInput()" min="0"></td>
-           <td data-label="% Lancar" id="e_k5_pct">${pctPill(s.kls5.tot>0 ? s.kls5.lancar/s.kls5.tot*100 : 0)}</td>
+           <td data-label="Total Siswa"><input type="number" id="e_k5_tot" class="edit-input" value="${s.kls5.tot || 0}" oninput="onEditInput()" min="0"></td>
+           <td data-label="Lancar"><input type="number" id="e_k5_lan" class="edit-input" style="color:var(--success)" value="${s.kls5.lancar || 0}" oninput="onEditInput()" min="0"></td>
+           <td data-label="Belum"><input type="number" id="e_k5_bel" class="edit-input" value="${s.kls5.belum || 0}" oninput="onEditInput()" min="0"></td>
+           <td data-label="Prioritas"><input type="number" id="e_k5_pri" class="edit-input" value="${s.kls5.tidak || 0}" oninput="onEditInput()" min="0"></td>
+           <td data-label="% Lancar" id="e_k5_pct">${pctPill(s.kls5.tot>0 ? (s.kls5.lancar || 0)/s.kls5.tot*100 : 0)}</td>
          </tr>`;
        } else {
-         k5Html = `<tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls5.lancar}</td><td data-label="Belum">${s.kls5.belum}</td><td data-label="Prioritas">${s.kls5.tidak}</td><td data-label="% Lancar">${pctPill(s.kls5.tot>0 ? s.kls5.lancar/s.kls5.tot*100 : 0)}</td></tr>`;
+         k5Html = `<tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot || 0}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls5.lancar || 0}</td><td data-label="Belum">${s.kls5.belum || 0}</td><td data-label="Prioritas">${s.kls5.tidak || 0}</td><td data-label="% Lancar">${pctPill(s.kls5.tot>0 ? (s.kls5.lancar || 0)/s.kls5.tot*100 : 0)}</td></tr>`;
        }
     } else {
        k5Html = `<tr><td data-label="Kelas">Kelas V</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Sekolah ini belum memiliki peserta aktif pada Kelas 5 untuk periode ini.</span></td></tr>`;
     }
 
     const totalLabel = selectedKelas === 'all' ? 'Total Akumulasi' : `Total (Kelas ${selectedKelas})`;
-    const totalHtml = `<tr style="font-weight:800;background:var(--surface-2)" id="e_total_row"><td data-label="Kelas">${totalLabel}</td><td data-label="Populasi">${s.tot>0?s.tot:'<span style="color:var(--text-muted)">–</span>'}</td><td data-label="Lancar" style="color:var(--success)">${s.tot>0?s.lancar:'–'}</td><td data-label="Belum">${s.tot>0?s.belum:'–'}</td><td data-label="Prioritas">${s.tot>0?s.tidak:'–'}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>`;
+    const totalHtml = `<tr style="font-weight:800;background:var(--surface-2)" id="e_total_row"><td data-label="Kelas">${totalLabel}</td><td data-label="Populasi">${s.tot>0?s.tot:'<span style="color:var(--text-muted)">–</span>'}</td><td data-label="Lancar" style="color:var(--success)">${s.tot>0?(s.lancar || 0):'–'}</td><td data-label="Belum">${s.tot>0?(s.belum || 0):'–'}</td><td data-label="Prioritas">${s.tot>0?(s.tidak || 0):'–'}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>`;
 
     el.innerHTML = `
       <table class="modal-table">
@@ -4600,31 +4666,39 @@ function renderModalTab(idx) {
           ${totalHtml}
         </tbody>
       </table>
-      ${s.warnings.length && !isEditMode ? `<div style="margin-top:16px;padding:14px 20px;background:var(--warning-dim);border-radius:12px;font-size:13.5px;color:var(--warning);border:1px solid rgba(217,119,6,.2);box-shadow:var(--shadow-sm);">⚠ Ditemukan indikasi ketidaksesuaian struktur data yang memerlukan verifikasi lanjutan terkait: <strong>${s.warnings.join(', ')}</strong></div>` : ''}
+      ${s.warnings && s.warnings.length && !isEditMode ? `<div style="margin-top:16px;padding:14px 20px;background:var(--warning-dim);border-radius:12px;font-size:13.5px;color:var(--warning);border:1px solid rgba(217,119,6,.2);box-shadow:var(--shadow-sm);">⚠ Ditemukan indikasi ketidaksesuaian struktur data yang memerlukan verifikasi lanjutan terkait: <strong>${s.warnings.join(', ')}</strong></div>` : ''}
     `;
   } else if (idx === 1) {
-    let guruHtml = s.guru.map((g, i) => {
-      if (isEditMode) {
-         return `<tr>
-           <td data-label="Guru"><input type="text" id="e_g${i}_name" class="edit-input edit-input-txt" value="${g}" oninput="onEditInput()"></td>
-           <td data-label="Kehadiran (%)"><input type="number" id="e_g${i}_hadir" class="edit-input" value="${s.hadir[i]}" max="100" min="0" oninput="onEditInput()"></td>
-           <td data-label="Status" id="e_g${i}_status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
-         </tr>`;
-      } else {
-         return `<tr>
-           <td data-label="Guru">${g}</td>
-           <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
-           <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
-         </tr>`;
-      }
-    }).join('');
+    let guruHtml = '';
+    if (s.guru && Array.isArray(s.guru) && s.hadir && Array.isArray(s.hadir)) {
+      guruHtml = s.guru.map((g, i) => {
+        const h = s.hadir[i] !== undefined ? s.hadir[i] : 0;
+        if (isEditMode) {
+           return `<tr>
+             <td data-label="Guru"><input type="text" id="e_g${i}_name" class="edit-input edit-input-txt" value="${g}" oninput="onEditInput()"></td>
+             <td data-label="Kehadiran (%)"><input type="number" id="e_g${i}_hadir" class="edit-input" value="${h}" max="100" min="0" oninput="onEditInput()"></td>
+             <td data-label="Status" id="e_g${i}_status">${h>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':h>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
+           </tr>`;
+        } else {
+           return `<tr>
+             <td data-label="Guru">${g}</td>
+             <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${h}%</td>
+             <td data-label="Status">${h>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':h>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
+           </tr>`;
+        }
+      }).join('');
+    } else {
+      guruHtml = `<tr><td colspan="3" class="c" style="color:var(--text-muted)">Data guru tidak tersedia.</td></tr>`;
+    }
+    
+    const avgHadir = s.hadir && s.hadir.length > 0 ? s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length : 0;
     
     el.innerHTML = `
       <table class="modal-table">
         <thead><tr><th>Guru Pembimbing BTQ</th><th>Kehadiran ${isEditMode?'(%)':''}</th><th>Status</th></tr></thead>
         <tbody>${guruHtml}</tbody>
       </table>
-      ${!isEditMode ? `<div style="margin-top:10px;font-size:12px;color:var(--text-tertiary)">Rata-rata kehadiran: <strong style="color:var(--text-primary)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>` : ''}
+      ${!isEditMode && s.hadir && s.hadir.length > 0 ? `<div style="margin-top:10px;font-size:12px;color:var(--text-tertiary)">Rata-rata kehadiran: <strong style="color:var(--text-primary)">${n2(avgHadir)}%</strong></div>` : ''}
     `;
   } else {
     if(isEditMode) {
@@ -4634,10 +4708,12 @@ function renderModalTab(idx) {
     
     const allP = getAllPeriods();
     const rows = allP.map(p => {
-      const raw = DATABASE[p.year][p.month];
-      const found = raw.find(r => r.no === s.no);
+      const raw = DATABASE[p.year]?.[p.month];
+      if (!raw) return null;
+      const found = raw.find(r => String(r.no) === String(s.no) || String(r.nama) === String(s.nama));
       if(!found) return null;
       const agg = aggregateSchools([found])[0];
+      if(!agg) return null;
       return { period: `${p.month} ${p.year}`, pct: agg.pct, lancar: agg.lancar, tot: agg.tot, isInc: checkIncompleteData([found]) };
     }).filter(Boolean);
     
