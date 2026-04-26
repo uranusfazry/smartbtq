@@ -1214,12 +1214,31 @@ body.dark .exec-banner { background: var(--surface-2); border: 1px solid var(--b
 .trend-empty { text-align: center; padding: 48px 24px; color: var(--text-tertiary); font-size: 13px; }
 .trend-empty-icon { font-size: 32px; margin-bottom: 10px; }
 
-/* Dark mode fixes for new trend UI */
+/* ────────────────────────────────────────────
+   PAGINATION CONTROLS (NEW FEATURE)
+──────────────────────────────────────────── */
+.pagination-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border); }
+.page-btn { padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: var(--transition-fast); border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow-xs); }
+.page-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; background: var(--surface-2); }
+.page-info { font-size: 11.5px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.5px; text-transform: uppercase; }
+
+/* Aksen Tombol Premium */
+.page-btn.top-btn:hover:not(:disabled) { color: var(--success); border-color: var(--success); background: var(--success-dim); }
+.page-btn.bot-btn:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); background: var(--danger-dim); }
+
+/* Dark mode fixes for new trend UI & pagination */
 body.dark .trend-kpi-card { background: var(--surface); border-color: var(--border); }
 body.dark .premium-row-card { background: var(--surface-2); border-color: var(--border); }
 body.dark .pr-validation { background: var(--surface); border: 1px solid var(--border); }
 body.dark .pr-validation.warning { background: rgba(217,119,6,0.1); border-color: rgba(217,119,6,0.3); color: #fcd34d; }
 body.dark .badge-prio-c { background: #475569; }
+
+body.dark .pagination-controls { border-top-color: rgba(255,255,255,0.1); }
+body.dark .page-btn { background: var(--surface-2); border-color: rgba(255,255,255,0.1); color: var(--text-secondary); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+body.dark .page-btn:disabled { background: rgba(255,255,255,0.03); color: var(--text-tertiary); border-color: rgba(255,255,255,0.05); }
+body.dark .page-btn.top-btn:hover:not(:disabled) { background: rgba(22, 163, 74, 0.15); color: #4ade80; border-color: rgba(74, 222, 128, 0.3); }
+body.dark .page-btn.bot-btn:hover:not(:disabled) { background: rgba(220, 38, 38, 0.15); color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
 
 /* ────────────────────────────────────────────
    MODAL (BASE)
@@ -1313,22 +1332,20 @@ body.dark .empty-text-desc { color: var(--text-secondary); }
   display: flex;
   align-items: center;
   gap: 16px;
-  z-index: 99999; /* Diperkuat agar pasti di atas semua elemen */
+  z-index: 99999;
   opacity: 0;
   visibility: hidden;
-  pointer-events: none; /* Mencegah klik ghost saat sedang tidak aktif */
+  pointer-events: none;
   transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s ease;
 }
 
-/* state aktif */
 .fs-prompt.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0) scale(1);
   visibility: visible;
-  pointer-events: auto; /* Hanya bisa diklik saat benar-benar muncul */
+  pointer-events: auto;
 }
 
-/* state hide */
 .fs-prompt.hide {
   opacity: 0;
   transform: translateX(-50%) translateY(12px) scale(0.98);
@@ -1389,7 +1406,6 @@ body.dark .empty-text-desc { color: var(--text-secondary); }
   box-shadow: 0 4px 12px rgba(37,99,235,0.35);
 }
 
-/* Premium Dark Mode Override for Fullscreen Prompt */
 body.dark .fs-prompt {
   background: rgba(15,23,42,0.88);
   border: 1px solid rgba(255,255,255,0.08);
@@ -1451,7 +1467,7 @@ body.dark .fs-btn-accept {
    20. RESPONSIVE BASE & MOBILE LAYOUT
 ──────────────────────────────────────────── */
 @media(max-width:900px) {
-  .header-period-group { display: none; } /* Menyembunyikan filter dr header di HP agar tidak bertumpuk */
+  .header-period-group { display: none; }
   .header-brand-sub { display: none; }
   .btn-close-fs { top: 20px; right: 20px; }
   .sidebar-inner { padding: 24px; margin-top: 24px; gap: 24px; }
@@ -1528,7 +1544,6 @@ body.dark .fs-btn-accept {
   .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
   .chart-scroll-inner { width: 100% !important; height: 320px; } 
   
-  /* Disable all reopen animations and transforms on mobile for absolute stability */
   .sidebar,
   .sidebar-inner,
   .nav-item,
@@ -1540,74 +1555,6 @@ body.dark .fs-btn-accept {
       transform: none !important;
   }
 }
-
-
-/* ────────────────────────────────────────────
-   21. ENTERPRISE DARK MODE: MOBILE + DESKTOP
-──────────────────────────────────────────── */
-body.dark tbody tr:hover { background: rgba(255,255,255,.03); }
-body.dark .exec-banner { color: var(--text-secondary); }
-body.dark .chart-card, body.dark .kpi-card, body.dark .hero-metric, body.dark .table-surface, body.dark .conclusion-card, body.dark .analysis-card { border-color: var(--border); }
-body.dark thead th, body.dark .table-toolbar, body.dark tfoot td, body.dark .hero-stat { background: var(--surface-2); }
-body.dark .insight-item, body.dark .reco-list li, body.dark .hero-stat { background: var(--surface-2); border-color: var(--border); }
-body.dark .sort-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
-body.dark .btn-detail, body.dark .search-input { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
-
-body.dark .modal-overlay { background: rgba(2, 6, 23, 0.75); backdrop-filter: blur(8px); }
-body.dark .modal-box { background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2); }
-body.dark .modal-header { background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-body.dark .modal-title { color: #f8fafc; font-weight: 700; }
-body.dark .modal-close { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; }
-body.dark .modal-close:hover { background: rgba(220, 38, 38, 0.2); border-color: rgba(220, 38, 38, 0.5); color: #fca5a5; }
-body.dark .modal-tabs { background: #162032; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-body.dark .m-tab { color: #94a3b8; }
-body.dark .m-tab:hover { color: #e2e8f0; }
-body.dark .m-tab.active { color: #60a5fa; border-bottom-color: #60a5fa; }
-body.dark .modal-table th { background: #1e293b; border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: #94a3b8; }
-body.dark .modal-table td { border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
-body.dark .hist-row { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); }
-
-body.dark .pct-pill.pill-high { background: rgba(22, 163, 74, 0.15); color: #4ade80; box-shadow: 0 0 10px rgba(22, 163, 74, 0.25); border: 1px solid rgba(74, 222, 128, 0.2); }
-body.dark .pct-pill.pill-mid { background: rgba(217, 119, 6, 0.15); color: #fbbf24; box-shadow: 0 0 10px rgba(217, 119, 6, 0.25); border: 1px solid rgba(251, 191, 36, 0.2); }
-body.dark .pct-pill.pill-low { background: rgba(220, 38, 38, 0.15); color: #f87171; box-shadow: 0 0 10px rgba(220, 38, 38, 0.25); border: 1px solid rgba(248, 113, 113, 0.2); }
-
-@media (max-width: 768px) {
-  body.dark .header { background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
-  body.dark .ham span { background: #cbd5e1; }
-  body.dark .btn-print { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; }
-  body.dark .btn-print:hover { background: rgba(255, 255, 255, 0.1); }
-  body.dark .btn-print[title="Keluar"] { background: rgba(220, 38, 38, 0.15); border-color: rgba(220, 38, 38, 0.3); color: #fca5a5; }
-  body.dark .btn-fs-toggle { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; }
-  body.dark .btn-fs-toggle:hover:not(.hide) { background: rgba(255, 255, 255, 0.1); }
-  
-  body.dark .hero-metric, body.dark .kpi-card, body.dark .chart-card, body.dark .analysis-card, body.dark .conclusion-card { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); }
-  body.dark .hero-stat { background: #162032; border: 1px solid rgba(255, 255, 255, 0.05); }
-  
-  body.dark tbody tr { background: #162032; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); }
-  body.dark tbody td { border-bottom: 1px dashed rgba(255, 255, 255, 0.04); color: #f8fafc; }
-  body.dark tbody td[data-label="Sekolah"] { border-bottom: 2px solid rgba(255, 255, 255, 0.08); }
-  body.dark tfoot tr { background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.2); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-  body.dark tfoot td { border-bottom: 1px dashed rgba(37, 99, 235, 0.15); }
-  body.dark tfoot td[data-label="Sekolah"] { border-bottom: 2px solid rgba(37, 99, 235, 0.3); color: #60a5fa; }
-  
-  body.dark .modal-table tr { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); }
-  body.dark .modal-table td { border-bottom: 1px dashed rgba(255, 255, 255, 0.06); color: #e2e8f0; }
-  body.dark .modal-table td::before { color: #94a3b8; }
-  
-  body.dark .hist-row { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
-  body.dark .hist-period { border-bottom: 1px dashed rgba(255, 255, 255, 0.06); color: #f8fafc; }
-
-  body.dark .insight-item { background: #162032; border: 1px solid rgba(255, 255, 255, 0.05); }
-  body.dark .duo-card { background: #162032; border: 1px solid rgba(255, 255, 255, 0.06); }
-  body.dark .duo-card.best { background: rgba(22, 163, 74, 0.1); border-color: rgba(22, 163, 74, 0.2); }
-  body.dark .duo-card.worst { background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.2); }
-  
-  body.dark .sort-btn { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; }
-  body.dark .sort-btn.active { background: #2563eb; border-color: #3b82f6; color: #fff; }
-  
-  body.dark .trend-controls { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); }
-}
-
 
 /* ────────────────────────────────────────────
    22. GLOBAL OVERLAY LOCK SYSTEM (ENTERPRISE UX)
@@ -1629,14 +1576,12 @@ body.overlay-lock {
   bottom: 0;
 }
 
-/* Cegah interaction background utama (hindari scroll / tap tembus) */
 body.overlay-lock .header,
 body.overlay-lock .main {
   pointer-events: none !important;
   user-select: none !important;
 }
 
-/* Hanya overlay yang aktif yang bisa merespons interaksi */
 .modal-overlay,
 .sidebar.open,
 #loginView,
@@ -1645,7 +1590,6 @@ body.overlay-lock .main {
   pointer-events: auto !important;
 }
 
-/* Pastikan area scrollable di dalam overlay tetap lancar (mobile Safari fix) */
 .modal-box,
 .sidebar-inner,
 .fs-prompt {
@@ -2365,13 +2309,13 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           </div>
         </div>
 
-        <!-- School Progress Tracking (Grid) -->
+        <!-- School Progress Tracking (Grid with Pagination) -->
         <div class="charts-2col" id="trendProgressGrid" style="display: none; margin-top: 24px;">
           <div class="chart-card" style="margin-bottom:0;">
             <div class="chart-card-header" style="border-top: 3px solid var(--success);">
               <div>
                 <div class="chart-card-title">Top Progress</div>
-                <div class="chart-card-sub">Peringkat sekolah dengan peningkatan terbaik</div>
+                <div class="chart-card-sub">Peringkat sekolah dengan peningkatan kelancaran</div>
               </div>
             </div>
             <div class="chart-card-body" style="background:var(--surface-2); padding:16px;">
@@ -2515,6 +2459,15 @@ let dashboardState = {
         kecamatan: 'all', kelas: 'all'
     }
 };
+
+// ────────────────────────────────────────────
+// NEW: PAGINATION STATE
+// ────────────────────────────────────────────
+let trendDataTop = [];
+let trendDataBot = [];
+let trendPageTop = 1;
+let trendPageBot = 1;
+const TREND_LIMIT = 10; // Batas item per halaman (single source of truth)
 
 // ────────────────────────────────────────────
 // SAFE DOM HELPERS (PREVENT NULL CRASHES)
@@ -3796,7 +3749,7 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 }
 
 // ────────────────────────────────────────────
-// TREN KOMPREHENSIF (NEW EXECUTIVE LOGIC - AUTO MODE)
+// TREN KOMPREHENSIF & PAGINATION LOGIC
 // ────────────────────────────────────────────
 function renderTrend(cakupan) {
   if (!window.MASTER_PAYLOAD || !DATABASE) return;
@@ -3925,9 +3878,10 @@ function renderTrend(cakupan) {
           });
 
           execSum = { total_sekolah: tSekolah, total_siswa_aktif: tSiswa, progress_positif: pPositif, perlu_pendampingan: pEvaluasi };
-          dynamicProgress.sort((a,b) => (b.progress?.persen || 0) - (a.progress?.persen || 0));
-          topList = dynamicProgress.slice(0, 10);
-          botList = [...dynamicProgress].reverse().slice(0, 10);
+          
+          // Mempersiapkan list data utuh untuk Pagination UI, tanpa diiris menjadi 10
+          topList = [...dynamicProgress]; 
+          botList = [...dynamicProgress];
       } else {
           // Mode Snapshot
           const pTarget = validPeriods[0];
@@ -4037,7 +3991,7 @@ function renderTrend(cakupan) {
           });
       }
 
-      // --- 5. SCHOOL PROGRESS TRACKING ---
+      // --- 5. SCHOOL PROGRESS TRACKING WITH PAGINATION ---
       if (validPeriods.length < 2) {
           if(progressGrid) progressGrid.style.display = 'none';
           if(conclusionCard) conclusionCard.style.display = 'none';
@@ -4046,6 +4000,7 @@ function renderTrend(cakupan) {
       
       if(progressGrid) progressGrid.style.display = 'grid';
 
+      // Render Single Premium Card
       const renderPremiumCard = (item, isTop) => {
           if (!item) return '';
           const prog = item.progress || {};
@@ -4117,20 +4072,82 @@ function renderTrend(cakupan) {
           `;
       };
 
+      // Pagination Handlers
+      window.changeTrendPage = function(type, direction) {
+          if (type === 'top') {
+              trendPageTop += direction;
+              renderTrendList('top');
+          } else {
+              trendPageBot += direction;
+              renderTrendList('bot');
+          }
+      };
+
+      function renderPaginationControls(type, currentPage, totalItems) {
+          const totalPages = Math.ceil(totalItems / TREND_LIMIT) || 1;
+          const isPrevDisabled = currentPage === 1;
+          const isNextDisabled = currentPage === totalPages;
+          const btnClass = type === 'top' ? 'top-btn' : 'bot-btn';
+
+          if (totalItems <= TREND_LIMIT) return ''; // Tidak perlu tombol jika data <= 10
+
+          return `
+          <div class="pagination-controls">
+              <button class="page-btn ${btnClass}" onclick="changeTrendPage('${type}', -1)" ${isPrevDisabled ? 'disabled' : ''}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  Previous
+              </button>
+              <div class="page-info">Page ${currentPage} of ${totalPages}</div>
+              <button class="page-btn ${btnClass}" onclick="changeTrendPage('${type}', 1)" ${isNextDisabled ? 'disabled' : ''}>
+                  Next
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+          </div>
+          `;
+      }
+
+      function renderTrendList(type) {
+          const listContainer = document.getElementById(type === 'top' ? 'trendTopList' : 'trendBotList');
+          if (!listContainer) return;
+
+          const data = type === 'top' ? trendDataTop : trendDataBot;
+          const page = type === 'top' ? trendPageTop : trendPageBot;
+          const emptyMsg = type === 'top' 
+              ? `<div class="trend-empty"><div class="trend-empty-icon">📈</div>Belum ada sekolah yang mencatat tren progres positif di rentang ini.</div>`
+              : `<div class="trend-empty"><div class="trend-empty-icon">🏆</div>Seluruh sekolah berhasil mempertahankan atau meningkatkan performanya.</div>`;
+
+          if (data.length === 0) {
+              listContainer.innerHTML = emptyMsg;
+              return;
+          }
+
+          const startIndex = (page - 1) * TREND_LIMIT;
+          const paginatedItems = data.slice(startIndex, startIndex + TREND_LIMIT);
+          
+          let html = paginatedItems.map(item => renderPremiumCard(item, type === 'top')).join('');
+          html += renderPaginationControls(type, page, data.length);
+          
+          // Smooth render transition
+          listContainer.style.opacity = '0';
+          setTimeout(() => {
+              listContainer.innerHTML = html;
+              listContainer.style.transition = 'opacity 0.3s ease';
+              listContainer.style.opacity = '1';
+          }, 150);
+      }
+
+      // Memisahkan dan mengurutkan data untuk Top & Bot secara penuh (Single Source of Truth)
+      trendDataTop = topList.filter(s => (s.progress?.persen || 0) > 0).sort((a,b) => b.progress.persen - a.progress.persen);
+      trendDataBot = botList.filter(s => (s.progress?.persen || 0) <= 0).sort((a,b) => a.progress.persen - b.progress.persen);
+      
+      trendPageTop = 1;
+      trendPageBot = 1;
+
+      // Render lists
       const topEl = document.getElementById('trendTopList');
       const botEl = document.getElementById('trendBotList');
-
-      if (topEl) {
-          const realTopList = topList.filter(s => (s.progress?.persen || 0) > 0);
-          if (realTopList.length > 0) topEl.innerHTML = realTopList.map(s => renderPremiumCard(s, true)).join('');
-          else topEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📈</div>Belum ada sekolah yang mencatat tren progres positif di rentang ini.</div>`;
-      }
-
-      if (botEl) {
-          const realBotList = botList.filter(s => (s.progress?.persen || 0) <= 0);
-          if (realBotList.length > 0) botEl.innerHTML = realBotList.map(s => renderPremiumCard(s, false)).join('');
-          else botEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">🏆</div>Seluruh sekolah berhasil mempertahankan atau meningkatkan performanya.</div>`;
-      }
+      if (topEl) renderTrendList('top');
+      if (botEl) renderTrendList('bot');
 
       // --- 6. EXECUTIVE CONCLUSION AUTO GENERATION ---
       if(conclusionCard) conclusionCard.style.display = 'block';
