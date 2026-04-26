@@ -566,8 +566,6 @@ body.dark .log-theme-toggle:hover {
 .header-brand-dot { color: var(--primary); }
 .header-brand-sub { font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.2px; }
 .header-sep { width: 1px; height: 24px; background: var(--border); margin: 0 8px; }
-.header-period-group { display: flex; align-items: center; gap: 12px; }
-.period-label { font-size: 11.5px; color: var(--text-tertiary); font-weight: 500; letter-spacing: .2px; }
 
 /* Dark mode toggle button */
 #darkToggleBtn {
@@ -588,8 +586,8 @@ body.dark .log-theme-toggle:hover {
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 8px 40px 8px 14px;
-  font-size: 13px;
+  padding: 10px 40px 10px 14px;
+  font-size: 13.5px;
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
@@ -704,11 +702,9 @@ body.dark .sel:focus {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  /* Updated transitions for stability */
   transition: opacity 0.25s ease, visibility 0.25s;
   overflow-y: auto;
   
-  /* Global Font Stabilizer for Sidebar */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   backface-visibility: hidden;
@@ -744,13 +740,11 @@ body.dark .sidebar {
   flex-direction: column;
   gap: 36px;
   
-  /* HAPUS TRANSFORM & DELAY UNTUK STABILITAS */
   transform: none;
   opacity: 0;
   margin: auto;
   transition: opacity 0.25s ease;
   
-  /* FONT RENDERING STABILIZER 3D */
   transform-style: preserve-3d;
 }
 
@@ -778,7 +772,6 @@ body.dark .sidebar {
   z-index: 2010;
   box-shadow: var(--shadow-sm);
   
-  /* HAPUS TRANSFORM (ROTATE/SCALE) UNTUK STABILITAS */
   opacity: 0;
   transform: none;
   transition: background 0.2s ease, color 0.2s ease, opacity 0.25s ease;
@@ -795,7 +788,7 @@ body.dark .sidebar {
   background: var(--danger-dim);
   color: var(--danger);
   border-color: rgba(220, 38, 38, 0.3);
-  transform: none; /* NO ROTATE/SCALE ON HOVER */
+  transform: none; 
 }
 
 body.dark .btn-close-fs {
@@ -855,7 +848,7 @@ body.dark .btn-close-fs {
   background: var(--surface);
   border-color: var(--border);
   color: var(--text-primary);
-  transform: none; /* HAPUS TRANSLATE Y */
+  transform: none; 
   box-shadow: var(--shadow-sm);
 }
 body.dark .nav-item:hover {
@@ -892,39 +885,9 @@ body.dark .nav-icon { background: rgba(0,0,0,0.2); }
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 .nav-item:hover .nav-icon {
-  transform: none; /* HAPUS ROTATE/SCALE */
+  transform: none; 
 }
 
-/* Premium Filter Area in Menu */
-.sidebar-filter {
-  margin-top: 16px;
-  padding: 24px;
-  background: var(--surface);
-  border-radius: var(--r-xl);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-}
-body.dark .sidebar-filter {
-  background: var(--surface-2);
-}
-.sidebar-filter-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  margin-bottom: 16px;
-  display: block;
-  text-align: center;
-}
-.sidebar-filter select {
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 12px 16px;
-  font-size: 14.5px;
-  height: auto;
-  border-radius: var(--r-md);
-}
 
 /* ────────────────────────────────────────────
    8. MAIN CONTENT AREA
@@ -933,6 +896,47 @@ body.dark .sidebar-filter {
 .view { display: none; animation: viewEnter 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
 .view.active { display: block; }
 @keyframes viewEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ────────────────────────────────────────────
+   NEW PREMIUM FILTER SECTION (LABEL-LESS DESIGN)
+──────────────────────────────────────────── */
+.premium-filter-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease;
+}
+body.dark .premium-filter-section {
+  background: #162032; /* Sesuai dengan referensi gambar dark mode */
+  border-color: rgba(255,255,255,0.06);
+}
+
+/* Segmented Control Premium */
+.segmented-control { display: flex; background: var(--surface-2); padding: 4px; border-radius: var(--r-md); border: 1px solid var(--border); width: fit-content; margin: 0 auto 20px; }
+.seg-btn { flex: 1; padding: 8px 24px; font-size: 13px; font-weight: 600; color: var(--text-secondary); background: transparent; border: none; border-radius: var(--r-sm); cursor: pointer; transition: var(--transition-fast); }
+.seg-btn.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); }
+body.dark .seg-btn { color: var(--text-secondary); }
+body.dark .seg-btn.active { background: var(--surface); color: #60a5fa; border: 1px solid rgba(255,255,255,0.05); }
+
+/* Preset Group Premium */
+.preset-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-2); }
+.preset-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-size: 11.5px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: var(--transition-fast); }
+.preset-btn:hover { background: var(--primary-dim); color: var(--primary); border-color: rgba(37,99,235,0.3); transform: translateY(-1px); }
+.preset-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
+body.dark .preset-group { border-top-color: var(--border); }
+body.dark .preset-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
+body.dark .preset-btn:hover { background: rgba(37,99,235,0.15); color: #60a5fa; border-color: rgba(37,99,235,0.4); }
+body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #3b82f6; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+/* Validation Alert */
+.validation-alert { display: none; align-items: center; gap: 8px; padding: 10px 14px; border-radius: var(--r-sm); font-size: 12px; font-weight: 500; background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.2); margin-top: 12px; animation: fadeInMsg 0.25s ease-out; }
+.validation-alert.show { display: flex; }
 
 /* ────────────────────────────────────────────
    9. PAGE HEADER
@@ -1807,6 +1811,48 @@ body.dark .loading-progress-value {
   .global-loading { display: none !important; }
   .log-theme-switch { display: none !important; }
 }
+
+/* ────────────────────────────────────────────
+   NEW PREMIUM FILTER SECTION (LABEL-LESS DESIGN)
+──────────────────────────────────────────── */
+.premium-filter-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease;
+}
+body.dark .premium-filter-section {
+  background: #162032; /* Sesuai dengan referensi gambar dark mode */
+  border-color: rgba(255,255,255,0.06);
+}
+
+/* Segmented Control Premium */
+.segmented-control { display: flex; background: var(--surface-2); padding: 4px; border-radius: var(--r-md); border: 1px solid var(--border); width: fit-content; margin: 0 auto 20px; }
+.seg-btn { flex: 1; padding: 8px 24px; font-size: 13px; font-weight: 600; color: var(--text-secondary); background: transparent; border: none; border-radius: var(--r-sm); cursor: pointer; transition: var(--transition-fast); }
+.seg-btn.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); }
+body.dark .seg-btn { color: var(--text-secondary); }
+body.dark .seg-btn.active { background: var(--surface); color: #60a5fa; border: 1px solid rgba(255,255,255,0.05); }
+
+/* Preset Group Premium */
+.preset-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-2); }
+.preset-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-size: 11.5px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: var(--transition-fast); }
+.preset-btn:hover { background: var(--primary-dim); color: var(--primary); border-color: rgba(37,99,235,0.3); transform: translateY(-1px); }
+.preset-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
+body.dark .preset-group { border-top-color: var(--border); }
+body.dark .preset-btn { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
+body.dark .preset-btn:hover { background: rgba(37,99,235,0.15); color: #60a5fa; border-color: rgba(37,99,235,0.4); }
+body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #3b82f6; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+/* Validation Alert */
+.validation-alert { display: none; align-items: center; gap: 8px; padding: 10px 14px; border-radius: var(--r-sm); font-size: 12px; font-weight: 500; background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.2); margin-top: 12px; animation: fadeInMsg 0.25s ease-out; }
+.validation-alert.show { display: flex; }
+
 </style>
 </head>
 <body>
@@ -1984,23 +2030,64 @@ body.dark .loading-progress-value {
           </button>
         </nav>
 
-        <div class="sidebar-filter">
-          <span class="sidebar-filter-label">Filter Wilayah & Periode</span>
-          <select class="sel select" id="sbKecamatan">
-            <option value="all">Semua Kecamatan</option>
-            <option value="Langensari">Langensari</option>
-            <option value="Purwaharja">Purwaharja</option>
-            <option value="Pataruman">Pataruman</option>
-            <option value="Banjar">Banjar</option>
-          </select>
-          <select class="sel" id="sbKelas" style="margin-top:12px; width:100%;">
-            <option value="all">Semua (Kelas 4 & 5)</option>
-            <option value="4">Hanya Kelas 4</option>
-            <option value="5">Hanya Kelas 5</option>
-          </select>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
-            <select class="sel" id="sbYear"></select>
-            <select class="sel" id="sbMonth"></select>
+        <!-- ══ FILTER WILAYAH & PERIODE DIPINDAHKAN KE SINI (HAMBURGER MENU) ══ -->
+        <div class="premium-filter-section" id="masterFilterSection" style="margin-top: 16px; margin-bottom: 0; width: 100%; max-width: 100%;">
+          <div class="tc-label" style="text-align:center; display:block; margin-bottom:20px; letter-spacing:1.5px;">FILTER WILAYAH & PERIODE</div>
+          
+          <!-- Premium Segmented Control -->
+          <div class="segmented-control" style="margin-bottom: 20px;">
+             <button class="seg-btn active" id="modeSingleBtn" onclick="setPeriodMode('single')">1 Bulan</button>
+             <button class="seg-btn" id="modeRangeBtn" onclick="setPeriodMode('range')">Rentang Waktu</button>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:16px;">
+             <!-- Wilayah & Kelas -->
+             <select class="sel" id="mfKecamatan" onchange="resetPresets()">
+                <option value="all">Semua Kecamatan</option>
+                <option value="Langensari">Langensari</option>
+                <option value="Purwaharja">Purwaharja</option>
+                <option value="Pataruman">Pataruman</option>
+                <option value="Banjar">Banjar</option>
+             </select>
+             
+             <select class="sel" id="mfKelas" onchange="resetPresets()">
+                <option value="all">Semua (Kelas 4 & 5)</option>
+                <option value="4">Hanya Kelas 4</option>
+                <option value="5">Hanya Kelas 5</option>
+             </select>
+
+             <!-- Periode Awal -->
+             <div id="groupAwalLabel" style="display:none; font-size:11px; color:var(--text-tertiary); text-align:center; font-weight:600; letter-spacing: 0.5px;">DARI PERIODE</div>
+             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" id="groupAwal">
+                <select class="sel" id="mfAwalTahun" onchange="validateFilter(); resetPresets()"></select>
+                <select class="sel" id="mfAwalBulan" onchange="validateFilter(); resetPresets()"></select>
+             </div>
+
+             <!-- Periode Akhir -->
+             <div id="groupAkhirLabel" style="display: none; font-size:11px; color:var(--text-tertiary); text-align:center; font-weight:600; letter-spacing: 0.5px;">SAMPAI DENGAN</div>
+             <div style="display: none; grid-template-columns: 1fr 1fr; gap: 12px;" id="groupAkhir">
+                <select class="sel" id="mfAkhirTahun" onchange="validateFilter(); resetPresets()"></select>
+                <select class="sel" id="mfAkhirBulan" onchange="validateFilter(); resetPresets()"></select>
+             </div>
+             
+             <!-- Validation Alert -->
+             <div class="validation-alert" id="filterValidationMsg">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>Periode awal tidak boleh lebih besar dari periode akhir.</span>
+             </div>
+             
+             <button class="btn-submit" id="btnApplyFilter" onclick="applyMasterFilter()" style="margin-top: 8px; justify-content:center; width: 100%; height:44px; font-size:13.5px; border-radius: 12px;">
+                Terapkan Filter
+             </button>
+
+             <!-- Quick Preset -->
+             <div class="preset-group">
+                <button class="preset-btn active" id="preset1" onclick="setPreset(1)">1 Bulan</button>
+                <button class="preset-btn" id="preset3" onclick="setPreset(3)">3 Bulan</button>
+                <button class="preset-btn" id="preset6" onclick="setPreset(6)">6 Bulan</button>
+                <button class="preset-btn" id="preset12" onclick="setPreset(12)">12 Bulan</button>
+                <button class="preset-btn" id="presetAll" onclick="setPreset('all')">Seluruh Waktu</button>
+             </div>
           </div>
         </div>
       </div>
@@ -2236,43 +2323,6 @@ body.dark .loading-progress-value {
           </div>
         </div>
 
-        <!-- Control Panel -->
-        <div class="trend-controls">
-          <div class="tc-row">
-            <div class="tc-group">
-              <label class="tc-label">Mode Analisis</label>
-              <select id="trendMode" class="sel" style="min-width: 240px;" onchange="handleTrendModeChange()">
-                <option value="seluruh">Seluruh Waktu (Awal s.d. Sekarang)</option>
-                <option value="tahunan">Agregat Tahunan (Yearly)</option>
-                <option value="kustom">Rentang Periode Kustom</option>
-              </select>
-            </div>
-
-            <!-- Custom Selectors -->
-            <div id="tcCustomGroup" style="display:none; gap:20px; flex-wrap:wrap;">
-              <div class="tc-group">
-                <label class="tc-label">Dari Periode</label>
-                <div style="display:flex; gap:8px;">
-                  <select id="tDariBulan" class="sel" onchange="updateTrendView()"></select>
-                  <select id="tDariTahun" class="sel" onchange="updateTrendView()"></select>
-                </div>
-              </div>
-              <div class="tc-group">
-                <label class="tc-label">Sampai Periode</label>
-                <div style="display:flex; gap:8px;">
-                  <select id="tSampaiBulan" class="sel" onchange="updateTrendView()"></select>
-                  <select id="tSampaiTahun" class="sel" onchange="updateTrendView()"></select>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div id="trendWarning" class="error-msg" style="margin-top:0; padding:8px 14px; display:none;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <strong>Validasi Gagal:</strong> Periode 'Sampai' tidak boleh lebih awal dari periode 'Dari'.
-          </div>
-        </div>
-
         <!-- NEW: Executive Summary KPI Grid -->
         <div class="trend-kpi-grid" id="trendKpiGrid" style="display: none;">
             <div class="trend-kpi-card tk-card-blue">
@@ -2401,7 +2451,6 @@ body.dark .loading-progress-value {
     <span>Untuk pengalaman dashboard yang lebih optimal.</span>
   </div>
   <div class="fs-prompt-actions">
-    <!-- Perbaikan nama fungsi & deklarasi type="button" agar klik akurat -->
     <button type="button" class="fs-btn-dismiss" onclick="hideFullscreenPrompt(true)">Nanti</button>
     <button type="button" class="fs-btn-accept" onclick="acceptFullscreenPrompt()">Aktifkan</button>
   </div>
@@ -2456,6 +2505,16 @@ let isLoading = false;
 
 // Trend State
 let isTrendInitialized = false;
+
+// STATE FILTER TERPUSAT
+let dashboardState = {
+    filterMode: 'single', 
+    filter: {
+        fromMonth: '', fromYear: '',
+        toMonth: '', toYear: '',
+        kecamatan: 'all', kelas: 'all'
+    }
+};
 
 // ────────────────────────────────────────────
 // SAFE DOM HELPERS (PREVENT NULL CRASHES)
@@ -2540,7 +2599,6 @@ async function showDashboardView() {
   unlockOverlayBackground(true); // Lepas lock setelah login
   
   // Inisialisasi event dan ambil data
-  setupEventListeners(); 
   initFullscreenSystem();
   await initDashboard();
 }
@@ -2666,43 +2724,44 @@ function setupLoginLogic() {
 // ────────────────────────────────────────────
 // DASHBOARD DATA INIT & EVENT LISTENERS
 // ────────────────────────────────────────────
+
+// backend sync filter
+async function fetchDashboardData(isInit = false) {
+    const url = new URL(API_URL);
+    url.searchParams.append('action', 'dashboard');
+    
+    // Pastikan parameter dari URL selalu disisipkan, kecuali saat inisialisasi awal.
+    if (!isInit) {
+        url.searchParams.append('fromMonth', dashboardState.filter.fromMonth);
+        url.searchParams.append('fromYear', dashboardState.filter.fromYear);
+        url.searchParams.append('toMonth', dashboardState.filter.toMonth);
+        url.searchParams.append('toYear', dashboardState.filter.toYear);
+        url.searchParams.append('kecamatan', dashboardState.filter.kecamatan);
+        url.searchParams.append('kelas', dashboardState.filter.kelas);
+    }
+
+    const res = await fetch(url.toString());
+    return await res.json();
+}
+
 async function initDashboard() {
   if (isLoading) return;
   try {
     showLoading("Menyinkronkan Dashboard", "Mengambil data inisial dari server...");
-    const [res] = await Promise.all([
-        fetch(API_URL),
+    const [resData] = await Promise.all([
+        fetchDashboardData(true), // Single source of truth fetcher
         new Promise(resolve => setTimeout(resolve, 800))
     ]);
     
-    // Pastikan fetch selesai dan parse JSON
-    const rawData = await res.json();
+    window.MASTER_PAYLOAD = resData; 
+    DATABASE = resData.grouped_data || resData; 
+
+    // Setup Filter Dropdowns
+    initMasterFilterDropdowns();
     
-    // Simpan seluruh object backend ke state global
-    window.MASTER_PAYLOAD = rawData; 
-    
-    // Antisipasi nested grouped_data dari backend baru, atau fallback ke root jika backend lama
-    DATABASE = rawData.grouped_data || rawData; 
+    // Auto trigger 1 Bulan preset filter (single month mode)
+    setPreset(1);
 
-    // Setup tahun default
-    const years = Object.keys(DATABASE).sort((a, b) => b - a);
-    if (years.length > 0) {
-      currentYear = years[0];
-      
-      const availableMonths = MONTH_ORDER.filter(m => DATABASE[currentYear][m]);
-      if (availableMonths.length > 0) {
-        currentMonth = availableMonths[availableMonths.length - 1];
-      }
-    }
-
-    initYearDropdown();
-    initMonthDropdown();
-
-    if (currentYear && currentMonth && DATABASE[currentYear][currentMonth]) {
-      renderUI(DATABASE[currentYear][currentMonth]);
-    } else {
-      showEmpty();
-    }
   } catch (err) {
     console.error("Init Error:", err);
     showError();
@@ -2712,63 +2771,182 @@ async function initDashboard() {
 }
 
 function setupEventListeners() {
-  const sbTahun = document.getElementById("sbYear");
-  const sbBulan = document.getElementById("sbMonth");
-  const sbKec = document.getElementById("sbKecamatan");
-  const sbKelas = document.getElementById("sbKelas");
-
-  const handleYearChange = (e) => {
-    if (isLoading) { e.preventDefault(); return; }
-    currentYear = e.target.value;
-    if (sbTahun) sbTahun.value = currentYear;
-    
-    initMonthDropdown(); 
-    loadData(currentYear, currentMonth);
-  };
-
-  const handleMonthChange = (e) => {
-    if (isLoading) { e.preventDefault(); return; }
-    currentMonth = e.target.value;
-    if (sbBulan) sbBulan.value = currentMonth;
-    
-    loadData(currentYear, currentMonth);
-  };
-
-  const handleKecChange = (e) => {
-    if (isLoading) { e.preventDefault(); return; }
-    selectedKecamatan = e.target.value;
-    if (sbKec) sbKec.value = selectedKecamatan;
-    
-    stackDisplayMode = selectedKecamatan === 'all' ? 'top20' : 'all';
-    
-    if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-        triggerLocalLoading(
-          `Memfilter ${selectedKecamatan === 'all' ? 'Semua Wilayah' : 'Kec. ' + selectedKecamatan}`, 
-          "Menerapkan konfigurasi filter pada dashboard...",
-          () => { renderUI(DATABASE[currentYear][currentMonth]); }
-        );
-    }
-  };
-
-  const handleKelasChange = (e) => {
-    if (isLoading) { e.preventDefault(); return; }
-    selectedKelas = e.target.value;
-    
-    if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-        const namaKelas = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
-        triggerLocalLoading(
-          `Memfilter Data ${namaKelas}`, 
-          "Menyinkronkan ulang metrik dashboard...",
-          () => { renderUI(DATABASE[currentYear][currentMonth]); }
-        );
-    }
-  };
-
-  if (sbTahun) sbTahun.onchange = handleYearChange;
-  if (sbBulan) sbBulan.onchange = handleMonthChange;
-  if (sbKec) sbKec.onchange = handleKecChange;
-  if (sbKelas) sbKelas.onchange = handleKelasChange;
+  // Fungsi sinkronisasi ganda dikosongkan karena UI filter kini terpusat (Single UI) 
+  // di dalam Menu Fullscreen Hamburger saja.
 }
+
+// ────────────────────────────────────────────
+// NEW: LOGIKA FILTER PREMIUM (1 BULAN & RENTANG)
+// ────────────────────────────────────────────
+
+// Helper to remove active state from quick presets
+function resetPresets() {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+}
+
+// single month mode & range period mode
+function setPeriodMode(mode) {
+    dashboardState.filterMode = mode;
+    document.getElementById('modeSingleBtn').classList.toggle('active', mode === 'single');
+    document.getElementById('modeRangeBtn').classList.toggle('active', mode === 'range');
+    
+    document.getElementById('groupAkhir').style.display = mode === 'range' ? 'grid' : 'none';
+    document.getElementById('groupAkhirLabel').style.display = mode === 'range' ? 'block' : 'none';
+    document.getElementById('groupAwalLabel').style.display = mode === 'range' ? 'block' : 'none';
+    
+    validateFilter();
+}
+
+// validation range period
+function validateFilter() {
+    const mode = dashboardState.filterMode;
+    const btn = document.getElementById('btnApplyFilter');
+    const msg = document.getElementById('filterValidationMsg');
+    
+    if (mode === 'single') {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        msg.classList.remove('show');
+        return true;
+    }
+
+    const vAwal = getPeriodValue(document.getElementById('mfAwalTahun').value, document.getElementById('mfAwalBulan').value);
+    const vAkhir = getPeriodValue(document.getElementById('mfAkhirTahun').value, document.getElementById('mfAkhirBulan').value);
+
+    // Auto validation logic: mencegah klik fetch apabila end_date lebih kecil dari start_date
+    if (vAwal > vAkhir) {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        msg.classList.add('show');
+        return false;
+    } else {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        msg.classList.remove('show');
+        return true;
+    }
+}
+
+// quick preset filter
+function setPreset(val) {
+    // Menghapus styling active di seluruh list preset
+    resetPresets();
+    
+    const allP = getAllPeriods();
+    if (allP.length === 0) return;
+
+    // Default target merupakan periode pencatatan terbaru dari data server
+    const latest = allP[allP.length - 1];
+    
+    if (val === 1) {
+        document.getElementById('preset1').classList.add('active');
+        setPeriodMode('single');
+        document.getElementById('mfAwalBulan').value = latest.month;
+        document.getElementById('mfAwalTahun').value = latest.year;
+    } else {
+        const btnMap = {3: 'preset3', 6: 'preset6', 12: 'preset12', 'all': 'presetAll'};
+        if (btnMap[val]) document.getElementById(btnMap[val]).classList.add('active');
+        
+        setPeriodMode('range');
+        document.getElementById('mfAkhirBulan').value = latest.month;
+        document.getElementById('mfAkhirTahun').value = latest.year;
+
+        if (val === 'all') {
+            const oldest = allP[0];
+            document.getElementById('mfAwalBulan').value = oldest.month;
+            document.getElementById('mfAwalTahun').value = oldest.year;
+        } else {
+            const targetIndex = Math.max(0, allP.length - val);
+            const start = allP[targetIndex];
+            document.getElementById('mfAwalBulan').value = start.month;
+            document.getElementById('mfAwalTahun').value = start.year;
+        }
+    }
+
+    // Eksekusi API secara mulus setelah Quick Preset memvalidasi data form
+    if(validateFilter()) {
+        applyMasterFilter(); 
+    }
+}
+
+function initMasterFilterDropdowns() {
+    const allP = getAllPeriods(); 
+    if (allP.length === 0) return;
+
+    const years = [...new Set(allP.map(p => p.year))].sort((a,b) => b - a);
+    const months = MONTH_ORDER;
+
+    const pop = (id, arr) => {
+        const el = document.getElementById(id);
+        if(el) el.innerHTML = arr.map(v => `<option value="${v}">${v}</option>`).join('');
+    };
+
+    pop('mfAwalBulan', months);
+    pop('mfAwalTahun', years);
+    pop('mfAkhirBulan', months);
+    pop('mfAkhirTahun', years);
+}
+
+async function applyMasterFilter() {
+    if (!validateFilter()) return;
+
+    const mode = dashboardState.filterMode;
+    const mfAwalBulan = document.getElementById('mfAwalBulan').value;
+    const mfAwalTahun = document.getElementById('mfAwalTahun').value;
+    const mfKec = document.getElementById('mfKecamatan').value;
+    const mfKelas = document.getElementById('mfKelas').value;
+
+    let mfAkhirBulan = mfAwalBulan;
+    let mfAkhirTahun = mfAwalTahun;
+
+    // Jika masuk mode range period, ubah value dari UI Akhir
+    if (mode === 'range') {
+        mfAkhirBulan = document.getElementById('mfAkhirBulan').value;
+        mfAkhirTahun = document.getElementById('mfAkhirTahun').value;
+    }
+
+    // Menyetel Parameter Global Dashboard State ke Parameter URL Sync Backend
+    dashboardState.filter = {
+        fromMonth: mfAwalBulan, fromYear: mfAwalTahun,
+        toMonth: mfAkhirBulan, toYear: mfAkhirTahun,
+        kecamatan: mfKec, kelas: mfKelas
+    };
+
+    // Sinkronisasi state komponen rendering lama (Safe Refactor)
+    selectedKecamatan = mfKec;
+    selectedKelas = mfKelas;
+    currentMonth = mfAkhirBulan;
+    currentYear = mfAkhirTahun;
+
+    // Tutup panel Hamburger Menu secara otomatis setelah tombol diklik
+    closeSidebar();
+
+    showLoading("Menerapkan Filter Data", "Menyinkronkan data validasi dengan server...");
+    
+    try {
+        const rawData = await fetchDashboardData(false);
+        window.MASTER_PAYLOAD = rawData;
+        DATABASE = rawData.grouped_data || rawData;
+
+        if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+            renderUI(DATABASE[currentYear][currentMonth]);
+        } else {
+            showEmpty();
+            if(document.getElementById('view-trend').classList.contains('active')) {
+                renderTrend(mfKec === 'all' ? 'Kota Banjar' : `Kec. ${mfKec}`);
+            }
+        }
+    } catch(e) {
+        console.error("Filter apply error:", e);
+        showError();
+    } finally {
+        hideLoading();
+    }
+}
+
 
 // ────────────────────────────────────────────
 // FULLSCREEN TRUE API SYSTEM
@@ -2927,37 +3105,6 @@ function renderSkeletonUI() {
     }
 }
 
-async function loadData(year, month) {
-  if (isLoading) return;
-  try {
-    showLoading(
-       `Memuat Data ${month} ${year}`, 
-       "Menarik data langsung dari sistem rekapitulasi utama..."
-    );
-    
-    const [res] = await Promise.all([
-        fetch(API_URL),
-        new Promise(resolve => setTimeout(resolve, 800))
-    ]);
-    
-    const rawData = await res.json();
-    
-    window.MASTER_PAYLOAD = rawData; 
-    DATABASE = rawData.grouped_data || rawData;
-
-    if (!DATABASE[year] || !DATABASE[year][month]) {
-      showEmpty();
-    } else {
-      renderUI(DATABASE[year][month]);
-    }
-  } catch (err) {
-    console.error("Fetch API Error:", err);
-    showError();
-  } finally {
-    hideLoading();
-  }
-}
-
 function showError() {
   safeSetText("r-title", "Tidak dapat mengambil data dari server");
   safeSetText("r-subtitle", "Terjadi masalah koneksi atau konfigurasi API.");
@@ -2970,39 +3117,8 @@ function showEmpty() {
   safeSetText("r-title", "Data belum tersedia pada periode ini");
   safeSetText("r-subtitle", `Data kosong untuk ${currentMonth} ${currentYear}`);
   safeSetHTML("hero-pct", `-<sup>%</sup>`);
-  safeSetHTML("hero-desc", "Silakan pilih bulan atau tahun lain pada menu.");
-  safeSetHTML("tableBody", `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di periode tersebut</td></tr>`);
-}
-
-// ────────────────────────────────────────────
-// DROPDOWN RENDERERS
-// ────────────────────────────────────────────
-function initYearDropdown() {
-  const years = Object.keys(DATABASE).sort((a, b) => b - a);
-  const opts = years.map(y => `<option value="${y}">${y}</option>`).join("");
-  
-  const sbY = document.getElementById("sbYear");
-  if (sbY) { sbY.innerHTML = opts; sbY.value = currentYear; }
-}
-
-function initMonthDropdown() {
-  const availableMonths = DATABASE[currentYear] || {};
-  const months = MONTH_ORDER.filter(m => availableMonths[m]);
-
-  if (months.length === 0) {
-    const noOpt = '<option value="">- Kosong -</option>';
-    if (document.getElementById("sbMonth")) document.getElementById("sbMonth").innerHTML = noOpt;
-    return;
-  }
-
-  if (!months.includes(currentMonth)) {
-    currentMonth = months[0];
-  }
-
-  const opts = months.map(m => `<option value="${m}">${m}</option>`).join("");
-  
-  const sbM = document.getElementById("sbMonth");
-  if (sbM) { sbM.innerHTML = opts; sbM.value = currentMonth; }
+  safeSetHTML("hero-desc", "Silakan pilih rentang periode lain pada menu filter di atas.");
+  safeSetHTML("tableBody", `<tr><td colspan="9" class="c" style="color:var(--text-tertiary)">Data tidak tersedia di rentang periode tersebut</td></tr>`);
 }
 
 // ────────────────────────────────────────────
@@ -3133,12 +3249,9 @@ function showSection(id) {
   });
   closeSidebar();
   
-  // Jika menu Trend dibuka, inisialisasi kontrol jika belum
+  // Jika menu Trend dibuka, pastikan render pakai filter terkini
   if (id === 'view-trend') {
-      if (!isTrendInitialized) {
-          initTrendControls();
-      }
-      renderTrend(selectedKecamatan); // Pastikan render pakai filter terkini
+      renderTrend(selectedKecamatan); 
   }
   
   window.dispatchEvent(new Event('resize'));
@@ -3287,7 +3400,6 @@ function renderUI(data) {
     renderCharts(T, allSchoolsAggr, pct, cakupan, isAll);
     
     if(document.getElementById('view-trend') && document.getElementById('view-trend').classList.contains('active')) {
-        if(!isTrendInitialized) initTrendControls();
         renderTrend(cakupan);
     }
 
@@ -3684,63 +3796,8 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
 }
 
 // ────────────────────────────────────────────
-// TREN KOMPREHENSIF (NEW EXECUTIVE LOGIC)
+// TREN KOMPREHENSIF (NEW EXECUTIVE LOGIC - AUTO MODE)
 // ────────────────────────────────────────────
-function initTrendControls() {
-    const allP = getAllPeriods();
-    if(allP.length === 0) return;
-    
-    // Sort chronologically
-    allP.sort((a,b) => getPeriodValue(a.year, a.month) - getPeriodValue(b.year, b.month));
-    
-    // Populate Dropdowns
-    const years = [...new Set(allP.map(p => p.year))];
-    const months = MONTH_ORDER;
-    
-    const popSelect = (id, arr) => {
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.innerHTML = arr.map(v => `<option value="${v}">${v}</option>`).join('');
-    };
-
-    popSelect('tDariBulan', months);
-    popSelect('tSampaiBulan', months);
-    popSelect('tDariTahun', years);
-    popSelect('tSampaiTahun', years);
-
-    // Set defaults: Dari = Awal, Sampai = Akhir
-    const firstP = allP[0];
-    const lastP = allP[allP.length-1];
-
-    document.getElementById('tDariBulan').value = firstP.month;
-    document.getElementById('tDariTahun').value = firstP.year;
-    document.getElementById('tSampaiBulan').value = lastP.month;
-    document.getElementById('tSampaiTahun').value = lastP.year;
-
-    isTrendInitialized = true;
-}
-
-function handleTrendModeChange() {
-    const mode = document.getElementById('trendMode').value;
-    const customGroup = document.getElementById('tcCustomGroup');
-    const warningEl = document.getElementById('trendWarning');
-    
-    if (mode === 'kustom') {
-        customGroup.style.display = 'flex';
-    } else {
-        customGroup.style.display = 'none';
-        warningEl.style.display = 'none';
-    }
-    
-    updateTrendView();
-}
-
-function updateTrendView() {
-    if(!isTrendInitialized) return;
-    const cakupan = selectedKecamatan === 'all' ? 'Kota Banjar' : `Kec. ${selectedKecamatan}`;
-    renderTrend(cakupan);
-}
-
 function renderTrend(cakupan) {
   if (!window.MASTER_PAYLOAD || !DATABASE) return;
 
@@ -3752,11 +3809,8 @@ function renderTrend(cakupan) {
       const valBanner = document.getElementById('trendValidationBanner');
       const conclusionCard = document.getElementById('trendConclusionCard');
       
-      const modeSelect = document.getElementById('trendMode');
-      const mode = modeSelect ? modeSelect.value : 'seluruh';
       const isDark = document.body.classList.contains('dark');
       const gridColorConfig = isDark ? '#334155' : '#e2e8f0';
-      const warningEl = document.getElementById('trendWarning');
 
       if (allP.length === 0) {
         if(tEl) tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📊</div>Data belum tersedia.</div>`;
@@ -3771,161 +3825,120 @@ function renderTrend(cakupan) {
       
       allP.sort((a,b) => getPeriodValue(a.year, a.month) - getPeriodValue(b.year, b.month));
       
-      let validPeriods = [];
-      let isBarChart = false;
+      // Ambil nilai dari Master Filter
+      const mfDariBulan = document.getElementById('mfAwalBulan')?.value || allP[0].month;
+      const mfDariTahun = document.getElementById('mfAwalTahun')?.value || allP[0].year;
+      const mfSampaiBulan = document.getElementById('mfAkhirBulan')?.value || allP[allP.length-1].month;
+      const mfSampaiTahun = document.getElementById('mfAkhirTahun')?.value || allP[allP.length-1].year;
+
+      const vDari = getPeriodValue(mfDariTahun, mfDariBulan);
+      const vSampai = getPeriodValue(mfSampaiTahun, mfSampaiBulan);
       
-      // LOGIC MODE: SELURUH WAKTU
-      if (mode === 'seluruh') {
-          validPeriods = [...allP];
-          safeSetText('tsbTitle', `Menampilkan Seluruh Waktu`);
-          safeSetText('tsbDesc', `Perkembangan historis lengkap dari ${allP[0].month} ${allP[0].year} sampai ${allP[allP.length-1].month} ${allP[allP.length-1].year}.`);
-      } 
-      // LOGIC MODE: TAHUNAN
-      else if (mode === 'tahunan') {
-          isBarChart = true;
-          const years = [...new Set(allP.map(p => p.year))].sort();
-          validPeriods = years.map(yr => {
-              let tLancar=0, tTot=0;
-              allP.filter(p => p.year === yr).forEach(p => {
-                  let raw = DATABASE[p.year]?.[p.month] || [];
-                  if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
-                  const T = computeTotals(aggregateSchools(raw));
-                  tLancar += T.lancar;
-                  tTot += T.tot;
-              });
-              return { label: `Tahun ${yr}`, pct: tTot > 0 ? (tLancar/tTot*100) : 0, year: yr };
-          });
-          
-          safeSetText('tsbTitle', `Agregat Performa Tahunan`);
-          safeSetText('tsbDesc', `Analisis rata-rata capaian BTQ dari tahun ke tahun untuk memetakan progres jangka panjang.`);
-      }
-      // LOGIC MODE: RENTANG KUSTOM
-      else if (mode === 'kustom') {
-          const elDM = document.getElementById('tDariBulan');
-          const elDY = document.getElementById('tDariTahun');
-          const elSM = document.getElementById('tSampaiBulan');
-          const elSY = document.getElementById('tSampaiTahun');
-          
-          const dM = elDM ? elDM.value : allP[0].month;
-          const dY = elDY ? elDY.value : allP[0].year;
-          const sM = elSM ? elSM.value : allP[allP.length-1].month;
-          const sY = elSY ? elSY.value : allP[allP.length-1].year;
-          
-          const vDari = getPeriodValue(dY, dM);
-          const vSampai = getPeriodValue(sY, sM);
-          
-          if (vSampai < vDari) {
-              if(warningEl) warningEl.style.display = 'flex';
-              if(tEl) tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">⚠</div>Menunggu rentang waktu yang valid...</div>`;
-              safeSetText('tsbTitle', "Rentang Waktu Terbalik");
-              safeSetText('tsbDesc', "Silakan perbaiki pilihan bulan dan tahun agar proses analitik dapat berjalan.");
-              if(progressGrid) progressGrid.style.display = 'none';
-              if(kpiGrid) kpiGrid.style.display = 'none';
-              if(valBanner) valBanner.style.display = 'none';
-              if(conclusionCard) conclusionCard.style.display = 'none';
-              return;
-          }
-          if(warningEl) warningEl.style.display = 'none';
-          
-          validPeriods = allP.filter(p => {
-              const v = getPeriodValue(p.year, p.month);
-              return v >= vDari && v <= vSampai;
-          });
-          
-          if(validPeriods.length === 0) {
-              if(tEl) tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📂</div>Tidak ada data yang terekam pada rentang kustom tersebut.</div>`;
-              safeSetText('tsbTitle', "Data Tidak Ditemukan");
-              safeSetText('tsbDesc', `Periode ${dM} ${dY} s.d. ${sM} ${sY} kosong.`);
-              if(progressGrid) progressGrid.style.display = 'none';
-              if(kpiGrid) kpiGrid.style.display = 'none';
-              if(valBanner) valBanner.style.display = 'none';
-              if(conclusionCard) conclusionCard.style.display = 'none';
-              return;
-          }
-          
-          safeSetText('tsbTitle', `Analisis Rentang Kustom`);
-          safeSetText('tsbDesc', `Memantau perkembangan dari ${dM} ${dY} sampai dengan ${sM} ${sY}.`);
+      let validPeriods = allP.filter(p => {
+          const v = getPeriodValue(p.year, p.month);
+          return v >= vDari && v <= vSampai;
+      });
+      
+      if(validPeriods.length === 0) {
+          if(tEl) tEl.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📂</div>Tidak ada data yang terekam pada rentang filter tersebut.</div>`;
+          safeSetText('tsbTitle', "Data Tidak Ditemukan");
+          safeSetText('tsbDesc', `Periode ${mfDariBulan} ${mfDariTahun} s.d. ${mfSampaiBulan} ${mfSampaiTahun} kosong.`);
+          if(progressGrid) progressGrid.style.display = 'none';
+          if(kpiGrid) kpiGrid.style.display = 'none';
+          if(valBanner) valBanner.style.display = 'none';
+          if(conclusionCard) conclusionCard.style.display = 'none';
+          return;
       }
 
-      // --- 1. DATA EXTRACTION (BACKEND API vs DYNAMIC CALCULATION) ---
+      // Deteksi Otomatis (Snapshot vs Trend)
+      let isSnapshot = (vDari === vSampai);
+      
+      if (isSnapshot) {
+          safeSetText('tsbTitle', `Performa Snapshot (${mfSampaiBulan} ${mfSampaiTahun})`);
+          safeSetText('tsbDesc', `Menganalisis poin waktu spesifik tanpa perbandingan progres historis.`);
+      } else {
+          safeSetText('tsbTitle', `Tren Performa (${mfDariBulan} ${mfDariTahun} s.d. ${mfSampaiBulan} ${mfSampaiTahun})`);
+          safeSetText('tsbDesc', `Memantau pergerakan dan dinamika progres sekolah pada rentang waktu tersebut.`);
+      }
+
+      // --- 1. DATA EXTRACTION ---
       let execSum = {};
       let topList = [];
       let botList = [];
       let hasStructuralChange = false;
-      const payload = window.MASTER_PAYLOAD;
 
-      const useBackendFully = mode === 'seluruh' && selectedKecamatan === 'all' && payload && payload.executive_summary;
+      if (validPeriods.length >= 2) {
+          const pStart = validPeriods[0];
+          const pEnd = validPeriods[validPeriods.length - 1];
 
-      if (useBackendFully) {
-          execSum = payload.executive_summary || {};
-          topList = payload.top_progress || [];
-          botList = payload.need_attention || [];
-          
-          const pm = payload.progress_monitoring || [];
-          hasStructuralChange = pm.some(i => i.validation && i.validation.changed === true);
-      } else {
-          if (!isBarChart && validPeriods.length >= 2) {
-              const pStart = validPeriods[0];
-              const pEnd = validPeriods[validPeriods.length - 1];
-
-              let rawStart = DATABASE[pStart.year]?.[pStart.month] || [];
-              let rawEnd = DATABASE[pEnd.year]?.[pEnd.month] || [];
-              if (selectedKecamatan !== 'all') {
-                  rawStart = rawStart.filter(s => s.kecamatan === selectedKecamatan);
-                  rawEnd = rawEnd.filter(s => s.kecamatan === selectedKecamatan);
-              }
-
-              const schStart = aggregateSchools(rawStart);
-              const schEnd = aggregateSchools(rawEnd);
-
-              let dynamicProgress = [];
-              let tSekolah = 0, tSiswa = 0, pPositif = 0, pEvaluasi = 0;
-
-              schEnd.forEach(eSch => {
-                  const sSch = schStart.find(s => s.no === eSch.no);
-                  if(sSch && sSch.tot > 0 && eSch.tot > 0) {
-                      tSekolah++;
-                      tSiswa += eSch.tot;
-
-                      let awalLancar = 0, akhirLancar = 0;
-                      let awalTot = 0, akhirTot = 0;
-                      let changed = false;
-
-                      if (sSch.kls4.tersedia && eSch.kls4.tersedia) {
-                          awalLancar += sSch.kls4.lancar; akhirLancar += eSch.kls4.lancar;
-                          awalTot += sSch.kls4.tot; akhirTot += eSch.kls4.tot;
-                      } else if (sSch.kls4.tersedia !== eSch.kls4.tersedia) changed = true;
-
-                      if (sSch.kls5.tersedia && eSch.kls5.tersedia) {
-                          awalLancar += sSch.kls5.lancar; akhirLancar += eSch.kls5.lancar;
-                          awalTot += sSch.kls5.tot; akhirTot += eSch.kls5.tot;
-                      } else if (sSch.kls5.tersedia !== eSch.kls5.tersedia) changed = true;
-
-                      if (changed) hasStructuralChange = true;
-
-                      let pctAwal = awalTot > 0 ? (awalLancar / awalTot * 100) : 0;
-                      let pctAkhir = akhirTot > 0 ? (akhirLancar / akhirTot * 100) : 0;
-                      let diff = pctAkhir - pctAwal; 
-
-                      let status = "Stabil";
-                      if (diff > 0) { status = "Progress Positif"; pPositif++; }
-                      else if (diff < 0) { status = "Perlu Evaluasi"; pEvaluasi++; }
-
-                      dynamicProgress.push({
-                          no: eSch.no,
-                          nama: eSch.nama,
-                          validation: { changed: changed, note: changed ? "Perubahan Struktur Data" : "Comparable Data Valid" },
-                          progress: { total_siswa_latest: eSch.tot, awal_lancar: awalLancar, akhir_lancar: akhirLancar, awal_pct: pctAwal, akhir_pct: pctAkhir, persen: diff, status: status },
-                          awal: sSch, akhir: eSch
-                      });
-                  }
-              });
-
-              execSum = { total_sekolah: tSekolah, total_siswa_aktif: tSiswa, progress_positif: pPositif, perlu_pendampingan: pEvaluasi };
-              dynamicProgress.sort((a,b) => (b.progress?.persen || 0) - (a.progress?.persen || 0));
-              topList = dynamicProgress.slice(0, 10);
-              botList = [...dynamicProgress].reverse().slice(0, 10);
+          let rawStart = DATABASE[pStart.year]?.[pStart.month] || [];
+          let rawEnd = DATABASE[pEnd.year]?.[pEnd.month] || [];
+          if (selectedKecamatan !== 'all') {
+              rawStart = rawStart.filter(s => s.kecamatan === selectedKecamatan);
+              rawEnd = rawEnd.filter(s => s.kecamatan === selectedKecamatan);
           }
+
+          const schStart = aggregateSchools(rawStart);
+          const schEnd = aggregateSchools(rawEnd);
+
+          let dynamicProgress = [];
+          let tSekolah = 0, tSiswa = 0, pPositif = 0, pEvaluasi = 0;
+
+          schEnd.forEach(eSch => {
+              const sSch = schStart.find(s => s.no === eSch.no);
+              if(sSch && sSch.tot > 0 && eSch.tot > 0) {
+                  tSekolah++;
+                  tSiswa += eSch.tot;
+
+                  let awalLancar = 0, akhirLancar = 0;
+                  let awalTot = 0, akhirTot = 0;
+                  let changed = false;
+
+                  if (sSch.kls4.tersedia && eSch.kls4.tersedia) {
+                      awalLancar += sSch.kls4.lancar; akhirLancar += eSch.kls4.lancar;
+                      awalTot += sSch.kls4.tot; akhirTot += eSch.kls4.tot;
+                  } else if (sSch.kls4.tersedia !== eSch.kls4.tersedia) changed = true;
+
+                  if (sSch.kls5.tersedia && eSch.kls5.tersedia) {
+                      awalLancar += sSch.kls5.lancar; akhirLancar += eSch.kls5.lancar;
+                      awalTot += sSch.kls5.tot; akhirTot += eSch.kls5.tot;
+                  } else if (sSch.kls5.tersedia !== eSch.kls5.tersedia) changed = true;
+
+                  if (changed) hasStructuralChange = true;
+
+                  let pctAwal = awalTot > 0 ? (awalLancar / awalTot * 100) : 0;
+                  let pctAkhir = akhirTot > 0 ? (akhirLancar / akhirTot * 100) : 0;
+                  let diff = pctAkhir - pctAwal; 
+
+                  let status = "Stabil";
+                  if (diff > 0) { status = "Progress Positif"; pPositif++; }
+                  else if (diff < 0) { status = "Perlu Evaluasi"; pEvaluasi++; }
+
+                  dynamicProgress.push({
+                      no: eSch.no,
+                      nama: eSch.nama,
+                      validation: { changed: changed, note: changed ? "Perubahan Struktur Data" : "Comparable Data Valid" },
+                      progress: { total_siswa_latest: eSch.tot, awal_lancar: awalLancar, akhir_lancar: akhirLancar, awal_pct: pctAwal, akhir_pct: pctAkhir, persen: diff, status: status },
+                      awal: sSch, akhir: eSch
+                  });
+              }
+          });
+
+          execSum = { total_sekolah: tSekolah, total_siswa_aktif: tSiswa, progress_positif: pPositif, perlu_pendampingan: pEvaluasi };
+          dynamicProgress.sort((a,b) => (b.progress?.persen || 0) - (a.progress?.persen || 0));
+          topList = dynamicProgress.slice(0, 10);
+          botList = [...dynamicProgress].reverse().slice(0, 10);
+      } else {
+          // Mode Snapshot
+          const pTarget = validPeriods[0];
+          let rawTarget = DATABASE[pTarget.year]?.[pTarget.month] || [];
+          if (selectedKecamatan !== 'all') {
+              rawTarget = rawTarget.filter(s => s.kecamatan === selectedKecamatan);
+          }
+          const schTarget = aggregateSchools(rawTarget);
+          const T = computeTotals(schTarget);
+          
+          execSum = { total_sekolah: schTarget.length, total_siswa_aktif: T.tot, progress_positif: 0, perlu_pendampingan: 0 };
       }
 
       // --- 2. RENDER KPI GRIDS ---
@@ -3940,13 +3953,13 @@ function renderTrend(cakupan) {
       }
 
       // --- 3. RENDER VALIDATION BANNER ---
-      if (!isBarChart && validPeriods.length >= 2) {
+      if (validPeriods.length >= 2) {
           if(valBanner) {
               valBanner.style.display = 'block';
               if (hasStructuralChange) {
                   valBanner.style.background = 'var(--warning-dim)';
                   valBanner.style.borderLeftColor = 'var(--warning)';
-                  safeSetHTML('trendValidationText', "<strong>Status Data:</strong> Terdapat perubahan struktur data antar periode. Analisis menggunakan <em>comparable data</em> untuk menjaga akurasi.");
+                  safeSetHTML('trendValidationText', "<strong>Status Data:</strong> Terdapat perubahan struktur data antar periode pada rentang filter terpilih. Analisis menggunakan <em>comparable data</em> untuk menjaga akurasi.");
               } else {
                   valBanner.style.background = 'var(--success-dim)';
                   valBanner.style.borderLeftColor = 'var(--success)';
@@ -3964,23 +3977,13 @@ function renderTrend(cakupan) {
       
       destroyChart('trend');
       
-      let labels = [];
-      let pctData = [];
-
-      if (isBarChart) {
-          labels = validPeriods.map(p => p.label);
-          pctData = validPeriods.map(p => parseFloat(n2(p.pct)));
-          safeSetText('trendChartSub', "Pencapaian agregat rata-rata setiap tahunnya");
-      } else {
-          labels = validPeriods.map(p => `${p.month.substring(0,3)} ${p.year}`);
-          pctData = validPeriods.map(p => {
-              let raw = DATABASE[p.year]?.[p.month] || [];
-              if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
-              const T = computeTotals(aggregateSchools(raw));
-              return T.tot > 0 ? parseFloat(n2(T.lancar / T.tot * 100)) : 0;
-          });
-          safeSetText('trendChartSub', "Perkembangan capaian rata-rata dari seluruh sekolah");
-      }
+      let labels = validPeriods.map(p => `${p.month.substring(0,3)} ${p.year}`);
+      let pctData = validPeriods.map(p => {
+          let raw = DATABASE[p.year]?.[p.month] || [];
+          if (selectedKecamatan !== 'all') raw = raw.filter(s => s.kecamatan === selectedKecamatan);
+          const T = computeTotals(aggregateSchools(raw));
+          return T.tot > 0 ? parseFloat(n2(T.lancar / T.tot * 100)) : 0;
+      });
 
       const canvas = document.getElementById('trendChartCanvas');
       if (canvas) {
@@ -3995,21 +3998,21 @@ function renderTrend(cakupan) {
           }
 
           charts['trend'] = new Chart(canvas, {
-            type: isBarChart ? 'bar' : 'line',
+            type: isSnapshot ? 'bar' : 'line',
             data: {
               labels,
               datasets: [{
                 label: '% Lancar', data: pctData,
                 borderColor: isDark ? '#60a5fa' : '#2563eb', 
-                backgroundColor: isBarChart ? (isDark ? '#3b82f6' : '#2563eb') : gradient, 
+                backgroundColor: isSnapshot ? (isDark ? '#3b82f6' : '#2563eb') : gradient, 
                 pointBackgroundColor: isDark ? '#60a5fa' : '#2563eb',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
-                pointRadius: isBarChart ? 0 : 5, 
-                pointHoverRadius: isBarChart ? 0 : 7, 
-                borderWidth: isBarChart ? 0 : 3, 
-                borderRadius: isBarChart ? 6 : 0,
-                fill: !isBarChart, 
+                pointRadius: isSnapshot ? 0 : 5, 
+                pointHoverRadius: isSnapshot ? 0 : 7, 
+                borderWidth: isSnapshot ? 0 : 3, 
+                borderRadius: isSnapshot ? 6 : 0,
+                fill: !isSnapshot, 
                 tension: 0.35
               }]
             },
@@ -4034,8 +4037,8 @@ function renderTrend(cakupan) {
           });
       }
 
-      // --- 5. SCHOOL PROGRESS TRACKING (Premium Executive Cards) ---
-      if (isBarChart || validPeriods.length < 2) {
+      // --- 5. SCHOOL PROGRESS TRACKING ---
+      if (validPeriods.length < 2) {
           if(progressGrid) progressGrid.style.display = 'none';
           if(conclusionCard) conclusionCard.style.display = 'none';
           return;
@@ -4055,17 +4058,6 @@ function renderTrend(cakupan) {
           
           let pctAwal = prog.awal_pct;
           let pctAkhir = prog.akhir_pct;
-          
-          if (pctAwal === undefined && item.awal) {
-              const aT = (item.awal.kls4?.total || 0) + (item.awal.kls5?.total || 0);
-              const aL = (item.awal.kls4?.lancar || 0) + (item.awal.kls5?.lancar || 0);
-              pctAwal = aT > 0 ? (aL/aT*100) : 0;
-          }
-          if (pctAkhir === undefined && item.akhir) {
-              const eT = (item.akhir.kls4?.total || 0) + (item.akhir.kls5?.total || 0);
-              const eL = (item.akhir.kls4?.lancar || 0) + (item.akhir.kls5?.lancar || 0);
-              pctAkhir = eT > 0 ? (eL/eT*100) : 0;
-          }
 
           const absoluteDiff = typeof prog.persen === 'number' ? prog.persen : ((pctAkhir || 0) - (pctAwal || 0));
           const displayDiff = absoluteDiff > 0 ? `+${absoluteDiff.toFixed(1)}%` : `${absoluteDiff.toFixed(1)}%`;
@@ -4106,13 +4098,13 @@ function renderTrend(cakupan) {
               </div>
               <div class="pr-body">
                   <div class="pr-stat">
-                      <span class="pr-stat-lbl">Progress Mutlak</span>
-                      <span class="pr-stat-val">${(pctAwal||0).toFixed(1)}% → ${(pctAkhir||0).toFixed(1)}%</span>
+                      <span class="pr-stat-lbl">Periode Awal</span>
+                      <span class="pr-stat-val">${(pctAwal||0).toFixed(1)}%</span>
                   </div>
                   <div class="pr-stat">
-                      <span class="pr-stat-lbl">Status Evaluasi</span>
+                      <span class="pr-stat-lbl">Periode Akhir</span>
                       <span class="pr-stat-val" style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
-                        ${statusText} ${prioHtml}
+                        ${(pctAkhir||0).toFixed(1)}% ${prioHtml}
                       </span>
                   </div>
                   <div class="pr-validation ${valChanged ? 'warning' : 'success'}" style="${!valChanged && !document.body.classList.contains('dark') ? 'color:var(--success); background:var(--success-dim)' : ''}">
@@ -4142,32 +4134,22 @@ function renderTrend(cakupan) {
 
       // --- 6. EXECUTIVE CONCLUSION AUTO GENERATION ---
       if(conclusionCard) conclusionCard.style.display = 'block';
+
+      const dStart = pctData[0] || 0;
+      const dEnd = pctData[pctData.length-1] || 0;
+      const dTot = dEnd - dStart;
       
-      let backendNote = "";
-      if (useBackendFully && payload.summary && payload.summary.note) {
-          backendNote = payload.summary.note;
-      }
-
-      let concHtml = "";
-      if (backendNote) {
-          concHtml = `<strong>Ringkasan Eksekutif:</strong> ${backendNote}`;
+      let concHtml = `Berdasarkan filter periode dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif ${cakupan} `;
+      
+      if(dTot > 0) {
+          concHtml += `menunjukkan tren <strong>peningkatan agregat sebesar +${n2(dTot)}%</strong>. `;
+      } else if (dTot < 0) {
+          concHtml += `mengalami kemunduran dengan <strong>penurunan agregat sebesar ${n2(Math.abs(dTot))}%</strong>. `;
       } else {
-          const dStart = pctData[0] || 0;
-          const dEnd = pctData[pctData.length-1] || 0;
-          const dTot = dEnd - dStart;
-          
-          concHtml = `Berdasarkan pengolahan data analitik dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif Dinas Pendidikan `;
-          
-          if(dTot > 0) {
-              concHtml += `menunjukkan tren <strong>peningkatan agregat sebesar +${n2(dTot)}%</strong>. `;
-          } else if (dTot < 0) {
-              concHtml += `mengalami kemunduran dengan <strong>penurunan agregat sebesar ${n2(Math.abs(dTot))}%</strong>. `;
-          } else {
-              concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
-          }
-
-          concHtml += `Secara spesifik, dari total ${execSum.total_sekolah || 0} sekolah aktif, mayoritas (${execSum.progress_positif || 0} sekolah) berhasil mengukir progres positif berkat efektivitas pembelajaran BTQ. Namun, sistem mendeteksi keberadaan <strong>${execSum.perlu_pendampingan || 0} sekolah</strong> yang membutuhkan atensi khusus dan evaluasi metodologi (termasuk pada Level Prioritas A dan B) guna mencegah terjadinya penurunan mutu akademis yang lebih luas.`;
+          concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
       }
+
+      concHtml += `Secara spesifik, dari total ${execSum.total_sekolah || 0} sekolah aktif, sebanyak ${execSum.progress_positif || 0} sekolah berhasil mengukir progres positif. Namun, sistem mendeteksi keberadaan <strong>${execSum.perlu_pendampingan || 0} sekolah</strong> yang membutuhkan atensi khusus guna mencegah terjadinya penurunan mutu akademis yang lebih luas.`;
 
       safeSetHTML('trendConclusionText', concHtml);
 
@@ -4178,311 +4160,174 @@ function renderTrend(cakupan) {
 }
 
 // ────────────────────────────────────────────
-// KESIMPULAN & REKOMENDASI
+// RENDER KESIMPULAN
 // ────────────────────────────────────────────
 function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
-  try {
-    const sorted = currentSchools.filter(s => s.tot > 0).sort((a,b) => b.pct - a.pct);
-    const lowC = sorted.filter(s => s.pct < 60).length;
-    const pL = T.tot > 0 ? n2(T.lancar / T.tot * 100) : 0;
-    const pB = T.tot > 0 ? n2(T.belum / T.tot * 100) : 0;
-    const pK = T.tot > 0 ? n2(T.tidak / T.tot * 100) : 0;
-
-    let callout = '';
-    if (isAll) {
-      const kr = ["Langensari","Purwaharja","Pataruman","Banjar"].map(k => {
-        const ks = allSchoolsAggr.filter(s => s.kecamatan === k);
-        const t = computeTotals(ks);
-        return {name: k, pct: t.tot > 0 ? (t.lancar / t.tot * 100) : 0};
-      }).sort((a,b) => b.pct - a.pct);
-      callout = `Pusat orbit prestasi saat ini ada pada Kec. <strong>${kr[0].name}</strong> dengan realisasi ideal (${n2(kr[0].pct)}%). Fokus intervensi diarahkan secara institusional ke Kec. <strong>${kr[kr.length-1].name}</strong> sebagai sektor prioritas pembinaan (${n2(kr[kr.length-1].pct)}%).`;
-    } else {
-      callout = `Sorotan Regional <strong>${cakupan}</strong> — Ekosistem belajar <strong>${best ? best.nama : '-'}</strong> diposisikan sebagai prototipe rujukan (${n2(best ? best.pct : 0)}%). Peringatan: <strong>${lowC} sekolah dasar</strong> dilaporkan berada di bawah standar kelayakan (60%).`;
-    }
-    
-    safeSetHTML('k-callout', callout);
-    
-    const classStr = selectedKelas === 'all' ? 'Gabungan Kelas 4 & 5' : `Kelas ${selectedKelas}`;
-    safeSetHTML('k-body', `
-      Asesmen formal dari ekstraksi data matriks <strong>${classStr}</strong> per <strong>${currentMonth} ${currentYear}</strong> dalam area komputasi <strong>${cakupan}</strong> mengkalkulasi kumpulan <strong>${fmt(T.tot)} jejak digital valid</strong> dari total ${currentSchools.length} klaster unit dasar. Nilai valuasi capaian di ekuilibrium angka <strong>${n2(pct)}%</strong>. Menjabarkan rincian teknis: <strong>${pL}%</strong> SDM telah terklasifikasi mapan secara alfabetikal bahasa Al-Qur'an, diiringi <strong>${pB}%</strong> pada ambang fase medium, sekaligus menyisakan celah berat pada <strong>${pK}%</strong> demografi siswa tanpa pengenalan struktur huruf yang paling minimal sekalipun.
-    `);
-    
-    safeSetHTML('k-reco', [
-      `Pendampingan <em>on-site</em> wajib ke <strong>${lowC} sekolah</strong> kategori merah (&lt;60%), libatkan pengawas pembina dan praktisi BTQ berpengalaman.`,
-      `Investigasi guru dengan kehadiran di bawah 80% oleh Dinas Pendidikan untuk memastikan hak siswa atas pembelajaran agama terpenuhi.`,
-      `Kembangkan program "Tutor Sebaya Al-Qur'an" secara struktural di kelas IV–V untuk mempercepat penurunan angka ketidaklancaran.`,
-      `Pastikan kedisiplinan input data sekolah (mencegah data kosong) dengan melibatkan operator wilayah pada rapat koordinasi kepala sekolah bulanan.`
-    ].map((r, i) => `<li><span class="reco-num">${i+1}</span><span>${r}</span></li>`).join(''));
-  } catch(err) {
-    console.error("Kesimpulan Error:", err);
-  }
+  const isGood = pct >= 75;
+  safeSetHTML('k-callout', `Tingkat kelancaran BTQ di ${cakupan} saat ini berada di angka <strong>${n2(pct)}%</strong>. Status: ${isGood ? '<strong>BAIK</strong>' : '<strong>PERLU DITINGKATKAN</strong>'}.`);
+  
+  let bodyText = `Berdasarkan data yang terkumpul dari ${currentSchools.length} sekolah dengan total ${fmt(T.tot)} siswa, sebanyak ${fmt(T.lancar)} siswa telah lancar membaca Al-Qur'an. `;
+  if (T.tidak > 0) bodyText += `Namun, masih terdapat ${fmt(T.tidak)} siswa yang belum bisa sama sekali. `;
+  safeSetHTML('k-body', bodyText);
+  
+  let recoHTML = '';
+  if(worst) recoHTML += `<li><div class="reco-num">1</div><div>Pendampingan intensif untuk <strong>${worst.nama}</strong> yang memiliki tingkat kelancaran terendah (${n2(worst.pct)}%).</div></li>`;
+  if(best) recoHTML += `<li><div class="reco-num">2</div><div>Adopsi metode pembelajaran dari <strong>${best.nama}</strong> (${n2(best.pct)}%) ke sekolah-sekolah lain.</div></li>`;
+  recoHTML += `<li><div class="reco-num">3</div><div>Peningkatan pengawasan kehadiran guru BTQ, saat ini rata-rata ${n2(T.avgHadir)}%.</div></li>`;
+  safeSetHTML('k-reco', recoHTML);
 }
 
 // ────────────────────────────────────────────
-// MODAL DETAIL SEKOLAH
+// MODAL LOGIC (Detail Sekolah)
 // ────────────────────────────────────────────
-function openModal(no, tabIdx = 0) {
-  lastSchoolCardId = `school-row-${no}`; 
-  currentModalSchool = currentSchools.find(s => s.no === no);
-  if(!currentModalSchool) return;
-  document.getElementById('modalTitle').textContent = currentModalSchool.nama;
-  
-  document.querySelectorAll('.m-tab').forEach((t,i) => t.classList.toggle('active', i === tabIdx));
-  renderModalTab(tabIdx);
-  
-  lockOverlayBackground();
+function openModal(no) {
+  const s = currentSchools.find(x => x.no == no);
+  if(!s) return;
+  currentModalSchool = s;
+  safeSetText('modalTitle', s.nama);
+  switchTab(0);
   document.getElementById('modalOverlay').classList.add('open');
-}
-
-function switchTab(idx) {
-  document.querySelectorAll('.m-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
-  renderModalTab(idx);
-}
-
-function renderModalTab(idx) {
-  const s = currentModalSchool;
-  if (!s) return;
-  const el = document.getElementById('modalContent');
-  
-  if (idx === 0) {
-    const k4Html = s.kls4.tersedia 
-      ? `<tr><td data-label="Kelas">Kelas IV</td><td data-label="Total Siswa">${s.kls4.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls4.lancar}</td><td data-label="Belum">${s.kls4.belum}</td><td data-label="Prioritas">${s.kls4.tidak}</td><td data-label="% Lancar">${pctPill(s.kls4.lancar/s.kls4.tot*100)}</td></tr>`
-      : `<tr><td data-label="Kelas">Kelas IV</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Belum terdapat laporan BTQ untuk Kelas 4 pada periode yang dipilih.</span></td></tr>`;
-      
-    const k5Html = s.kls5.tersedia 
-      ? `<tr><td data-label="Kelas">Kelas V</td><td data-label="Total Siswa">${s.kls5.tot}</td><td data-label="Lancar" style="color:var(--success);font-weight:800">${s.kls5.lancar}</td><td data-label="Belum">${s.kls5.belum}</td><td data-label="Prioritas">${s.kls5.tidak}</td><td data-label="% Lancar">${pctPill(s.kls5.lancar/s.kls5.tot*100)}</td></tr>`
-      : `<tr><td data-label="Kelas">Kelas V</td><td colspan="5" class="empty-state-cell"><span class="status-badge unavailable">Belum Tersedia</span> <span class="empty-text-desc">Sekolah ini belum memiliki peserta aktif pada Kelas 5 untuk periode ini.</span></td></tr>`;
-
-    const totalLabel = selectedKelas === 'all' ? 'Total Akumulasi' : `Total (Kelas ${selectedKelas})`;
-    const totalHtml = `<tr style="font-weight:800;background:var(--surface-2)"><td data-label="Kelas">${totalLabel}</td><td data-label="Populasi">${s.tot>0?s.tot:'<span style="color:var(--text-muted)">–</span>'}</td><td data-label="Lancar" style="color:var(--success)">${s.tot>0?s.lancar:'–'}</td><td data-label="Belum">${s.tot>0?s.belum:'–'}</td><td data-label="Prioritas">${s.tot>0?s.tidak:'–'}</td><td data-label="% Lancar">${s.tot>0?pctPill(s.pct):'–'}</td></tr>`;
-
-    el.innerHTML = `
-      <table class="modal-table">
-        <thead><tr><th>Kelas</th><th>Populasi</th><th>Lancar</th><th>Belum</th><th>Prioritas</th><th>% Lancar</th></tr></thead>
-        <tbody>
-          ${k4Html}
-          ${k5Html}
-          ${totalHtml}
-        </tbody>
-      </table>
-      ${s.warnings.length ? `<div style="margin-top:16px;padding:14px 20px;background:var(--warning-dim);border-radius:12px;font-size:13.5px;color:var(--warning);border:1px solid rgba(217,119,6,.2);box-shadow:var(--shadow-sm);">⚠ Ditemukan indikasi ketidaksesuaian struktur data yang memerlukan verifikasi lanjutan terkait: <strong>${s.warnings.join(', ')}</strong></div>` : ''}
-    `;
-  } else if (idx === 1) {
-    el.innerHTML = `
-      <table class="modal-table">
-        <thead><tr><th>Guru Pembimbing BTQ</th><th>Kehadiran</th><th>Status</th></tr></thead>
-        <tbody>
-          ${s.guru.map((g, i) => `<tr>
-            <td data-label="Guru">${g}</td>
-            <td data-label="Kehadiran" style="font-variant-numeric:tabular-nums">${s.hadir[i]}%</td>
-            <td data-label="Status">${s.hadir[i]>=90?'<span style="color:var(--success);font-weight:600">✓ Disiplin</span>':s.hadir[i]>=75?'<span style="color:var(--warning);font-weight:600">⚠ Cukup</span>':'<span style="color:var(--danger);font-weight:600">✕ Perlu Pendampingan</span>'}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-      <div style="margin-top:10px;font-size:12px;color:var(--text-tertiary)">Rata-rata kehadiran: <strong style="color:var(--text-primary)">${n2(s.hadir.reduce((a,b)=>a+b,0)/s.hadir.length)}%</strong></div>
-    `;
-  } else {
-    const allP = getAllPeriods();
-    const rows = allP.map(p => {
-      const raw = DATABASE[p.year][p.month];
-      const found = raw.find(r => r.no === s.no);
-      if(!found) return null;
-      const agg = aggregateSchools([found])[0];
-      return { period: `${p.month} ${p.year}`, pct: agg.pct, lancar: agg.lancar, tot: agg.tot, isInc: checkIncompleteData([found]) };
-    }).filter(Boolean);
-    
-    if (rows.length < 2) {
-      el.innerHTML = `<div class="trend-empty"><div class="trend-empty-icon">📅</div>Butuh minimal 2 periode untuk menampilkan riwayat.</div>`;
-    } else {
-      el.innerHTML = `<div>${rows.map((h, i) => {
-        let diff = '';
-        if (i > 0) {
-          if (h.isInc !== rows[i-1].isInc) {
-            diff = `<span style="color:var(--warning);font-size:11.5px;font-weight:600" title="Kelengkapan data berbeda">⚠ Data Berubah</span>`;
-          } else {
-            const d = h.pct - rows[i-1].pct;
-            diff = d > 0.05 ? `<span style="color:var(--success);font-size:11.5px;font-weight:600">▲ +${n2(d)}%</span>` :
-                   d < -0.05 ? `<span style="color:var(--danger);font-size:11.5px;font-weight:600">▼ ${n2(d)}%</span>` :
-                   `<span style="color:var(--text-muted);font-size:11.5px">–</span>`;
-          }
-        }
-        return `<div class="hist-row">
-          <span class="hist-period">${h.period}</span>
-          <span style="font-size:12px;color:var(--text-secondary)">${h.tot>0?fmt(h.lancar)+' / '+fmt(h.tot)+' siswa':'<span style="color:var(--text-muted)">Data Kosong</span>'}</span>
-          <span class="hist-pct" style="color:${h.pct>=80?'var(--success)':h.pct>=60?'var(--warning)':'var(--danger)'}">${h.tot>0?n2(h.pct)+'%':'–'}</span>
-          ${diff}
-        </div>`;
-      }).join('')}</div>`;
-    }
-  }
+  lockOverlayBackground();
 }
 
 function closeModal(e) {
-  if (!e || e.target === document.getElementById('modalOverlay') || !e.target) {
-    const overlay = document.getElementById('modalOverlay');
-    if(overlay.classList.contains('open')) {
-      overlay.classList.remove('open');
-      unlockOverlayBackground();
-    }
+  if(e && e.target !== document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('open');
+  currentModalSchool = null;
+  unlockOverlayBackground();
+}
+
+function switchTab(idx) {
+  if(!currentModalSchool) return;
+  document.querySelectorAll('.m-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  const s = currentModalSchool;
+  let html = '';
+  
+  if(idx === 0) {
+    html = `<div style="overflow-x:auto;"><table class="modal-table">
+      <thead><tr><th>Kelas</th><th>Total</th><th>Lancar</th><th>Belum</th><th>Tidak Bisa</th></tr></thead>
+      <tbody>
+        <tr><td data-label="Kelas">Kelas 4</td><td data-label="Total">${s.kls4.tersedia ? s.kls4.tot : '-'}</td><td data-label="Lancar">${s.kls4.tersedia ? s.kls4.lancar : '-'}</td><td data-label="Belum">${s.kls4.tersedia ? s.kls4.belum : '-'}</td><td data-label="Tidak">${s.kls4.tersedia ? s.kls4.tidak : '-'}</td></tr>
+        <tr><td data-label="Kelas">Kelas 5</td><td data-label="Total">${s.kls5.tersedia ? s.kls5.tot : '-'}</td><td data-label="Lancar">${s.kls5.tersedia ? s.kls5.lancar : '-'}</td><td data-label="Belum">${s.kls5.tersedia ? s.kls5.belum : '-'}</td><td data-label="Tidak">${s.kls5.tersedia ? s.kls5.tidak : '-'}</td></tr>
+      </tbody>
+    </table></div>`;
+  } else if(idx === 1) {
+    html = `<div style="overflow-x:auto;"><table class="modal-table">
+      <thead><tr><th>Kelas</th><th>Guru Pendamping</th><th>Kehadiran</th></tr></thead>
+      <tbody>`;
+    s.rows.forEach(r => {
+      let klsStr = [];
+      if(isValidClass(r.kls4)) klsStr.push('Kelas 4');
+      if(isValidClass(r.kls5)) klsStr.push('Kelas 5');
+      const hadirCls = r.hadir >= 90 ? 'color:var(--success)' : r.hadir >= 75 ? 'color:var(--warning)' : 'color:var(--danger)';
+      html += `<tr><td data-label="Kelas">${klsStr.join(' & ')}</td><td data-label="Guru">${r.guru}</td><td data-label="Hadir" style="font-weight:600;${hadirCls}">${r.hadir}%</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+  } else {
+    html += `<div style="margin-top:8px">`;
+    const allP = getAllPeriods();
+    let lastPct = null;
+    allP.forEach(p => {
+      const raw = DATABASE[p.year][p.month];
+      if(!raw) return;
+      const sch = aggregateSchools(raw).find(x => x.no === s.no);
+      if(!sch || sch.tot === 0) return;
+      const diffStr = lastPct !== null ? (sch.pct > lastPct ? `<span style="color:var(--success)">▲ +${n2(sch.pct - lastPct)}%</span>` : sch.pct < lastPct ? `<span style="color:var(--danger)">▼ ${n2(sch.pct - lastPct)}%</span>` : `<span style="color:var(--text-tertiary)">→ 0%</span>`) : '-';
+      html += `<div class="hist-row"><div class="hist-period">${p.month} ${p.year}</div><div class="hist-pct">${n2(sch.pct)}%</div><div class="hist-diff">${diffStr}</div></div>`;
+      lastPct = sch.pct;
+    });
+    html += `</div>`;
+  }
+  safeSetHTML('modalContent', html);
+}
+
+// ────────────────────────────────────────────
+// DARK THEME INTEGRATION
+// ────────────────────────────────────────────
+function applyTheme(isDark) {
+  if (isDark) {
+    document.body.classList.add('dark');
+    document.querySelector('.icon-moon').style.display = 'none';
+    document.querySelector('.icon-sun').style.display = 'block';
+    document.querySelector('.toggle-text').textContent = 'Mode Terang';
+    document.getElementById('themeColorMeta').setAttribute('content', '#0f172a');
+  } else {
+    document.body.classList.remove('dark');
+    document.querySelector('.icon-moon').style.display = 'block';
+    document.querySelector('.icon-sun').style.display = 'none';
+    document.querySelector('.toggle-text').textContent = 'Mode Gelap';
+    document.getElementById('themeColorMeta').setAttribute('content', '#f8fafc');
+  }
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  
+  if (typeof Chart !== 'undefined') {
+    const gridColorConfig = isDark ? '#334155' : '#e2e8f0';
+    Chart.defaults.color = isDark ? '#94a3b8' : '#94a3b8';
+    Object.keys(charts).forEach(k => {
+      if (charts[k] && charts[k].options.scales) {
+        if (charts[k].options.scales.x && charts[k].options.scales.x.grid) charts[k].options.scales.x.grid.color = gridColorConfig;
+        if (charts[k].options.scales.y && charts[k].options.scales.y.grid) charts[k].options.scales.y.grid.color = gridColorConfig;
+        charts[k].update();
+      }
+    });
   }
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { 
-      closeModal(); 
-      closeSidebar(); 
-      hideFullscreenPrompt(true);
-  }
-});
+// Init Theme Defaults
+const savedTheme = localStorage.getItem('theme');
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+  applyTheme(true);
+} else {
+  applyTheme(false);
+}
 
-/**
- * SMART BTQ — Dark Mode Toggle + UI Enhancement
- */
-(function() {
-  'use strict';
+// Login Theme Toggle Bind
+const logToggle = document.getElementById('loginThemeToggle');
+if (logToggle) {
+  logToggle.addEventListener('click', () => {
+    applyTheme(!document.body.classList.contains('dark'));
+  });
+}
 
-  const DARK_KEY = 'smartbtq_darkmode';
-
-  function applyDark(isDark) {
-    document.body.classList.toggle('dark', isDark);
-    
-    const btn = document.getElementById('darkToggleBtn');
-    if (btn) {
-      btn.textContent = isDark ? '☀️' : '🌙';
-      btn.title = isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode';
-    }
-
-    const loginThemeToggle = document.getElementById('loginThemeToggle');
-    if (loginThemeToggle) {
-      const iconMoon = loginThemeToggle.querySelector('.icon-moon');
-      const iconSun = loginThemeToggle.querySelector('.icon-sun');
-      const textEl = loginThemeToggle.querySelector('.toggle-text');
-      
-      if (isDark) {
-        if(iconMoon) iconMoon.style.display = 'none';
-        if(iconSun) iconSun.style.display = 'block';
-        if(textEl) textEl.textContent = 'Mode Terang';
-      } else {
-        if(iconMoon) iconMoon.style.display = 'block';
-        if(iconSun) iconSun.style.display = 'none';
-        if(textEl) textEl.textContent = 'Mode Gelap';
-      }
-    }
-
-    const themeColorMeta = document.getElementById('themeColorMeta');
-    if(themeColorMeta) {
-      themeColorMeta.setAttribute('content', isDark ? '#020817' : '#ffffff');
-    }
-
-    if (window.Chart) {
-      const textColor = isDark ? '#94a3b8' : '#94a3b8';
-      Chart.defaults.color = textColor;
-      Chart.defaults.scale = Chart.defaults.scale || {};
-    }
-  }
-
-  function setTheme(isDark) {
-    if (document.body.classList.contains('dark') === isDark) return;
-    localStorage.setItem(DARK_KEY, isDark ? '1' : '0');
-    applyDark(isDark);
-
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-      if (typeof DATABASE !== 'undefined' && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
-        renderUI(DATABASE[currentYear][currentMonth]);
-      }
-    }, 50);
-  }
-
-  function toggleDark() {
-    setTheme(!document.body.classList.contains('dark'));
-  }
-
-  function initDarkMode() {
-    const stored = localStorage.getItem(DARK_KEY);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const isDark = stored !== null ? stored === '1' : prefersDark;
-    applyDark(isDark);
-  }
-
-  function injectDarkToggle() {
-    const headerRight = document.querySelector('.header-right');
-    if (!headerRight || document.getElementById('darkToggleBtn')) return;
-
-    const btn = document.createElement('button');
-    btn.id = 'darkToggleBtn';
-    btn.setAttribute('aria-label', 'Toggle Dark Mode');
-    btn.title = 'Dark Mode';
-    btn.textContent = '🌙';
-    btn.onclick = toggleDark;
-
-    const firstBtn = headerRight.querySelector('.btn-print');
-    if (firstBtn) {
-      headerRight.insertBefore(btn, firstBtn);
-    } else {
-      headerRight.appendChild(btn);
-    }
-  }
-
-  const loginThemeToggle = document.getElementById('loginThemeToggle');
-  if (loginThemeToggle) {
-    loginThemeToggle.addEventListener('click', () => {
-      const isCurrentlyDark = document.body.classList.contains('dark');
-      setTheme(!isCurrentlyDark);
-    });
-  }
-
-  document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-      e.preventDefault();
-      toggleDark();
+// Inject Dashboard Header Dark Toggle
+const headerRight = document.querySelector('.header-right');
+if (headerRight) {
+  const dbToggle = document.createElement('button');
+  dbToggle.id = 'darkToggleBtn';
+  dbToggle.title = 'Ganti Tema';
+  dbToggle.innerHTML = `
+    <svg class="db-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <svg class="db-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  `;
+  headerRight.insertBefore(dbToggle, headerRight.firstChild);
+  
+  dbToggle.addEventListener('click', () => {
+    const isDark = !document.body.classList.contains('dark');
+    applyTheme(isDark);
+    const m = dbToggle.querySelector('.db-icon-moon');
+    const s = dbToggle.querySelector('.db-icon-sun');
+    if(m && s) {
+      m.style.display = isDark ? 'none' : 'block';
+      s.style.display = isDark ? 'block' : 'none';
     }
   });
 
-  const mq = window.matchMedia('(prefers-color-scheme: dark)');
-  mq.addEventListener('change', function(e) {
-    if (localStorage.getItem(DARK_KEY) === null) {
-      applyDark(e.matches);
+  // Init Dashboard Icon display sync
+  setTimeout(() => {
+    const isDark = document.body.classList.contains('dark');
+    const m = dbToggle.querySelector('.db-icon-moon');
+    const s = dbToggle.querySelector('.db-icon-sun');
+    if(m && s) {
+      m.style.display = isDark ? 'none' : 'block';
+      s.style.display = isDark ? 'block' : 'none';
     }
-  });
-
-  function init() {
-    initDarkMode();
-    injectDarkToggle();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(m) {
-      if (m.attributeName === 'style' && m.target.id === 'dashboardView') {
-        const isVisible = m.target.style.display !== 'none';
-        if (isVisible) {
-          setTimeout(injectDarkToggle, 100);
-        }
-      }
-    });
-  });
-
-  const dashEl = document.getElementById('dashboardView');
-  if (dashEl) {
-    observer.observe(dashEl, { attributes: true });
-  } else {
-    const bodyObserver = new MutationObserver(function() {
-      const d = document.getElementById('dashboardView');
-      if (d) {
-        observer.observe(d, { attributes: true });
-        bodyObserver.disconnect();
-        init();
-      }
-    });
-    bodyObserver.observe(document.body, { childList: true, subtree: true });
-  }
-})();
+  }, 0);
+}
 </script>
 </body>
 </html>
