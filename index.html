@@ -2553,6 +2553,36 @@ function safeSetHTML(id, html) {
   if (el) el.innerHTML = html;
 }
 
+// --- Notifikasi Enterprise / Toast ---
+function showNotification(msg, type = 'success') {
+  let toastContainer = document.getElementById('toastContainer');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'toastContainer';
+    toastContainer.style.cssText = 'position:fixed; top:20px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:10px; pointer-events:none;';
+    document.body.appendChild(toastContainer);
+  }
+
+  const toast = document.createElement('div');
+  toast.style.cssText = `background: ${type === 'success' ? '#16a34a' : '#dc2626'}; color:white; padding:14px 24px; border-radius:8px; font-weight:600; font-size:14px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); transform:translateX(100%); opacity:0; transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display:flex; align-items:center; gap:8px;`;
+
+  const icon = type === 'success' ? '✓' : '✕';
+  toast.innerHTML = `<span style="background:rgba(255,255,255,0.2); border-radius:50%; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; font-size:12px;">${icon}</span> ${msg}`;
+
+  toastContainer.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.style.transform = 'translateX(0)';
+    toast.style.opacity = '1';
+  });
+
+  setTimeout(() => {
+    toast.style.transform = 'translateX(100%)';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 400);
+  }, 3500);
+}
+
 // ────────────────────────────────────────────
 // GLOBAL OVERLAY LOCK SYSTEM
 // ────────────────────────────────────────────
@@ -3109,8 +3139,8 @@ function aggregateSchools(rawArr) {
   if (!rawArr || !Array.isArray(rawArr)) return [];
   
   return rawArr.map((s, idx) => {
-    // PROTEKSI NULL: Buat ID yang aman jika backend tidak mengirim 'no'
-    const safeId = s.no ? String(s.no) : String(s.nama).replace(/\s+/g, '_') + '_' + idx;
+    // PROTEKSI NULL & SAFE ID: Prioritaskan s.no, jika tidak ada gunakan nama dengan Regex Hapus Spasi
+    const safeId = s.no ? String(s.no) : (s.nama ? String(s.nama).replace(/\s+/g, "") + "_" + idx : "school_" + idx);
     
     let tot=0, lancar=0, belum=0, tidak=0;
     let k4t=0,k4l=0,k4b=0,k4k=0, k5t=0,k5l=0,k5b=0,k5k=0;
@@ -3631,7 +3661,12 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
         },
         options: {
           indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-          onClick: (e, els) => { if(els.length > 0 && barChartActiveData[els[0].index]) openModal(barChartActiveData[els[0].index].id); },
+          onClick: (e, els) => { 
+             if(els.length > 0) {
+                const s = barChartActiveData[els[0].index];
+                if (s && (s.id || s.no || s.nama)) openModal(s.id || s.no || s.nama);
+             }
+          },
           scales: {
             x: { min: 0, max: 100, grid: {color: gridColorConfig}, ticks: {callback: v=>v+'%', font:{size:10}}, border:{display:false} },
             y: { grid: {display: false}, ticks: {font:{size:10.5}}, border:{display:false} }
@@ -3699,7 +3734,12 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].id); },
+          onClick: (e, els) => { 
+             if(els.length > 0) {
+                const s = stackChartActiveData[els[0].index];
+                if (s && (s.id || s.no || s.nama)) openModal(s.id || s.no || s.nama);
+             }
+          },
           scales: {
             x: { stacked: true, grid: {display: false}, ticks: {font:{size:9.5}, maxRotation:45}, border:{display:false} },
             y: { stacked: true, grid: {color: gridColorConfig}, border:{display:false} }
@@ -4186,7 +4226,7 @@ function renderTrend(cakupan) {
           }
 
           return `
-          <div class="premium-row-card clickable" onclick="openModal('${item.no || item.id}', 2)">
+          <div class="premium-row-card clickable" onclick="openModal('${item.id || item.no || item.nama}', 2)">
               <div class="pr-header">
                   <div class="pr-name-group">
                       <div class="pr-name">${item.nama || '-'}</div>
@@ -4315,12 +4355,19 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
 // MODAL DETAIL SEKOLAH
 // ────────────────────────────────────────────
 function openModal(id, tabIdx = 0) {
+  // SAFE NULL CHECK
+  if (!id) {
+      showNotification("Akses ditolak: ID Sekolah tidak valid / null.", "error");
+      return;
+  }
+
   // Mendukung ID String untuk Null Safety
   lastSchoolCardId = `school-row-${id}`; 
-  currentModalSchool = currentSchools.find(s => String(s.id) === String(id) || String(s.no) === String(id));
+  currentModalSchool = currentSchools.find(s => String(s.id) === String(id) || String(s.no) === String(id) || String(s.nama) === String(id));
   
   if(!currentModalSchool) {
-      console.warn("Sekolah tidak ditemukan untuk ID:", id);
+      showNotification("Data detail sekolah tidak ditemukan pada sistem.", "error");
+      console.warn("Sekolah null/tidak ditemukan untuk ID:", id);
       return;
   }
   
@@ -4361,11 +4408,13 @@ function verifyPin() {
   const pinInput = document.getElementById('pinInput');
   if (pinInput.value === DEV_PIN) {
     closePinPrompt();
+    showNotification("Autentikasi berhasil. Mode Edit Aktif.", "success");
     enableEditMode();
   } else {
     pinInput.classList.add('error');
     pinInput.value = '';
     pinInput.focus();
+    showNotification("PIN tidak valid. Akses ditolak.", "error");
   }
 }
 
@@ -4484,6 +4533,7 @@ function onEditInput() {
 
   validateEditData();
   
+  // Real-time perhitungan Otomatis Persentase ke DOM UI
   if (document.getElementById('e_k4_pct') && editTempData.kls4.tersedia) {
     document.getElementById('e_k4_pct').innerHTML = pctPill(editTempData.kls4.tot > 0 ? (editTempData.kls4.lancar/editTempData.kls4.tot*100) : 0);
   }
@@ -4513,6 +4563,12 @@ async function saveModalChanges() {
   
   const btnSave = document.getElementById('btnSaveModal');
   if(!btnSave) return;
+
+  // SAFE NULL CHECK untuk object sekolah yang diedit
+  if (!editTempData || !editTempData.nama) {
+      showNotification("Gagal: Data sekolah tidak ditemukan atau null.", "error");
+      return;
+  }
   
   btnSave.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;margin-right:6px;"></span>Menyimpan...';
   btnSave.disabled = true;
@@ -4522,14 +4578,12 @@ async function saveModalChanges() {
     const targetRow = editTempData.rows && editTempData.rows[0] ? editTempData.rows[0] : {};
     const enteredPin = document.getElementById('pinInput') ? document.getElementById('pinInput').value : DEV_PIN;
     
+    // Payload sinkron murni sesuai parameter Apps Script Baru (Tanpa object ID lama)
     const requestPayload = {
-      action: 'update',
       pin: enteredPin,
       Tahun: currentYear,
       Bulan: currentMonth,
       Sekolah: editTempData.nama,
-      Guru: targetRow.guru || (editTempData.guru && editTempData.guru[0]) || "",
-      Hadir: parseInt(targetRow.hadir !== undefined ? targetRow.hadir : (editTempData.hadir && editTempData.hadir[0])) || 0,
       Total4: parseInt(editTempData.kls4.tot) || 0,
       Lancar4: parseInt(editTempData.kls4.lancar) || 0,
       Belum4: parseInt(editTempData.kls4.belum) || 0,
@@ -4537,14 +4591,14 @@ async function saveModalChanges() {
       Total5: parseInt(editTempData.kls5.tot) || 0,
       Lancar5: parseInt(editTempData.kls5.lancar) || 0,
       Belum5: parseInt(editTempData.kls5.belum) || 0,
-      Tidak5: parseInt(editTempData.kls5.tidak) || 0
+      Tidak5: parseInt(editTempData.kls5.tidak) || 0,
+      Guru: targetRow.guru || (editTempData.guru && editTempData.guru[0]) || "",
+      Hadir: parseInt(targetRow.hadir !== undefined ? targetRow.hadir : (editTempData.hadir && editTempData.hadir[0])) || 0
     };
 
     const response = await fetch(API_URL, { 
         method: 'POST', 
         headers: {
-            // Karena Apps Script terkadang memblokir Content-Type JSON via CORS,
-            // Mode "text/plain" aman digunakan jika backend men-handle JSON.parse(e.postData.contents)
             "Content-Type": "text/plain;charset=utf-8", 
         },
         body: JSON.stringify(requestPayload) 
@@ -4561,7 +4615,7 @@ async function saveModalChanges() {
         throw new Error(result.message || "Gagal menyimpan ke database server.");
     }
 
-    // 2. Terapkan secara Real-Time ke Dashboard Memory State (Optimistic UI)
+    // 2. Terapkan secara Real-Time ke Dashboard Memory State (Optimistic UI Profesional - Anti Jump)
     if (DATABASE && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
         const rawMonthData = DATABASE[currentYear][currentMonth];
         const target = rawMonthData.find(s => String(s.no) === String(editTempData.no) || String(s.nama) === String(editTempData.nama));
@@ -4580,24 +4634,28 @@ async function saveModalChanges() {
            if (editTempData.guru && editTempData.guru.length > 0) {
               editTempData.guru.forEach((gName, idx) => {
                   if (!target.rows[idx]) target.rows[idx] = {};
-                  target.rows[idx].guru = gName;
-                  target.rows[idx].hadir = editTempData.hadir[idx];
+                  target.rows[idx].guru = requestPayload.Guru;
+                  target.rows[idx].hadir = requestPayload.Hadir;
               });
            }
         }
         
         disableEditMode();
         renderUI(rawMonthData);
-        openModal(editTempData.id || editTempData.no, 0);
+        // Buka kembali modal yang sudah memuat data secara halus tanpa reload
+        openModal(editTempData.id || editTempData.no || editTempData.nama, 0);
+        
+        showNotification(`Data ${requestPayload.Sekolah} berhasil diperbarui!`, "success");
     } else {
-        // Fallback jika memory state berantakan, reload full data
+        // Fallback Data Reload
         await loadData(currentYear, currentMonth);
         disableEditMode();
         closeModal();
+        showNotification(`Data berhasil diperbarui ke server.`, "success");
     }
 
   } catch (err) {
-    alert("Gagal memperbarui data: " + err.message);
+    showNotification("Gagal memperbarui data: " + err.message, "error");
     btnSave.innerHTML = 'Simpan Perubahan';
     btnSave.disabled = false;
   }
