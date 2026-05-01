@@ -1925,6 +1925,15 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           <span class="btn-text">Layar Penuh</span>
         </button>
 
+        <!-- FITUR BARU: TOMBOL REFRESH CACHE -->
+        <button class="btn-print" id="refreshBtn" style="background: var(--primary);" title="Segarkan Data & Hapus Cache">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+             <path d="M21 2v6h-6"></path>
+             <path d="M3 12a9 9 0 1 0 2.13-5.83L2 9"></path>
+          </svg>
+          <span class="btn-text">Refresh Data</span>
+        </button>
+
         <!-- Dark mode toggle is dynamically injected here via JS -->
         <button class="btn-print" onclick="window.print()" title="Cetak PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -2537,30 +2546,36 @@ function unlockOverlayBackground(force = false) {
 // ────────────────────────────────────────────
 // INIT & APP ROUTING (LOGIN / DASHBOARD)
 // ────────────────────────────────────────────
+
+// 🎯 INTI SOLUSI: DOMContentLoaded dieksekusi agar Dashboard refresh data secara otomatis
 document.addEventListener("DOMContentLoaded", () => {
+  setupEventListeners(); // Pasang semua listener di awal
+
   if (localStorage.getItem('isLogin') === 'true') {
-    showDashboardView();
+    // 1. Tampilkan kontainer UI dashboard & siapkan fullscreen
+    showDashboardView(); 
+
+    // 2. Tunggu sebentar agar UI stabil, lalu auto-refresh clear cache dari server
+    setTimeout(() => {
+      // parameter `true` artinya ini adalah *initial load*, sehingga auto-render setup 1-month
+      refreshData(true); 
+    }, 300);
   } else {
     showLoginView();
   }
 });
 
-async function showDashboardView() {
+function showDashboardView() {
   document.getElementById('loginView').style.display = 'none';
   document.getElementById('dashboardView').style.display = 'block';
-  
-  unlockOverlayBackground(true); // Lepas lock setelah login
-  
-  // Inisialisasi event dan ambil data
+  unlockOverlayBackground(true); 
   initFullscreenSystem();
-  await initDashboard();
 }
 
 function showLoginView() {
   document.getElementById('loginView').style.display = 'flex';
   document.getElementById('dashboardView').style.display = 'none';
-  
-  lockOverlayBackground(); // Lock background untuk layar login
+  lockOverlayBackground(); 
   setupLoginLogic();
 }
 
@@ -2584,7 +2599,6 @@ function setupLoginLogic() {
   const iconShow   = document.getElementById('iconShow');
   const iconHide   = document.getElementById('iconHide');
 
-  // Toggle password visibility
   togglePw.addEventListener('click', function () {
     const isHidden = passwordEl.type === 'password';
     passwordEl.type = isHidden ? 'text' : 'password';
@@ -2594,7 +2608,6 @@ function setupLoginLogic() {
     passwordEl.focus();
   });
 
-  // Hide error on input
   [usernameEl, passwordEl].forEach(function (el) {
     el.addEventListener('input', function () {
       if (errorMsg.classList.contains('visible')) {
@@ -2603,7 +2616,6 @@ function setupLoginLogic() {
     });
   });
 
-  // Trigger shake animation
   function triggerShake() {
     card.classList.remove('shake');
     void card.offsetWidth; /* reflow */
@@ -2613,7 +2625,6 @@ function setupLoginLogic() {
     }, { once: true });
   }
 
-  // Set loading state
   function setLoading(state) {
     if (state) {
       btnText.textContent = 'Memproses…';
@@ -2627,7 +2638,6 @@ function setupLoginLogic() {
     }
   }
 
-  // Form submit handling
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -2647,7 +2657,11 @@ function setupLoginLogic() {
           // Switch view
           showDashboardView();
           
-          // Clear password input
+          // 🎯 Panggil refreshData agar fetch otomatis setelah login
+          setTimeout(() => {
+             refreshData(true);
+          }, 300);
+
           passwordEl.value = '';
           btnText.textContent = 'Masuk';
           btnSubmit.disabled = false;
@@ -2662,7 +2676,6 @@ function setupLoginLogic() {
     }, delay);
   });
 
-  // Enter key handling on inputs
   [usernameEl, passwordEl].forEach(function (el) {
     el.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
@@ -2678,7 +2691,7 @@ function setupLoginLogic() {
 // DASHBOARD DATA INIT & EVENT LISTENERS
 // ────────────────────────────────────────────
 
-// backend sync filter
+// Backend fetch wrapper yang digunakan saat user klik "Terapkan Filter"
 async function fetchDashboardData(isInit = false) {
     const url = new URL(API_URL);
     url.searchParams.append('action', 'dashboard');
@@ -2697,39 +2710,178 @@ async function fetchDashboardData(isInit = false) {
     return await res.json();
 }
 
-async function initDashboard() {
-  if (isLoading) return;
-  try {
-    showLoading("Menyinkronkan Dashboard", "Mengambil data inisial dari server...");
-    const [resData] = await Promise.all([
-        fetchDashboardData(true), // Single source of truth fetcher
-        new Promise(resolve => setTimeout(resolve, 800))
-    ]);
-    
-    window.MASTER_PAYLOAD = resData; 
-    DATABASE = resData.grouped_data || resData; 
-
-    // Setup Filter Dropdowns
-    initMasterFilterDropdowns();
-    
-    // Auto trigger 1 Bulan preset filter (single month mode)
-    setPreset(1);
-
-  } catch (err) {
-    console.error("Init Error:", err);
-    showError();
-  } finally {
-    hideLoading();
+function setupEventListeners() {
+  // Hubungkan tombol refresh dengan fungsi refreshData (parameter false = bukan load awal)
+  const btnRefresh = document.getElementById("refreshBtn");
+  if (btnRefresh) {
+      btnRefresh.addEventListener("click", () => refreshData(false));
   }
 }
 
-function setupEventListeners() {
-  // Fungsi sinkronisasi ganda dikosongkan karena UI filter kini terpusat (Single UI) 
-  // di dalam Menu Fullscreen Hamburger saja.
+// ────────────────────────────────────────────
+// 🎯 FUNGSI UTAMA PENGAMBILAN DATA KESELURUHAN (PRODUCTION READY)
+// ────────────────────────────────────────────
+async function refreshData(isInit = false) {
+    const btn = document.getElementById("refreshBtn");
+    
+    // Simpan konten UI tombol asli untuk dikembalikan saat finally
+    const originalContent = btn ? btn.innerHTML : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 2.13-5.83L2 9"></path></svg><span class="btn-text">Refresh Data</span>`;
+
+    try {
+        // 1. Loading UI pada tombol aktif (Bonus UX Pro)
+        if (btn) {
+            btn.disabled = true;
+            btn.style.opacity = "0.8";
+            btn.style.cursor = "wait";
+            btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> <span class="btn-text">Memuat...</span>`;
+        }
+
+        // Tampilkan global loading screen khusus jika ini adalah auto-load yang pertama kali
+        if (isInit) {
+            showLoading("Menyinkronkan Dashboard", "Menghapus cache & memuat data terbaru otomatis...");
+        }
+
+        // 2. Clear cache backend
+        await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "clear_cache" })
+        });
+
+        // 3. Delay kecil agar Google Apps Script dan server cache siap merespons data yang fresh
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // 4. Setup AbortController dengan Timeout 10 Detik
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
+        // 5. Build URL beserta parameter filter yang sedang aktif
+        const url = new URL(API_URL);
+        url.searchParams.append('action', 'dashboard');
+        
+        // Sertakan filter aktif jika bukan inisialisasi awal, 
+        // sehingga dashboard tidak mereset filter yang telah diatur user.
+        if (!isInit && dashboardState.filter.fromMonth) {
+            url.searchParams.append('fromMonth', dashboardState.filter.fromMonth);
+            url.searchParams.append('fromYear', dashboardState.filter.fromYear);
+            url.searchParams.append('toMonth', dashboardState.filter.toMonth);
+            url.searchParams.append('toYear', dashboardState.filter.toYear);
+            url.searchParams.append('kecamatan', dashboardState.filter.kecamatan);
+            url.searchParams.append('kelas', dashboardState.filter.kelas);
+        }
+
+        // 6. Fetch data utama yang baru
+        const res = await fetch(url.toString(), {
+            signal: controller.signal
+        });
+
+        // Hapus timeout karena request berhasil
+        clearTimeout(timeout);
+
+        if (!res.ok) {
+            throw new Error("Response error HTTP: " + res.status);
+        }
+
+        const data = await res.json();
+
+        // 7. Validasi wajib status "success"
+        if (!data || (data.status && data.status !== "success")) {
+            throw new Error(data.message || "Backend error: Gagal mengambil data valid");
+        }
+
+        // 8. Update State Internal
+        const actualData = data.data || data;
+        
+        if (!actualData.grouped_data && !Object.keys(actualData).length) {
+           throw new Error("Struktur data tidak lengkap");
+        }
+
+        window.MASTER_PAYLOAD = actualData; 
+        DATABASE = actualData.grouped_data || actualData; 
+
+        // 9. Render Ulang ke UI
+        if (isInit) {
+            // -- Eksekusi Spesial Saat Load Pertama Kali --
+            initMasterFilterDropdowns();
+            
+            // Setel state mode ke "1 Bulan" secara manual
+            setPeriodMode('single');
+            const allP = getAllPeriods();
+            
+            if (allP.length > 0) {
+                const latest = allP[allP.length - 1]; // Cari data bulan paling akhir
+                
+                // Styling preset button
+                document.getElementById('preset1')?.classList.add('active');
+                
+                // Ubah nilai Select Dropdown UI
+                const mfaBulan = document.getElementById('mfAwalBulan');
+                const mfaTahun = document.getElementById('mfAwalTahun');
+                if (mfaBulan) mfaBulan.value = latest.month;
+                if (mfaTahun) mfaTahun.value = latest.year;
+                
+                // Terapkan ke state internal filter
+                selectedKecamatan = 'all';
+                selectedKelas = 'all';
+                currentMonth = latest.month;
+                currentYear = latest.year;
+                
+                dashboardState.filter = {
+                    fromMonth: currentMonth, fromYear: currentYear,
+                    toMonth: currentMonth, toYear: currentYear,
+                    kecamatan: 'all', kelas: 'all'
+                };
+            }
+
+            // Render Dashboard View langsung tanpa memanggil double fetch
+            if (currentYear && currentMonth && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+                renderUI(DATABASE[currentYear][currentMonth]);
+            } else {
+                showEmpty();
+            }
+        } else {
+            // -- Eksekusi Reguler (Saat User klik tombol Refresh Data Manual) --
+            if (currentYear && currentMonth && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+                renderUI(DATABASE[currentYear][currentMonth]);
+            } else {
+                showEmpty(); // Jika filter bulan ini tiba-tiba ditarik/dihapus di server
+            }
+            
+            // Perbarui trend jika halaman tren sedang terbuka saat tombol ditekan
+            if (document.getElementById('view-trend').classList.contains('active')) {
+                renderTrend(selectedKecamatan === 'all' ? 'Kota Banjar' : `Kec. ${selectedKecamatan}`);
+            }
+        }
+
+    } catch (err) {
+        console.error("REFRESH ERROR:", err);
+        // Tampilkan peringatan spesifik jika error karena Timeout (10 detik)
+        if (err.name === 'AbortError') {
+            alert("Gagal memuat ulang: Request Timeout (10 detik). Silakan periksa koneksi internet Anda.");
+        } else {
+            if (!isInit) {
+                alert("Gagal menyegarkan data. Cek koneksi internet atau server.");
+            } else {
+                showError(); // Gunakan tampilan error embeded di tengah layar pada beban inisial
+            }
+        }
+    } finally {
+        // 10. Loading OFF (WAJIB ADA): Kembalikan kondisi tombol seperti semula
+        if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btn.style.cursor = "pointer";
+            btn.innerHTML = originalContent; 
+        }
+        
+        // Hapus Global overlay loading box untuk init
+        if (isInit) {
+            hideLoading();
+        }
+    }
 }
 
 // ────────────────────────────────────────────
-// NEW: LOGIKA FILTER PREMIUM (1 BULAN & RENTANG)
+// LOGIKA FILTER PREMIUM (1 BULAN & RENTANG)
 // ────────────────────────────────────────────
 
 // Helper to remove active state from quick presets
@@ -2785,7 +2937,6 @@ function validateFilter() {
 
 // quick preset filter
 function setPreset(val) {
-    // Menghapus styling active di seluruh list preset
     resetPresets();
     
     const allP = getAllPeriods();
@@ -2843,6 +2994,7 @@ function initMasterFilterDropdowns() {
     pop('mfAkhirTahun', years);
 }
 
+// Eksekusi saat User Meng-klik manual "Terapkan Filter"
 async function applyMasterFilter() {
     if (!validateFilter()) return;
 
@@ -2855,34 +3007,31 @@ async function applyMasterFilter() {
     let mfAkhirBulan = mfAwalBulan;
     let mfAkhirTahun = mfAwalTahun;
 
-    // Jika masuk mode range period, ubah value dari UI Akhir
     if (mode === 'range') {
         mfAkhirBulan = document.getElementById('mfAkhirBulan').value;
         mfAkhirTahun = document.getElementById('mfAkhirTahun').value;
     }
 
-    // Menyetel Parameter Global Dashboard State ke Parameter URL Sync Backend
     dashboardState.filter = {
         fromMonth: mfAwalBulan, fromYear: mfAwalTahun,
         toMonth: mfAkhirBulan, toYear: mfAkhirTahun,
         kecamatan: mfKec, kelas: mfKelas
     };
 
-    // Sinkronisasi state komponen rendering lama (Safe Refactor)
     selectedKecamatan = mfKec;
     selectedKelas = mfKelas;
     currentMonth = mfAkhirBulan;
     currentYear = mfAkhirTahun;
 
-    // Tutup panel Hamburger Menu secara otomatis setelah tombol diklik
     closeSidebar();
 
     showLoading("Menerapkan Filter Data", "Menyinkronkan data validasi dengan server...");
     
     try {
         const rawData = await fetchDashboardData(false);
-        window.MASTER_PAYLOAD = rawData;
-        DATABASE = rawData.grouped_data || rawData;
+        const actualData = rawData.data || rawData;
+        window.MASTER_PAYLOAD = actualData;
+        DATABASE = actualData.grouped_data || actualData;
 
         if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
             renderUI(DATABASE[currentYear][currentMonth]);
@@ -3780,7 +3929,6 @@ function renderTrend(cakupan) {
       
       allP.sort((a,b) => getPeriodValue(a.year, a.month) - getPeriodValue(b.year, b.month));
       
-      // Ambil nilai dari Master Filter
       const mfDariBulan = document.getElementById('mfAwalBulan')?.value || allP[0].month;
       const mfDariTahun = document.getElementById('mfAwalTahun')?.value || allP[0].year;
       const mfSampaiBulan = document.getElementById('mfAkhirBulan')?.value || allP[allP.length-1].month;
@@ -3805,7 +3953,6 @@ function renderTrend(cakupan) {
           return;
       }
 
-      // Deteksi Otomatis (Snapshot vs Trend)
       let isSnapshot = (vDari === vSampai);
       
       if (isSnapshot) {
@@ -3816,7 +3963,6 @@ function renderTrend(cakupan) {
           safeSetText('tsbDesc', `Memantau pergerakan dan dinamika progres sekolah pada rentang waktu tersebut.`);
       }
 
-      // --- 1. DATA EXTRACTION ---
       let execSum = {};
       let topList = [];
       let botList = [];
@@ -3880,12 +4026,9 @@ function renderTrend(cakupan) {
           });
 
           execSum = { total_sekolah: tSekolah, total_siswa_aktif: tSiswa, progress_positif: pPositif, perlu_pendampingan: pEvaluasi };
-          
-          // Mempersiapkan list data utuh untuk Pagination UI, tanpa diiris menjadi 10
           topList = [...dynamicProgress]; 
           botList = [...dynamicProgress];
       } else {
-          // Mode Snapshot
           const pTarget = validPeriods[0];
           let rawTarget = DATABASE[pTarget.year]?.[pTarget.month] || [];
           if (selectedKecamatan !== 'all') {
@@ -3897,7 +4040,6 @@ function renderTrend(cakupan) {
           execSum = { total_sekolah: schTarget.length, total_siswa_aktif: T.tot, progress_positif: 0, perlu_pendampingan: 0 };
       }
 
-      // --- 2. RENDER KPI GRIDS ---
       if (execSum && Object.keys(execSum).length > 0) {
           if(kpiGrid) kpiGrid.style.display = 'grid';
           safeSetText('tkTotalSekolah', fmt(execSum.total_sekolah || 0));
@@ -3908,7 +4050,6 @@ function renderTrend(cakupan) {
           if(kpiGrid) kpiGrid.style.display = 'none';
       }
 
-      // --- 3. RENDER VALIDATION BANNER ---
       if (validPeriods.length >= 2) {
           if(valBanner) {
               valBanner.style.display = 'block';
@@ -3926,7 +4067,6 @@ function renderTrend(cakupan) {
           if(valBanner) valBanner.style.display = 'none';
       }
 
-      // --- 4. PREPARE CHART DATA ---
       if(tEl) {
         tEl.innerHTML = '<canvas id="trendChartCanvas"></canvas>';
       }
@@ -3993,7 +4133,6 @@ function renderTrend(cakupan) {
           });
       }
 
-      // --- 5. SCHOOL PROGRESS TRACKING WITH PAGINATION ---
       if (validPeriods.length < 2) {
           if(progressGrid) progressGrid.style.display = 'none';
           if(conclusionCard) conclusionCard.style.display = 'none';
@@ -4002,7 +4141,6 @@ function renderTrend(cakupan) {
       
       if(progressGrid) progressGrid.style.display = 'grid';
 
-      // Render Single Premium Card
       const renderPremiumCard = (item, isTop) => {
           if (!item) return '';
           const prog = item.progress || {};
@@ -4074,7 +4212,6 @@ function renderTrend(cakupan) {
           `;
       };
 
-      // Pagination Handlers
       window.changeTrendPage = function(type, direction) {
           if (type === 'top') {
               trendPageTop += direction;
@@ -4091,7 +4228,7 @@ function renderTrend(cakupan) {
           const isNextDisabled = currentPage === totalPages;
           const btnClass = type === 'top' ? 'top-btn' : 'bot-btn';
 
-          if (totalItems <= TREND_LIMIT) return ''; // Tidak perlu tombol jika data <= 10
+          if (totalItems <= TREND_LIMIT) return ''; 
 
           return `
           <div class="pagination-controls">
@@ -4129,7 +4266,6 @@ function renderTrend(cakupan) {
           let html = paginatedItems.map(item => renderPremiumCard(item, type === 'top')).join('');
           html += renderPaginationControls(type, page, data.length);
           
-          // Smooth render transition
           listContainer.style.opacity = '0';
           setTimeout(() => {
               listContainer.innerHTML = html;
@@ -4138,20 +4274,17 @@ function renderTrend(cakupan) {
           }, 150);
       }
 
-      // Memisahkan dan mengurutkan data untuk Top & Bot secara penuh (Single Source of Truth)
       trendDataTop = topList.filter(s => (s.progress?.persen || 0) > 0).sort((a,b) => b.progress.persen - a.progress.persen);
       trendDataBot = botList.filter(s => (s.progress?.persen || 0) <= 0).sort((a,b) => a.progress.persen - b.progress.persen);
       
       trendPageTop = 1;
       trendPageBot = 1;
 
-      // Render lists
       const topEl = document.getElementById('trendTopList');
       const botEl = document.getElementById('trendBotList');
       if (topEl) renderTrendList('top');
       if (botEl) renderTrendList('bot');
 
-      // --- 6. EXECUTIVE CONCLUSION AUTO GENERATION ---
       if(conclusionCard) conclusionCard.style.display = 'block';
 
       const dStart = pctData[0] || 0;
@@ -4199,12 +4332,12 @@ function renderKesimpulan(T, pct, allSchoolsAggr, cakupan, best, worst, isAll) {
 // ────────────────────────────────────────────
 // MODAL LOGIC (Detail Sekolah)
 // ────────────────────────────────────────────
-function openModal(no) {
-  const s = currentSchools.find(x => x.no == no);
+function openModal(no, tabIndex = 0) {
+  const s = currentSchools.find(x => x.no == no) || barChartActiveData.find(x => x.no == no) || stackChartActiveData.find(x => x.no == no);
   if(!s) return;
   currentModalSchool = s;
   safeSetText('modalTitle', s.nama);
-  switchTab(0);
+  switchTab(tabIndex);
   document.getElementById('modalOverlay').classList.add('open');
   lockOverlayBackground();
 }
@@ -4238,9 +4371,9 @@ function switchTab(idx) {
       let klsStr = [];
       if(isValidClass(r.kls4)) klsStr.push('Kelas 4');
       if(isValidClass(r.kls5)) klsStr.push('Kelas 5');
-      const hVal = r.hadir_avg !== undefined ? r.hadir_avg : (Number(r.hadir) || 0);
+      const hVal = r.hadir_avg != null && !isNaN(r.hadir_avg) ? parseFloat(r.hadir_avg) : 0;
       const hadirCls = hVal >= 90 ? 'color:var(--success)' : hVal >= 75 ? 'color:var(--warning)' : 'color:var(--danger)';
-      const hadirDisp = String(r.hadir).includes('/') ? r.hadir : `${r.hadir}%`;
+      const hadirDisp = String(r.hadir).includes('/') ? r.hadir : `${hVal}%`;
       html += `<tr><td data-label="Kelas">${klsStr.join(' & ')}</td><td data-label="Guru">${r.guru}</td><td data-label="Hadir" style="font-weight:600;${hadirCls}">${hadirDisp}</td></tr>`;
     });
     html += `</tbody></table></div>`;
@@ -4249,7 +4382,7 @@ function switchTab(idx) {
     const allP = getAllPeriods();
     let lastPct = null;
     allP.forEach(p => {
-      const raw = DATABASE[p.year][p.month];
+      const raw = DATABASE[p.year]?.[p.month];
       if(!raw) return;
       const sch = aggregateSchools(raw).find(x => x.no === s.no);
       if(!sch || sch.tot === 0) return;
@@ -4268,87 +4401,49 @@ function switchTab(idx) {
 function applyTheme(isDark) {
   if (isDark) {
     document.body.classList.add('dark');
-    document.querySelector('.icon-moon').style.display = 'none';
-    document.querySelector('.icon-sun').style.display = 'block';
-    document.querySelector('.toggle-text').textContent = 'Mode Terang';
+    const iconMoon = document.querySelector('.icon-moon');
+    const iconSun = document.querySelector('.icon-sun');
+    const toggleText = document.querySelector('.toggle-text');
+    if(iconMoon) iconMoon.style.display = 'none';
+    if(iconSun) iconSun.style.display = 'block';
+    if(toggleText) toggleText.textContent = 'Mode Terang';
     document.getElementById('themeColorMeta').setAttribute('content', '#0f172a');
   } else {
     document.body.classList.remove('dark');
-    document.querySelector('.icon-moon').style.display = 'block';
-    document.querySelector('.icon-sun').style.display = 'none';
-    document.querySelector('.toggle-text').textContent = 'Mode Gelap';
-    document.getElementById('themeColorMeta').setAttribute('content', '#f8fafc');
+    const iconMoon = document.querySelector('.icon-moon');
+    const iconSun = document.querySelector('.icon-sun');
+    const toggleText = document.querySelector('.toggle-text');
+    if(iconMoon) iconMoon.style.display = 'block';
+    if(iconSun) iconSun.style.display = 'none';
+    if(toggleText) toggleText.textContent = 'Mode Gelap';
+    document.getElementById('themeColorMeta').setAttribute('content', '#ffffff');
   }
+  
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
   
-  if (typeof Chart !== 'undefined') {
-    const gridColorConfig = isDark ? '#334155' : '#e2e8f0';
-    Chart.defaults.color = isDark ? '#94a3b8' : '#94a3b8';
-    Object.keys(charts).forEach(k => {
-      if (charts[k] && charts[k].options.scales) {
-        if (charts[k].options.scales.x && charts[k].options.scales.x.grid) charts[k].options.scales.x.grid.color = gridColorConfig;
-        if (charts[k].options.scales.y && charts[k].options.scales.y.grid) charts[k].options.scales.y.grid.color = gridColorConfig;
-        charts[k].update();
-      }
+  if (window.MASTER_PAYLOAD && currentYear && currentMonth && DATABASE[currentYear]?.[currentMonth]) {
+    renderUI(DATABASE[currentYear][currentMonth]);
+  }
+}
+
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+  applyTheme(isDark);
+
+  const loginToggle = document.getElementById('loginThemeToggle');
+  if (loginToggle) {
+    loginToggle.addEventListener('click', () => {
+      applyTheme(!document.body.classList.contains('dark'));
     });
   }
 }
 
-// Init Theme Defaults
-const savedTheme = localStorage.getItem('theme');
-const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-  applyTheme(true);
-} else {
-  applyTheme(false);
-}
+// Eksekusi inisialisasi tema segera
+initTheme();
 
-// Login Theme Toggle Bind
-const logToggle = document.getElementById('loginThemeToggle');
-if (logToggle) {
-  logToggle.addEventListener('click', () => {
-    applyTheme(!document.body.classList.contains('dark'));
-  });
-}
-
-// Inject Dashboard Header Dark Toggle
-const headerRight = document.querySelector('.header-right');
-if (headerRight) {
-  const dbToggle = document.createElement('button');
-  dbToggle.id = 'darkToggleBtn';
-  dbToggle.title = 'Ganti Tema';
-  dbToggle.innerHTML = `
-    <svg class="db-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-    </svg>
-    <svg class="db-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-    </svg>
-  `;
-  headerRight.insertBefore(dbToggle, headerRight.firstChild);
-  
-  dbToggle.addEventListener('click', () => {
-    const isDark = !document.body.classList.contains('dark');
-    applyTheme(isDark);
-    const m = dbToggle.querySelector('.db-icon-moon');
-    const s = dbToggle.querySelector('.db-icon-sun');
-    if(m && s) {
-      m.style.display = isDark ? 'none' : 'block';
-      s.style.display = isDark ? 'block' : 'none';
-    }
-  });
-
-  // Init Dashboard Icon display sync
-  setTimeout(() => {
-    const isDark = document.body.classList.contains('dark');
-    const m = dbToggle.querySelector('.db-icon-moon');
-    const s = dbToggle.querySelector('.db-icon-sun');
-    if(m && s) {
-      m.style.display = isDark ? 'none' : 'block';
-      s.style.display = isDark ? 'block' : 'none';
-    }
-  }, 0);
-}
 </script>
 </body>
 </html>
