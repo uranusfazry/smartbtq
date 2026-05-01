@@ -537,8 +537,9 @@ body.dark .log-theme-toggle:hover {
 .charts-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
 @media(max-width: 1100px) { .charts-2col { grid-template-columns: 1fr; } }
 .chart-wrap { position: relative; }
-.chart-scroll { overflow-x: auto; padding-bottom: 4px; }
-.chart-scroll-inner { position: relative; height: 300px; }
+/* MENDUKUNG HORIZONTAL SCROLL PENUH */
+.chart-scroll { overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+.chart-scroll-inner { position: relative; height: 300px; transition: width 0.3s ease; }
 .pie-insight-grid { grid-template-columns: repeat(3, 1fr); display: grid; gap: 12px; }
 
 /* ────────────────────────────────────────────
@@ -633,13 +634,32 @@ body.dark .sel:focus {
 .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .btn-print {
   display: flex; align-items: center; gap: 6px;
-  background: var(--primary); color: #fff; border: none; border-radius: var(--r-md);
-  padding: 8px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer;
-  transition: var(--transition-base); box-shadow: 0 2px 6px rgba(37,99,235,.25);
+  background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--r-md);
+  padding: 8px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow-xs);
+  transition: var(--transition-base); 
   white-space: nowrap; letter-spacing: 0.1px;
 }
-.btn-print:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.35); }
-.btn-print svg { width: 14px; height: 14px; }
+.btn-print:hover { background: var(--border-2); border-color: var(--text-tertiary); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.btn-print svg { width: 14px; height: 14px; flex-shrink: 0;}
+
+/* Action Buttons (Primary Colors) */
+.btn-action-primary {
+  background: var(--primary); color: #fff; border: none; box-shadow: 0 2px 6px rgba(37,99,235,.25);
+}
+.btn-action-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.35); }
+
+/* Export Excel specific */
+.btn-export-excel {
+  background: #16a34a; color: white; border: none; box-shadow: 0 2px 6px rgba(22,163,74,.25);
+}
+.btn-export-excel:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,163,74,.35); }
+
+/* Export PDF specific */
+.btn-export-pdf {
+  background: #dc2626; color: white; border: none; box-shadow: 0 2px 6px rgba(220,38,38,.25);
+}
+.btn-export-pdf:hover { background: #b91c1c; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220,38,38,.35); }
+
 
 /* Premium Fullscreen Button */
 .btn-fs-toggle {
@@ -1540,9 +1560,11 @@ body.dark .fs-btn-accept {
   .hist-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px; border-radius: var(--r-md); }
   .hist-period { grid-column: 1 / -1; font-size: 14px; border-bottom: 1px dashed var(--border-2); padding-bottom: 6px; }
   .hist-pct { font-size: 16px; text-align: right; }
+  
   .chart-wrap { height: 260px !important; }
-  .chart-scroll { overflow-x: hidden !important; width: 100% !important; padding-bottom: 0; }
-  .chart-scroll-inner { width: 100% !important; height: 320px; } 
+  /* PERBAIKAN: Menghapus overflow-x: hidden dan width 100% !important agar HP bisa scroll horizontal */
+  .chart-scroll { overflow-x: auto; padding-bottom: 0; -webkit-overflow-scrolling: touch; }
+  .chart-scroll-inner { height: 320px; transition: width 0.3s ease; } 
   
   .sidebar,
   .sidebar-inner,
@@ -1597,6 +1619,67 @@ body.overlay-lock .main {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+}
+
+/* ────────────────────────────────────────────
+   23. MENU ACCESS CONTROL SYSTEM (NEW)
+──────────────────────────────────────────── */
+.nav-disabled {
+  opacity: 0.35 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  background: transparent !important;
+}
+
+.modal-overlay-access {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay-access.show {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-box-access {
+  background: var(--surface);
+  padding: 32px 28px;
+  border-radius: var(--r-xl);
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.25);
+  border: 1px solid var(--border);
+  transform: scale(0.95) translateY(15px);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-overlay-access.show .modal-box-access {
+  transform: scale(1) translateY(0);
+}
+
+body.dark .modal-box-access {
+  background: #162032;
+  border-color: rgba(255,255,255,0.1);
+}
+
+.blur-lock-hard {
+  overflow: hidden !important;
+}
+
+.blur-lock-hard .shell {
+  filter: blur(5px);
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
 /* Skeleton Animation (Shimmer) */
@@ -1925,8 +2008,8 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           <span class="btn-text">Layar Penuh</span>
         </button>
 
-        <!-- FITUR BARU: TOMBOL REFRESH CACHE -->
-        <button class="btn-print" id="refreshBtn" style="background: var(--primary);" title="Segarkan Data & Hapus Cache">
+        <!-- TOMBOL REFRESH CACHE -->
+        <button class="btn-print btn-action-primary" id="refreshBtn" title="Segarkan Data & Hapus Cache">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
              <path d="M21 2v6h-6"></path>
              <path d="M3 12a9 9 0 1 0 2.13-5.83L2 9"></path>
@@ -1934,12 +2017,30 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           <span class="btn-text">Refresh Data</span>
         </button>
 
-        <!-- Dark mode toggle is dynamically injected here via JS -->
-        <button class="btn-print" onclick="window.print()" title="Cetak PDF">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          <span class="btn-text">Cetak PDF</span>
+        <!-- TOMBOL DOWNLOAD PDF -->
+        <button class="btn-print btn-export-pdf" onclick="downloadPDF()" title="Download PDF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span class="btn-text">Download PDF</span>
         </button>
-        <button class="btn-print" onclick="doLogout()" style="background: var(--danger);" title="Keluar">
+
+        <!-- TOMBOL DOWNLOAD EXCEL -->
+        <button class="btn-print btn-export-excel" onclick="downloadExcel()" title="Download Excel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="8" y1="13" x2="16" y2="17"></line>
+            <line x1="16" y1="13" x2="8" y2="17"></line>
+          </svg>
+          <span class="btn-text">Download Excel</span>
+        </button>
+
+        <button class="btn-print" onclick="doLogout()" style="background: var(--danger); color: white; border: none;" title="Keluar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -2222,15 +2323,24 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
               <div id="pie-insight" style="margin-top:14px"></div>
             </div>
           </div>
+          
           <div class="chart-card" style="margin-bottom:0">
             <div class="chart-card-header">
               <div>
-                <div class="chart-card-title">Top 10 Sekolah</div>
+                <div class="chart-card-title">Peringkat Sekolah</div>
                 <div class="chart-card-sub">Klik batang untuk detail sekolah</div>
               </div>
+              <div class="sort-group" style="width:auto;">
+                <button class="sort-btn active" id="btnBarTop10" onclick="setBarMode('top10')">Top 10</button>
+                <button class="sort-btn" id="btnBarAll" onclick="setBarMode('all')">Semua</button>
+              </div>
             </div>
-            <div class="chart-card-body">
-              <div class="chart-wrap" style="height:220px"><canvas id="barChart"></canvas></div>
+            <div class="chart-card-body" style="padding-top:0">
+              <div class="ranking-wrapper" style="max-height: 280px; overflow-y: auto; overflow-x: hidden; padding-top: 16px; padding-right: 4px;">
+                <div id="barCanvasContainer" style="position: relative; height: 220px; width: 100%;">
+                  <canvas id="barChart"></canvas>
+                </div>
+              </div>
               <div id="bar-insight" style="margin-top:14px"></div>
             </div>
           </div>
@@ -2243,7 +2353,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
               <div class="chart-card-title" id="stackTitle">Distribusi Lengkap Per Sekolah</div>
               <div class="chart-card-sub">Klik batang untuk detail</div>
             </div>
-            <div class="sort-group" id="stackToggle" style="display:none; width:auto;">
+            <div class="sort-group" id="stackToggle" style="display:flex; width:auto;">
               <button class="sort-btn active" id="btnStackTop20" onclick="setStackMode('top20')">Top 20</button>
               <button class="sort-btn" id="btnStackAll" onclick="setStackMode('all')">Semua</button>
             </div>
@@ -2440,6 +2550,22 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
   </div>
 </div>
 
+<!-- ═══════════════ ACCESS CONTROL POPUP (NEW) ═══════════════ -->
+<div class="modal-overlay-access" id="accessPopupModal">
+  <div class="modal-box-access">
+    <div style="color: var(--warning); margin-bottom: 16px; display: flex; justify-content: center;">
+      <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </div>
+    <h3 style="margin-bottom: 8px; font-size: 19px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px;">Akses Terkunci</h3>
+    <p id="accessPopupText" style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.6;"></p>
+    <button onclick="closeAccessPopup()" class="btn-submit" style="width: 100%; justify-content: center; border-radius: 12px; padding: 12px 0;">Mengerti</button>
+  </div>
+</div>
+
 <!-- ═══════════════ SCRIPT YG SUDAH DIPERBAIKI (REFACTORED) ═══════════════ -->
 <script>
 // ────────────────────────────────────────────
@@ -2462,6 +2588,7 @@ let selectedKelas = 'all';
 let currentSchools = [], filteredSchools = [];
 let sortMode = 'default';
 let stackDisplayMode = 'top20';
+let barDisplayMode = 'top10'; // NEW: STATE UNTUK PERINGKAT SEKOLAH
 let charts = {};
 let barChartActiveData = [], stackChartActiveData = [];
 let currentModalSchool = null;
@@ -2481,6 +2608,8 @@ let dashboardState = {
         kecamatan: 'all', kelas: 'all'
     }
 };
+
+let isMultiMonth = false; // STATE GLOBAL KONTROL MENU BARU
 
 // ────────────────────────────────────────────
 // NEW: PAGINATION STATE
@@ -2595,6 +2724,33 @@ function showLoginView() {
 function doLogout() {
   localStorage.removeItem('isLogin');
   window.location.reload(); 
+}
+
+// ────────────────────────────────────────────
+// EXPORT SYSTEM (PDF & EXCEL)
+// ────────────────────────────────────────────
+function getFilterParams() {
+  const f = dashboardState.filter;
+  return {
+    fromMonth: f.fromMonth || currentMonth,
+    fromYear: f.fromYear || currentYear,
+    toMonth: f.toMonth || currentMonth,
+    toYear: f.toYear || currentYear,
+    kecamatan: f.kecamatan || selectedKecamatan,
+    kelas: f.kelas || selectedKelas
+  };
+}
+
+function downloadPDF() {
+  const params = new URLSearchParams(getFilterParams());
+  const url = API_URL + "?action=export_pdf&" + params.toString();
+  window.open(url, "_blank");
+}
+
+function downloadExcel() {
+  const params = new URLSearchParams(getFilterParams());
+  const url = API_URL + "?action=export_excel&" + params.toString();
+  window.open(url, "_blank");
 }
 
 // ────────────────────────────────────────────
@@ -2845,6 +3001,9 @@ async function refreshData(isInit = false) {
                 };
             }
 
+            // Atur status menu berdasarkan filter saat Inisialisasi Pertama
+            checkAndApplyMenuState(false);
+
             // Render Dashboard View langsung tanpa memanggil double fetch
             if (currentYear && currentMonth && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
                 renderUI(DATABASE[currentYear][currentMonth]);
@@ -2853,6 +3012,9 @@ async function refreshData(isInit = false) {
             }
         } else {
             // -- Eksekusi Reguler (Saat User klik tombol Refresh Data Manual) --
+            // Pastikan menu selalu sinkron sebelum render
+            checkAndApplyMenuState(false);
+
             if (currentYear && currentMonth && DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
                 renderUI(DATABASE[currentYear][currentMonth]);
             } else {
@@ -3045,6 +3207,9 @@ async function applyMasterFilter() {
         const actualData = rawData.data || rawData;
         window.MASTER_PAYLOAD = actualData;
         DATABASE = actualData.grouped_data || actualData;
+
+        // Cek Menu Status -> Jika menu saat ini menjadi tidak diizinkan, lakukan Redirect Paksa dengan peringatan
+        checkAndApplyMenuState(true);
 
         if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
             renderUI(DATABASE[currentYear][currentMonth]);
@@ -3356,9 +3521,98 @@ function dataQuality(school) {
 }
 
 // ────────────────────────────────────────────
+// NEW: LOGIKA SISTEM KONTROL MENU & POPUP UX
+// ────────────────────────────────────────────
+function getMonthCount(fromMonth, fromYear, toMonth, toYear) {
+  if (!fromMonth || !toMonth || !fromYear || !toYear) return 1;
+  const idxStart = MONTH_ORDER.indexOf(fromMonth);
+  const idxEnd = MONTH_ORDER.indexOf(toMonth);
+  const startVal = parseInt(fromYear) * 12 + idxStart;
+  const endVal = parseInt(toYear) * 12 + idxEnd;
+  return (endVal - startVal) + 1;
+}
+
+function applyMenuAccess() {
+  const menuMap = {
+    'view-ringkasan': document.querySelector('.nav-item[data-target="view-ringkasan"]'),
+    'view-tabel': document.querySelector('.nav-item[data-target="view-tabel"]'),
+    'view-grafik': document.querySelector('.nav-item[data-target="view-grafik"]'),
+    'view-trend': document.querySelector('.nav-item[data-target="view-trend"]'),
+    'view-kesimpulan': document.querySelector('.nav-item[data-target="view-kesimpulan"]')
+  };
+
+  // Reset kelas disabled terlebih dahulu
+  Object.values(menuMap).forEach(el => {
+    if (el) el.classList.remove('nav-disabled');
+  });
+
+  // Terapkan Disable sesuai mode yang ditentukan
+  if (isMultiMonth) {
+    if(menuMap['view-ringkasan']) menuMap['view-ringkasan'].classList.add('nav-disabled');
+    if(menuMap['view-grafik']) menuMap['view-grafik'].classList.add('nav-disabled');
+    if(menuMap['view-kesimpulan']) menuMap['view-kesimpulan'].classList.add('nav-disabled');
+  } else {
+    if(menuMap['view-trend']) menuMap['view-trend'].classList.add('nav-disabled');
+  }
+}
+
+function checkAndApplyMenuState(forceRedirect = false) {
+  const { fromMonth, fromYear, toMonth, toYear } = dashboardState.filter;
+  const count = getMonthCount(fromMonth, fromYear, toMonth, toYear);
+  isMultiMonth = count > 1; // Update state global multi-bulan
+  
+  applyMenuAccess(); // Eksekusi penutupan tombol
+
+  // Cek apakah filter memaksa perpindahan tab
+  if (forceRedirect) {
+    const activeView = document.querySelector('.view.active');
+    if (!activeView) return;
+    const currentView = activeView.id;
+    
+    if (isMultiMonth && ['view-ringkasan', 'view-grafik', 'view-kesimpulan'].includes(currentView)) {
+      showSection('view-trend', true); // TRUE untuk bypass pengecekan intercept di dalam showSection
+      showAccessPopup("Filter Multi-Bulan diaktifkan. Anda otomatis dialihkan ke menu Pusat Analitik & Tren karena menu lainnya khusus untuk analisis spesifik 1 Bulan.");
+    } else if (!isMultiMonth && currentView === 'view-trend') {
+      showSection('view-ringkasan', true);
+      showAccessPopup("Filter 1 Bulan diaktifkan. Menu Analitik Tren terkunci. Anda otomatis dialihkan kembali ke Ringkasan Eksekutif.");
+    }
+  }
+}
+
+function showAccessPopup(message) {
+  const modal = document.getElementById("accessPopupModal");
+  const text = document.getElementById("accessPopupText");
+  if (text) text.innerText = message;
+  if (modal) {
+    modal.classList.add("show");
+    document.body.classList.add("blur-lock-hard");
+  }
+}
+
+function closeAccessPopup() {
+  const modal = document.getElementById("accessPopupModal");
+  if (modal) {
+    modal.classList.remove("show");
+    document.body.classList.remove("blur-lock-hard");
+  }
+}
+
+// ────────────────────────────────────────────
 // NAVIGASI VIEW & SIDEBAR
 // ────────────────────────────────────────────
-function showSection(id) {
+function showSection(id, bypassCheck = false) {
+  // INTERCEPT KLIK JIKA MENU TERKUNCI (UX Guardrail)
+  if (!bypassCheck) {
+    if (isMultiMonth && ['view-ringkasan', 'view-grafik', 'view-kesimpulan'].includes(id)) {
+      showAccessPopup("Akses Ditolak: Menu tersebut hanya tersedia untuk mode filter '1 Bulan'. Silakan ubah rentang filter Anda terlebih dahulu.");
+      return;
+    }
+    if (!isMultiMonth && id === 'view-trend') {
+      showAccessPopup("Akses Ditolak: Pusat Analitik & Tren hanya mendukung pemantauan jangka panjang (>1 Bulan).");
+      return;
+    }
+  }
+
   document.querySelectorAll('.view').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(l => {
@@ -3621,6 +3875,15 @@ function setStackMode(mode) {
   }
 }
 
+function setBarMode(mode) {
+  barDisplayMode = mode;
+  document.getElementById('btnBarTop10').classList.toggle('active', mode === 'top10');
+  document.getElementById('btnBarAll').classList.toggle('active', mode === 'all');
+  if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
+      renderUI(DATABASE[currentYear][currentMonth]); 
+  }
+}
+
 function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
   try {
     Chart.defaults.font.family = "'Sora', system-ui, sans-serif";
@@ -3747,22 +4010,40 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       </div>
     `);
 
-    // ── 3. BAR TOP 10 ──
+    // ── 3. BAR RANKING (TOP 10 / SEMUA) ──
     destroyChart('bar');
     const valid = currentSchools.filter(s => s.tot > 0);
-    const top10 = [...valid].sort((a,b) => b.pct - a.pct).slice(0,10);
-    const bot1 = [...valid].sort((a,b) => a.pct - b.pct)[0];
-    barChartActiveData = top10;
+    const sortedDesc = [...valid].sort((a,b) => b.pct - a.pct);
+    
+    // Logic Toggle Tampilan Data
+    const displayBarData = barDisplayMode === 'all' ? sortedDesc : sortedDesc.slice(0, 10);
+    const top10 = sortedDesc.slice(0, 10); // Untuk insight panel tetap pakai Top 10
+    const bot1 = sortedDesc[sortedDesc.length-1];
+    
+    barChartActiveData = displayBarData;
+    
+    // Logic Tinggi Dinamis (35px per sekolah agar tidak berdesakan saat mode "Semua")
+    const barContainer = document.getElementById('barCanvasContainer');
+    if (barContainer) {
+        barContainer.style.height = barDisplayMode === 'all' ? Math.max(220, displayBarData.length * 35) + 'px' : '220px';
+    }
     
     const barChartCanvas = document.getElementById('barChart');
     if (barChartCanvas) {
       charts['bar'] = new Chart(barChartCanvas, {
         type: 'bar',
         data: {
-          labels: top10.map(s => s.nama.replace('SDN ','')),
+          labels: displayBarData.map(s => s.nama.replace('SDN ','')),
           datasets: [{
-            data: top10.map(s => parseFloat(n2(s.pct))),
-            backgroundColor: top10.map(s => s.pct >= 80 ? 'rgba(22,163,74,1)' : s.pct >= 60 ? 'rgba(217,119,6,1)' : 'rgba(220,38,38,1)'),
+            data: displayBarData.map(s => parseFloat(n2(s.pct))),
+            backgroundColor: displayBarData.map((s, index) => {
+              // Highlight Gold, Silver, Bronze untuk Top 3
+              if (index === 0) return 'rgba(234, 179, 8, 1)';   // Rank 1: Gold
+              if (index === 1) return 'rgba(148, 163, 184, 1)'; // Rank 2: Silver
+              if (index === 2) return 'rgba(180, 83, 9, 1)';    // Rank 3: Bronze
+              // Sisa ranking mengikuti warna standar (Hijau/Kuning/Merah)
+              return s.pct >= 80 ? 'rgba(22,163,74,0.7)' : s.pct >= 60 ? 'rgba(217,119,6,0.7)' : 'rgba(220,38,38,0.7)';
+            }),
             borderRadius: 4, borderSkipped: false,
           }]
         },
@@ -3779,7 +4060,10 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
               backgroundColor:'rgba(15,23,42,.92)', titleColor:'#fff', bodyColor:'rgba(255,255,255,.75)',
               padding: 10, cornerRadius: 8,
               callbacks: {
-                title: ctx => barChartActiveData[ctx[0].dataIndex].nama,
+                title: ctx => {
+                  const rank = ctx[0].dataIndex + 1;
+                  return `#${rank} - ${barChartActiveData[ctx[0].dataIndex].nama}`;
+                },
                 label: ctx => {
                   const s = barChartActiveData[ctx.dataIndex];
                   return [` ${n2(s.pct)}% lancar`, ` ${fmt(s.lancar)} dari ${fmt(s.tot)} siswa`];
@@ -3795,13 +4079,13 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       safeSetHTML('bar-insight', `
         <div class="duo-grid">
           <div class="duo-card best" onclick="openModal(${top10[0].no})">
-            <div class="duo-lbl">🏆 Terbaik</div>
+            <div class="duo-lbl">🏆 Peringkat #1</div>
             <div class="duo-name">${top10[0].nama}</div>
             <div class="duo-pct">${n2(top10[0].pct)}%</div>
             <div class="duo-meta">Kec. ${top10[0].kecamatan} · ${fmt(top10[0].lancar)}/${fmt(top10[0].tot)} siswa</div>
           </div>
           <div class="duo-card worst" onclick="openModal(${bot1.no})">
-            <div class="duo-lbl">⚠ Perhatian</div>
+            <div class="duo-lbl">⚠ Prioritas Bawah</div>
             <div class="duo-name">${bot1.nama}</div>
             <div class="duo-pct">${n2(bot1.pct)}%</div>
             <div class="duo-meta">Kec. ${bot1.kecamatan} · ${fmt(bot1.lancar)}/${fmt(bot1.tot)} siswa</div>
@@ -3819,7 +4103,15 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
     }
     
     const stackContainer = document.getElementById('stackCanvasContainer');
-    if (stackContainer) stackContainer.style.width = '100%';
+    if (stackContainer) {
+      // Dynamic width untuk Horizontal Scroll: jika data > 20, kalikan panjangnya
+      if (stackData.length > 20) {
+        // Alokasikan ~45px per batang agar tidak sempit
+        stackContainer.style.width = Math.max(1200, stackData.length * 45) + 'px';
+      } else {
+        stackContainer.style.width = '100%';
+      }
+    }
     
     stackChartActiveData = stackData;
     const stackChartCanvas = document.getElementById('stackChart');
@@ -3838,7 +4130,17 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
           responsive: true, maintainAspectRatio: false,
           onClick: (e, els) => { if(els.length > 0 && stackChartActiveData[els[0].index]) openModal(stackChartActiveData[els[0].index].no); },
           scales: {
-            x: { stacked: true, grid: {display: false}, ticks: {font:{size:9.5}, maxRotation:45}, border:{display:false} },
+            x: { 
+              stacked: true, 
+              grid: {display: false}, 
+              ticks: {
+                font:{size:9.5}, 
+                autoSkip: false,  // FITUR BARU: Mencegah label melompat
+                maxRotation: 60,  // FITUR BARU: Memiringkan teks
+                minRotation: 45
+              }, 
+              border:{display:false} 
+            },
             y: { stacked: true, grid: {color: gridColorConfig}, border:{display:false} }
           },
           plugins: {
@@ -4298,44 +4600,19 @@ function renderTrend(cakupan) {
       if (topEl) renderTrendList('top');
       if (botEl) renderTrendList('bot');
 
-      if(conclusionCard) conclusionCard.style.display = 'block';
-
-      const dStart = pctData[0] || 0;
-      const dEnd = pctData[pctData.length-1] || 0;
-      const dTot = dEnd - dStart;
-      
-      let concHtml = `Berdasarkan filter periode dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif ${cakupan} `;
-      
-      if(dTot > 0) {
-          concHtml += `menunjukkan tren <strong>peningkatan agregat sebesar +${n2(dTot)}%</strong>. `;
-      } else if (dTot < 0) {
-          concHtml += `mengalami kemunduran dengan <strong>penurunan agregat sebesar ${n2(Math.abs(dTot))}%</strong>. `;
-      } else {
-          concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
-      }
-
-      concHtml += `Secara spesifik, dari total ${execSum.total_sekolah || 0} sekolah aktif, sebanyak ${execSum.progress_positif || 0} sekolah berhasil mengukir progres positif. Namun, sistem mendeteksi keberadaan <strong>${execSum.perlu_pendampingan || 0} sekolah</strong> yang membutuhkan atensi khusus guna mencegah terjadinya penurunan mutu akademis yang lebih luas.`;
-
-      safeSetHTML('trendConclusionText', concHtml);
-
       // --- FITUR BARU: RENDER EXCLUDED SCHOOLS ---
       const excludedCard = document.getElementById('trendExcludedCard');
       const excludedContainer = document.getElementById('excludedContainer');
       
       if (excludedCard && excludedContainer) {
-          // Ambil dari payload backend secara dinamis, atur default array kosong
           const excluded = window.MASTER_PAYLOAD?.excluded_schools || [];
-          
-          // Filter data jika user sedang melihat per-kecamatan
           let displayExcluded = excluded;
           if (selectedKecamatan !== 'all') {
               displayExcluded = excluded.filter(s => s.kecamatan === selectedKecamatan);
           }
 
-          // Hanya tampilkan blok ini jika sedang membandingkan tren (ada rentang data >= 2 bulan)
           if (validPeriods.length >= 2) {
               excludedCard.style.display = 'block';
-              
               if (displayExcluded.length === 0) {
                   excludedContainer.innerHTML = `
                     <div style="padding:12px 16px; background: var(--success-dim); border: 1px solid rgba(22,163,74,0.2); border-radius: var(--r-md); color: var(--success); font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
@@ -4361,10 +4638,29 @@ function renderTrend(cakupan) {
                   `;
               }
           } else {
-              excludedCard.style.display = 'none'; // Sembunyikan jika bukan mode rentang waktu
+              excludedCard.style.display = 'none';
           }
       }
-      // --- SELESAI FITUR EXCLUDED SCHOOLS ---
+
+      if(conclusionCard) conclusionCard.style.display = 'block';
+
+      const dStart = pctData[0] || 0;
+      const dEnd = pctData[pctData.length-1] || 0;
+      const dTot = dEnd - dStart;
+      
+      let concHtml = `Berdasarkan filter periode dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif ${cakupan} `;
+      
+      if(dTot > 0) {
+          concHtml += `menunjukkan tren <strong>peningkatan agregat sebesar +${n2(dTot)}%</strong>. `;
+      } else if (dTot < 0) {
+          concHtml += `mengalami kemunduran dengan <strong>penurunan agregat sebesar ${n2(Math.abs(dTot))}%</strong>. `;
+      } else {
+          concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
+      }
+
+      concHtml += `Secara spesifik, dari total ${execSum.total_sekolah || 0} sekolah aktif, sebanyak ${execSum.progress_positif || 0} sekolah berhasil mengukir progres positif. Namun, sistem mendeteksi keberadaan <strong>${execSum.perlu_pendampingan || 0} sekolah</strong> yang membutuhkan atensi khusus guna mencegah terjadinya penurunan mutu akademis yang lebih luas.`;
+
+      safeSetHTML('trendConclusionText', concHtml);
 
   } catch(error) {
       console.error("Critical Error during Trend Render:", error);
