@@ -226,7 +226,7 @@ a {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: radial-gradient(circle at center, #ffffff 0%, #f0f4f8 100%);
+  background: var(--log-bg);
   font-family: var(--log-font);
   color: var(--log-ink-1);
   display: flex;
@@ -237,7 +237,8 @@ a {
 
 #loginView::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(circle at center, rgba(26,115,232,0.04) 0%, transparent 75%);
+  background: radial-gradient(ellipse 800px 500px at 20% 20%, rgba(26,115,232,0.04) 0%, transparent 70%),
+              radial-gradient(ellipse 600px 400px at 80% 80%, rgba(26,115,232,0.03) 0%, transparent 70%);
   pointer-events: none; z-index: 0;
 }
 
@@ -427,7 +428,7 @@ a {
    PREMIUM DARK MODE OVERRIDES FOR LOGIN
 ──────────────────────────────────────────── */
 body.dark #loginView {
-  --log-bg: #0f172a;
+  --log-bg: #020817;
   --log-surface: rgba(10, 25, 55, 0.88);
   --log-ink-1: #ffffff;
   --log-ink-2: #cbd5e1;
@@ -446,12 +447,10 @@ body.dark #loginView {
   --log-footer-role: #cbd5e1;
   --log-footer-school: #94a3b8;
   
-  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+  background: radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 30%),
+              radial-gradient(circle at bottom right, rgba(59,130,246,0.06), transparent 35%),
+              var(--log-bg);
   transition: background 0.35s ease;
-}
-
-body.dark #loginView::before {
-  background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 75%);
 }
 
 body.dark #loginView .login-card {
