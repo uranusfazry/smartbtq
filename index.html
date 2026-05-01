@@ -3131,7 +3131,9 @@ function aggregateSchools(rawArr) {
         }
       }
       
-      hadirArr.push(r.hadir); guruArr.push(r.guru);
+      const hVal = r.hadir_avg !== undefined ? r.hadir_avg : (Number(r.hadir) || 0);
+      hadirArr.push(hVal);
+      guruArr.push(r.guru);
     });
     
     return {
@@ -4236,8 +4238,10 @@ function switchTab(idx) {
       let klsStr = [];
       if(isValidClass(r.kls4)) klsStr.push('Kelas 4');
       if(isValidClass(r.kls5)) klsStr.push('Kelas 5');
-      const hadirCls = r.hadir >= 90 ? 'color:var(--success)' : r.hadir >= 75 ? 'color:var(--warning)' : 'color:var(--danger)';
-      html += `<tr><td data-label="Kelas">${klsStr.join(' & ')}</td><td data-label="Guru">${r.guru}</td><td data-label="Hadir" style="font-weight:600;${hadirCls}">${r.hadir}%</td></tr>`;
+      const hVal = r.hadir_avg !== undefined ? r.hadir_avg : (Number(r.hadir) || 0);
+      const hadirCls = hVal >= 90 ? 'color:var(--success)' : hVal >= 75 ? 'color:var(--warning)' : 'color:var(--danger)';
+      const hadirDisp = String(r.hadir).includes('/') ? r.hadir : `${r.hadir}%`;
+      html += `<tr><td data-label="Kelas">${klsStr.join(' & ')}</td><td data-label="Guru">${r.guru}</td><td data-label="Hadir" style="font-weight:600;${hadirCls}">${hadirDisp}</td></tr>`;
     });
     html += `</tbody></table></div>`;
   } else {
