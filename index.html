@@ -2018,7 +2018,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
         </button>
 
         <!-- TOMBOL DOWNLOAD PDF -->
-        <button class="btn-print btn-export-pdf" onclick="downloadPDF()" title="Download PDF">
+        <button class="btn-print btn-export-pdf" id="btnDownloadPDF" title="Download PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
@@ -2029,13 +2029,13 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           <span class="btn-text">Download PDF</span>
         </button>
 
-        <!-- TOMBOL DOWNLOAD EXCEL -->
-        <button class="btn-print btn-export-excel" onclick="downloadExcel()" title="Download Excel">
+        <!-- TOMBOL DOWNLOAD EXCEL (DIPERBARUI) -->
+        <button class="btn-print btn-export-excel" id="btnDownloadExcel" title="Download Excel">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="8" y1="13" x2="16" y2="17"></line>
-            <line x1="16" y1="13" x2="8" y2="17"></line>
+            <path d="M8 13h2v4H8z"></path>
+            <path d="M14 13h2v4h-2z"></path>
           </svg>
           <span class="btn-text">Download Excel</span>
         </button>
@@ -2566,6 +2566,17 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
   </div>
 </div>
 
+<!-- ═══════════════ DOWNLOAD FEEDBACK POPUP (NEW) ═══════════════ -->
+<div class="modal-overlay-access" id="downloadPopupModal">
+  <div class="modal-box-access" style="text-align: center; max-width: 320px;">
+    <div id="downloadPopupIcon" style="margin-bottom: 20px; display: flex; justify-content: center; color: var(--primary);">
+      <!-- Ikon akan disuntikkan oleh JS -->
+    </div>
+    <h3 id="downloadPopupTitle" style="margin-bottom: 8px; font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px;">Memproses</h3>
+    <p id="downloadPopupText" style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 0; line-height: 1.6;">Harap tunggu sebentar...</p>
+  </div>
+</div>
+
 <!-- ═══════════════ SCRIPT YG SUDAH DIPERBAIKI (REFACTORED) ═══════════════ -->
 <script>
 // ────────────────────────────────────────────
@@ -2741,16 +2752,143 @@ function getFilterParams() {
   };
 }
 
-function downloadPDF() {
+function buildExportUrl(type) {
   const params = new URLSearchParams(getFilterParams());
-  const url = API_URL + "?action=export_pdf&" + params.toString();
-  window.open(url, "_blank");
+  return `${API_URL}?action=${type}&${params.toString()}`;
+}
+
+function buildFileName(ext) {
+  const f = getFilterParams();
+  const dari = `${f.fromMonth}_${f.fromYear}`;
+  const sampai = `${f.toMonth}_${f.toYear}`;
+  
+  if (dari === sampai) {
+      return `Laporan_BTQ_${dari}.${ext}`;
+  }
+  return `Laporan_BTQ_${dari}_sd_${sampai}.${ext}`;
+}
+
+function setExportLoading(btnId, isLoading, originalHtml) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+
+  if (isLoading) {
+    btn.disabled = true;
+    btn.style.opacity = "0.8";
+    btn.style.cursor = "wait";
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> <span class="btn-text">Loading...</span>`;
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+    btn.innerHTML = originalHtml;
+  }
+}
+
+// Fitur UI Feedback Popup untuk Unduhan
+function showDownloadPopup(title, message, type = 'loading') {
+  const modal = document.getElementById("downloadPopupModal");
+  const titleEl = document.getElementById("downloadPopupTitle");
+  const textEl = document.getElementById("downloadPopupText");
+  const iconEl = document.getElementById("downloadPopupIcon");
+
+  titleEl.innerText = title;
+  textEl.innerHTML = message;
+
+  if (type === 'loading') {
+    iconEl.style.color = 'var(--primary)';
+    iconEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>`;
+  } else if (type === 'success') {
+    iconEl.style.color = 'var(--success)';
+    iconEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+  } else if (type === 'redirect') {
+     iconEl.style.color = 'var(--warning)';
+     iconEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
+  }
+
+  modal.classList.add("show");
+  document.body.classList.add("blur-lock-hard");
+}
+
+function closeDownloadPopup() {
+  const modal = document.getElementById("downloadPopupModal");
+  if (modal) {
+    modal.classList.remove("show");
+    document.body.classList.remove("blur-lock-hard");
+  }
+}
+
+async function downloadPDF() {
+  const f = getFilterParams();
+  if (!f.fromMonth || !f.toMonth) {
+    alert("Pilih periode terlebih dahulu");
+    return;
+  }
+
+  const btnId = "btnDownloadPDF";
+  const btn = document.getElementById(btnId);
+  const originalHtml = btn ? btn.innerHTML : '';
+
+  try {
+    setExportLoading(btnId, true, originalHtml);
+    // Munculkan popup modern status memproses
+    showDownloadPopup("Menyiapkan PDF", "Sistem sedang mengambil dokumen PDF dari server.<br/>Harap tunggu...", "loading");
+
+    const url = buildExportUrl('export_pdf');
+    const response = await fetch(url);
+    
+    if (!response.ok) throw new Error("HTTP Status: " + response.status);
+
+    // Menerima response berupa JSON sesuai update backend terbaru
+    const data = await response.json();
+    
+    if (data.status !== "success" || !data.url) {
+      throw new Error(data.message || "URL PDF tidak ditemukan dari server");
+    }
+
+    // Tampilkan popup sukses sekilas
+    showDownloadPopup("Berhasil!", "Dokumen PDF siap diunduh.", "success");
+
+    // Trigger auto-download tanpa membuka tab baru (menggunakan URL Google Drive dari JSON)
+    const link = document.createElement("a");
+    link.href = data.url;
+    link.download = buildFileName("pdf");
+    
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    // Tutup popup otomatis setelah 2 detik
+    setTimeout(() => {
+        closeDownloadPopup();
+    }, 2000);
+
+  } catch (err) {
+    closeDownloadPopup();
+    alert("Gagal mendownload PDF. Cek koneksi atau server backend Anda.");
+    console.error("Download PDF Error:", err);
+  } finally {
+    setExportLoading(btnId, false, originalHtml);
+  }
 }
 
 function downloadExcel() {
-  const params = new URLSearchParams(getFilterParams());
-  const url = API_URL + "?action=export_excel&" + params.toString();
-  window.open(url, "_blank");
+  const btnId = "btnDownloadExcel";
+  const btn = document.getElementById(btnId);
+  const originalHtml = btn ? btn.innerHTML : '';
+
+  // 1. Tampilkan loading di button
+  setExportLoading(btnId, true, originalHtml);
+  
+  // 2. Munculkan popup pengalihan
+  showDownloadPopup("Mengarahkan", "Anda akan diarahkan ke halaman Rekap Data Excel (Google Sites).", "redirect");
+
+  // 3. Jeda sejenak agar user bisa membaca notifikasi, lalu buka link
+  setTimeout(() => {
+    window.open('https://sites.google.com/view/btqbanjar/hasil', '_blank');
+    closeDownloadPopup();
+    setExportLoading(btnId, false, originalHtml);
+  }, 2000); 
 }
 
 // ────────────────────────────────────────────
@@ -2885,6 +3023,13 @@ function setupEventListeners() {
   if (btnRefresh) {
       btnRefresh.addEventListener("click", () => refreshData(false));
   }
+  
+  // Hubungkan tombol Export
+  const btnPdf = document.getElementById("btnDownloadPDF");
+  if (btnPdf) btnPdf.addEventListener("click", downloadPDF);
+  
+  const btnExcel = document.getElementById("btnDownloadExcel");
+  if (btnExcel) btnExcel.addEventListener("click", downloadExcel);
 }
 
 // ────────────────────────────────────────────
