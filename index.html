@@ -226,7 +226,7 @@ a {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: var(--log-bg);
+  background: radial-gradient(circle at center, #ffffff 0%, #f0f4f8 100%);
   font-family: var(--log-font);
   color: var(--log-ink-1);
   display: flex;
@@ -237,8 +237,7 @@ a {
 
 #loginView::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 800px 500px at 20% 20%, rgba(26,115,232,0.04) 0%, transparent 70%),
-              radial-gradient(ellipse 600px 400px at 80% 80%, rgba(26,115,232,0.03) 0%, transparent 70%);
+  background: radial-gradient(circle at center, rgba(37,99,235,0.04) 0%, transparent 70%);
   pointer-events: none; z-index: 0;
 }
 
@@ -249,7 +248,7 @@ a {
 }
 
 #loginView .login-wrapper {
-  position: relative; z-index: 1; width: 100%; max-width: 440px;
+  position: relative; z-index: 1; width: 100%; max-width: 420px; margin: auto;
   animation: loginEntranceAnim 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -428,7 +427,7 @@ a {
    PREMIUM DARK MODE OVERRIDES FOR LOGIN
 ──────────────────────────────────────────── */
 body.dark #loginView {
-  --log-bg: #020817;
+  --log-bg: #0f172a;
   --log-surface: rgba(10, 25, 55, 0.88);
   --log-ink-1: #ffffff;
   --log-ink-2: #cbd5e1;
@@ -447,10 +446,12 @@ body.dark #loginView {
   --log-footer-role: #cbd5e1;
   --log-footer-school: #94a3b8;
   
-  background: radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 30%),
-              radial-gradient(circle at bottom right, rgba(59,130,246,0.06), transparent 35%),
-              var(--log-bg);
+  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
   transition: background 0.35s ease;
+}
+
+body.dark #loginView::before {
+  background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%);
 }
 
 body.dark #loginView .login-card {
@@ -2772,16 +2773,16 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
                 
                 <div class="sys-spec-grid">
                   <div class="sys-spec-item">
-                    <span class="sys-lbl">Environment</span>
-                    <span class="sys-val">Production</span>
+                    <span class="sys-lbl">Lingkungan Sistem</span>
+                    <span class="sys-val">Produksi</span>
                   </div>
                   <div class="sys-spec-item">
-                    <span class="sys-lbl">System Status</span>
-                    <span class="sys-val" style="color: var(--success);">Active</span>
+                    <span class="sys-lbl">Status Sistem</span>
+                    <span class="sys-val" style="color: var(--success);">Aktif</span>
                   </div>
                   <div class="sys-spec-item">
-                    <span class="sys-lbl">Data Source</span>
-                    <span class="sys-val">Integrated Database</span>
+                    <span class="sys-lbl">Sumber Data</span>
+                    <span class="sys-val">Database Terintegrasi</span>
                   </div>
                 </div>
               </div>
