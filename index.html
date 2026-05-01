@@ -1290,7 +1290,7 @@ body.dark .info-card::before { background: linear-gradient(135deg, rgba(37,99,23
 .dev-profile { display: flex; align-items: center; gap: 24px; margin-top: 20px; padding: 28px; background: linear-gradient(to right, var(--surface-2), var(--surface)); border-radius: var(--r-xl); border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden; transition: var(--transition-base); }
 .dev-profile:hover { border-color: rgba(37,99,235,0.4); box-shadow: var(--shadow-md); transform: translateY(-3px); }
 .dev-profile::after { content: ''; position: absolute; right: 0; top: 0; height: 100%; width: 5px; background: var(--primary); }
-.dev-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; box-shadow: 0 8px 24px rgba(37,99,235,0.35); flex-shrink: 0; }
+.dev-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; box-shadow: 0 8px 24px rgba(37,99,235,0.35); flex-shrink: 0; overflow: hidden; }
 .dev-details { display: flex; flex-direction: column; align-items: flex-start; }
 .dev-details h4 { font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.3px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 .dev-badge-pro { background: var(--text-primary); color: var(--surface); padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -2131,12 +2131,8 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
 
       <!-- Brand -->
       <div class="brand">
-        <div class="brand-logo" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L3 7v5c0 5.25 3.83 10.17 9 11.38C17.17 22.17 21 17.25 21 12V7L12 2z" fill="#1a73e8" opacity="0.15"/>
-            <path d="M12 2L3 7v5c0 5.25 3.83 10.17 9 11.38C17.17 22.17 21 17.25 21 12V7L12 2z" stroke="#1a73e8" stroke-width="1.6" stroke-linejoin="round"/>
-            <path d="M8 12l2.5 2.5L16 9" stroke="#1a73e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+        <div class="brand-logo" aria-hidden="true" style="background: transparent; border: none; box-shadow: none;">
+          <img src="https://raw.githubusercontent.com/uranusfazry/smartbtq/main/assets/images/dinas.webp" alt="Logo Dinas" style="width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));">
         </div>
         <div class="brand-name" aria-label="SMART BTQ">
           <span class="dark">SMART</span> <span class="blue">BTQ</span>
@@ -2761,16 +2757,12 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           <div class="info-card">
             
             <div class="info-header">
-              <div class="info-logo">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
-                  <path d="M12 2L3 7v5c0 5.25 3.83 10.17 9 11.38C17.17 22.17 21 17.25 21 12V7L12 2z" fill="currentColor" fill-opacity="0.15"/>
-                  <path d="M12 2L3 7v5c0 5.25 3.83 10.17 9 11.38C17.17 22.17 21 17.25 21 12V7L12 2z" stroke-linecap="round"/>
-                  <path d="M8 12l2.5 2.5L16 9" stroke-linecap="round"/>
-                </svg>
+              <div class="info-logo" style="background: transparent; border: none; box-shadow: none;">
+                <img src="https://raw.githubusercontent.com/uranusfazry/smartbtq/main/assets/images/dinas.webp" alt="Logo Dinas" style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));">
               </div>
               <div>
                 <h2 class="info-title">SMART <span>BTQ</span></h2>
-                <p class="info-version">Platform Analitik Enterprise</p>
+                <p class="info-version">Sistem Monitoring Baca Tulis Al-Qur’an Berbasis Data</p>
               </div>
             </div>
             
@@ -2929,10 +2921,12 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
               <div class="info-section">
                 <h3>Pengembang & Arsitek Sistem</h3>
                 <div class="dev-profile">
-                  <div class="dev-avatar">FI</div>
+                  <div class="dev-avatar">
+                    <img src="https://raw.githubusercontent.com/uranusfazry/smartbtq/main/assets/images/fazry.webp" alt="Fazry Irawan" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+                  </div>
                   <div class="dev-details">
                     <h4>Fazry Irawan <span class="dev-badge-pro">Developer</span></h4>
-                    <span class="dev-role">Lead Developer & Data Administrator — SMART BTQ</span>
+                    <span class="dev-role">Data Administrator & Web Developer — SMART BTQ</span>
                     <p>Guru MI Panatasan &bull; Guru BTQ SDN 1 Batulawang</p>
                   </div>
                 </div>
