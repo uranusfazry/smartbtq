@@ -9,8 +9,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
    SMART BTQ — PREMIUM UI UPGRADE
@@ -2020,7 +2018,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
         </button>
 
         <!-- TOMBOL DOWNLOAD PDF -->
-        <button class="btn-print btn-export-pdf" id="btnExportPDF" onclick="downloadPDF()" title="Download PDF">
+        <button class="btn-print btn-export-pdf" id="btnDownloadPDF" title="Download PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
@@ -2032,7 +2030,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
         </button>
 
         <!-- TOMBOL DOWNLOAD CSV -->
-        <button class="btn-print btn-export-excel" id="btnExportCSV" onclick="downloadCSV()" title="Download CSV">
+        <button class="btn-print btn-export-excel" id="btnDownloadCSV" title="Download CSV">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
@@ -2150,7 +2148,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
     </aside>
 
     <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
-    <main class="main" id="pdf-content">
+    <main class="main" id="mainContentArea">
 
       <!-- DQ Banner -->
       <div class="dq-banner hidden" id="dqBanner">
@@ -2743,118 +2741,112 @@ function getFilterParams() {
   };
 }
 
-async function downloadPDF() {
-  const btn = document.getElementById("btnExportPDF");
-  const originalContent = btn.innerHTML;
+function buildExportUrl(type) {
+  const params = new URLSearchParams(getFilterParams());
+  return `${API_URL}?action=${type}&${params.toString()}`;
+}
 
-  try {
-    // 1. Loading UI pada tombol
+function buildFileName(ext) {
+  const f = getFilterParams();
+  const dari = `${f.fromMonth}_${f.fromYear}`;
+  const sampai = `${f.toMonth}_${f.toYear}`;
+  
+  if (dari === sampai) {
+      return `Laporan_BTQ_${dari}.${ext}`;
+  }
+  return `Laporan_BTQ_${dari}_sd_${sampai}.${ext}`;
+}
+
+function setExportLoading(btnId, isLoading, originalHtml) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+
+  if (isLoading) {
     btn.disabled = true;
     btn.style.opacity = "0.8";
     btn.style.cursor = "wait";
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> <span class="btn-text">Menyiapkan PDF...</span>`;
-
-    const element = document.getElementById("pdf-content");
-    if (!element) {
-      alert("Konten PDF tidak ditemukan");
-      return;
-    }
-
-    // 2. Generate Canvas dari Element HTML (Dukungan Resolusi Tinggi 2x)
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true, // Mengizinkan perenderan gambar/chart
-      backgroundColor: document.body.classList.contains('dark') ? '#0f172a' : '#f8fafc' // Sinkronisasi dengan mode tema
-    });
-
-    const imgData = canvas.toDataURL("image/png");
-    const { jsPDF } = window.jspdf;
-    
-    // 3. Konfigurasi Kertas A4
-    const pdf = new jsPDF("p", "mm", "a4");
-    const imgWidth = 210;
-    const pageHeight = 297;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    // Halaman Pertama
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    // Tambah halaman otomatis jika konten dashboard memanjang ke bawah
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-
-    // 4. Nama file dinamis
-    const params = new URLSearchParams(getFilterParams());
-    const fileName = `Laporan_BTQ_${params.get('fromMonth')}_${params.get('fromYear')}.pdf`;
-
-    // 5. Trigger download langsung (Frontend)
-    pdf.save(fileName);
-
-  } catch (error) {
-    console.error("Export PDF Error:", error);
-    alert("Gagal membuat PDF. Pastikan browser Anda mendukung fitur ini.");
-  } finally {
-    // 6. Kembalikan tombol ke keadaan normal
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> <span class="btn-text">Loading...</span>`;
+  } else {
     btn.disabled = false;
     btn.style.opacity = "1";
     btn.style.cursor = "pointer";
-    btn.innerHTML = originalContent;
+    btn.innerHTML = originalHtml;
+  }
+}
+
+async function downloadPDF() {
+  const f = getFilterParams();
+  if (!f.fromMonth || !f.toMonth) {
+    alert("Pilih periode terlebih dahulu");
+    return;
+  }
+
+  const btnId = "btnDownloadPDF";
+  const btn = document.getElementById(btnId);
+  const originalHtml = btn ? btn.innerHTML : '';
+
+  try {
+    setExportLoading(btnId, true, originalHtml);
+
+    const url = buildExportUrl('export_pdf');
+    const response = await fetch(url);
+    
+    if (!response.ok) throw new Error("HTTP Status: " + response.status);
+
+    const blob = await response.blob();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = buildFileName("pdf");
+    
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    URL.revokeObjectURL(link.href);
+
+  } catch (err) {
+    alert("Gagal mendownload PDF. Cek koneksi atau server backend Anda.");
+    console.error("Download PDF Error:", err);
+  } finally {
+    setExportLoading(btnId, false, originalHtml);
   }
 }
 
 async function downloadCSV() {
-  const btn = document.getElementById("btnExportCSV");
-  const originalContent = btn.innerHTML;
+  const f = getFilterParams();
+  if (!f.fromMonth || !f.toMonth) {
+    alert("Pilih periode terlebih dahulu");
+    return;
+  }
+
+  const btnId = "btnDownloadCSV";
+  const btn = document.getElementById(btnId);
+  const originalHtml = btn ? btn.innerHTML : '';
 
   try {
-    // 1. Loading UI pada tombol
-    btn.disabled = true;
-    btn.style.opacity = "0.8";
-    btn.style.cursor = "wait";
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> <span class="btn-text">Menyiapkan CSV...</span>`;
+    setExportLoading(btnId, true, originalHtml);
 
-    const params = new URLSearchParams(getFilterParams());
-    const url = `${API_URL}?action=export_csv&${params.toString()}`;
+    const url = buildExportUrl('export_csv');
+    const response = await fetch(url);
     
-    // 2. Fetch file dari backend
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error("Gagal download CSV");
-    }
+    if (!response.ok) throw new Error("HTTP Status: " + response.status);
 
-    // 3. Konversi menjadi Blob
-    const blob = await res.blob();
-    const downloadUrl = window.URL.createObjectURL(blob);
+    const blob = await response.blob();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = buildFileName("csv");
+    
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    URL.revokeObjectURL(link.href);
 
-    // 4. Trigger download secara senyap
-    const a = document.createElement("a");
-    a.href = downloadUrl;
-    a.download = `Laporan_BTQ_${params.get('fromMonth')}_${params.get('fromYear')}.csv`;
-
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    // 5. Bersihkan memory URL
-    window.URL.revokeObjectURL(downloadUrl);
-
-  } catch (error) {
-    console.error("Export CSV Error:", error);
-    alert("Gagal mendownload CSV. Cek koneksi atau server.");
+  } catch (err) {
+    alert("Gagal mendownload CSV. Cek koneksi atau server backend Anda.");
+    console.error("Download CSV Error:", err);
   } finally {
-    // 6. Kembalikan tombol ke keadaan normal
-    btn.disabled = false;
-    btn.style.opacity = "1";
-    btn.style.cursor = "pointer";
-    btn.innerHTML = originalContent;
+    setExportLoading(btnId, false, originalHtml);
   }
 }
 
@@ -2990,6 +2982,13 @@ function setupEventListeners() {
   if (btnRefresh) {
       btnRefresh.addEventListener("click", () => refreshData(false));
   }
+  
+  // Hubungkan tombol Export
+  const btnPdf = document.getElementById("btnDownloadPDF");
+  if (btnPdf) btnPdf.addEventListener("click", downloadPDF);
+  
+  const btnCsv = document.getElementById("btnDownloadCSV");
+  if (btnCsv) btnCsv.addEventListener("click", downloadCSV);
 }
 
 // ────────────────────────────────────────────
