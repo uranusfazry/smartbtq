@@ -2312,7 +2312,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
 
         <div class="fs-brand">
           <h2>SMART <span>BTQ</span></h2>
-          <p>Dashboard Navigasi Enterprise</p>
+          <p>Sistem Monitoring Baca Tulis Al-Qur’an Berbasis Data</p>
         </div>
 
         <nav class="fs-nav-wrapper">
@@ -2635,7 +2635,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
         <div class="page-header">
           <div>
             <div class="page-title">Analisis Tren</div>
-            <div class="page-subtitle" id="trend-sub">Monitoring performa institusional (Tahunan & Kustom Periode)</div>
+            <div class="page-subtitle" id="trend-sub">Pemantauan perkembangan kinerja sekolah berdasarkan periode waktu</div>
           </div>
         </div>
 
@@ -2644,22 +2644,22 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
             <div class="trend-kpi-card tk-card-blue">
                 <div class="tk-label">Total Sekolah Aktif</div>
                 <div class="tk-value sensitive-data" id="tkTotalSekolah">-</div>
-                <div class="tk-sub">Data komparatif tervalidasi</div>
+                <div class="tk-sub">Data telah diverifikasi dan dapat dibandingkan</div>
             </div>
             <div class="trend-kpi-card tk-card-blue">
                 <div class="tk-label">Total Siswa Aktif</div>
                 <div class="tk-value sensitive-data" id="tkTotalSiswa">-</div>
-                <div class="tk-sub">Pada periode terbaru</div>
+                <div class="tk-sub">Berdasarkan data terbaru</div>
             </div>
             <div class="trend-kpi-card tk-card-green">
                 <div class="tk-label">Progress Positif</div>
                 <div class="tk-value sensitive-data" id="tkProgressPositif">-</div>
-                <div class="tk-sub">Sekolah mengalami kenaikan tren</div>
+                <div class="tk-sub">Sekolah menunjukkan peningkatan kinerja</div>
             </div>
             <div class="trend-kpi-card tk-card-amber">
                 <div class="tk-label">Perlu Pendampingan</div>
                 <div class="tk-value sensitive-data" id="tkPendampingan">-</div>
-                <div class="tk-sub">Sekolah stagnan/menurun</div>
+                <div class="tk-sub">Sekolah tidak mengalami peningkatan atau mengalami penurunan</div>
             </div>
         </div>
 
@@ -2673,7 +2673,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           <div class="chart-card-header">
             <div>
               <div class="chart-card-title">Grafik Tren & Proyeksi Performa</div>
-              <div class="chart-card-sub" id="trendChartSub">Visualisasi pergerakan kinerja komprehensif berdasar persentase kelancaran</div>
+              <div class="chart-card-sub" id="trendChartSub">Grafik ini menunjukkan perubahan tingkat kelancaran dari waktu ke waktu</div>
             </div>
           </div>
           <div class="chart-card-body">
@@ -2713,7 +2713,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
             <div class="chart-card-header">
               <div>
                 <div class="chart-card-title">Pengecualian Data</div>
-                <div class="chart-card-sub">Sekolah yang tidak diikutsertakan dalam perbandingan tren</div>
+                <div class="chart-card-sub">Berikut sekolah yang tidak masuk dalam analisis tren</div>
               </div>
             </div>
             <div class="chart-card-body" style="padding: 20px 24px; background: var(--surface-2);">
@@ -4638,15 +4638,15 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       kecInsightHTML = `
         <div class="insight-item green">
           <div class="ii-label">Terbaik</div>
-          <div class="ii-text"><strong>Kec. ${bestKec.name}</strong> unggul dengan rata-rata <strong>${n2(bestKec.pct)}%</strong>. Jadikan referensi.</div>
+          <div class="ii-text"><strong>Kec. ${bestKec.name}</strong> memiliki hasil terbaik dengan rata-rata <strong>${n2(bestKec.pct)}%</strong>. Dapat dijadikan contoh bagi kecamatan lain.</div>
         </div>
         <div class="insight-item red">
           <div class="ii-label">Perhatian</div>
-          <div class="ii-text"><strong>Kec. ${worstKec.name}</strong> paling rendah <strong>${n2(worstKec.pct)}%</strong>. Butuh program khusus.</div>
+          <div class="ii-text"><strong>Kec. ${worstKec.name}</strong> memiliki hasil terendah yaitu <strong>${n2(worstKec.pct)}%</strong>. Perlu perhatian dan program peningkatan.</div>
         </div>
         <div class="insight-item amber">
           <div class="ii-label">Kesenjangan</div>
-          <div class="ii-text">Gap antar kecamatan mencapai <strong>${n2(kecGap)}%</strong> menunjukkan ketidakmerataan mutu.</div>
+          <div class="ii-text">Perbedaan antar kecamatan mencapai <strong>${n2(kecGap)}%</strong>, menunjukkan masih adanya ketimpangan hasil antar wilayah.</div>
         </div>
       `;
     } else {
@@ -4882,27 +4882,27 @@ function renderCharts(T, allSchoolsAggr, pct, cakupan, isAll) {
       <div class="analysis-card ac-blue">
         <div class="ac-eyebrow">Capaian Utama</div>
         <div class="ac-title">Kelancaran ${cakupan}</div>
-        <div class="ac-body">Rata-rata BTQ berada di <strong class="sensitive-data">${n2(pct)}%</strong>. <span class="sensitive-data">${highC}</span> sekolah sudah di level tinggi, <span class="sensitive-data">${midC}</span> sedang, dan <span class="sensitive-data">${lowC}</span> masih rendah.</div>
+        <div class="ac-body">Rata-rata kelancaran BTQ saat ini <strong class="sensitive-data">${n2(pct)}%</strong>. Sebanyak <span class="sensitive-data">${highC}</span> sekolah sudah baik, <span class="sensitive-data">${midC}</span> sekolah cukup, dan <span class="sensitive-data">${lowC}</span> sekolah masih perlu peningkatan.</div>
       </div>
       <div class="analysis-card ${isAll ? 'ac-blue' : 'ac-amber'}">
         <div class="ac-eyebrow">${isAll ? 'Peta Wilayah' : 'Konteks Internal'}</div>
         <div class="ac-title">${isAll ? 'Disparitas Antar Kecamatan' : 'Rentang Kualitas Sekolah'}</div>
-        <div class="ac-body">${isAll ? `Gap <strong class="sensitive-data">${n2(kecGap)}%</strong> antara Kec. ${bestKec.name} dan Kec. ${worstKec.name} menunjukkan ketidakmerataan.` : `Sekolah terbaik <strong>${top10[0] ? top10[0].nama : '-'}</strong> vs terendah <strong>${bot1 ? bot1.nama : '-'}</strong>: gap <strong class="sensitive-data">${top10[0] && bot1 ? n2(top10[0].pct - bot1.pct) : 0}%</strong>.`}</div>
+        <div class="ac-body">${isAll ? `Perbedaan antar kecamatan mencapai <strong class="sensitive-data">${n2(kecGap)}%</strong>. Hal ini menunjukkan hasil pembelajaran belum merata.` : `Perbedaan antara sekolah terbaik (<strong>${top10[0] ? top10[0].nama : '-'}</strong>) dan terendah (<strong>${bot1 ? bot1.nama : '-'}</strong>) mencapai <strong class="sensitive-data">${top10[0] && bot1 ? n2(top10[0].pct - bot1.pct) : 0}%</strong>.`}</div>
       </div>
       <div class="analysis-card ac-red">
         <div class="ac-eyebrow">Isu Kritis</div>
         <div class="ac-title">Titik Intervensi Prioritas</div>
-        <div class="ac-body"><strong class="sensitive-data">${fmt(T.tidak)} siswa (${n2(pKota)}%)</strong> sama sekali belum kenal huruf hijaiyah. <strong class="sensitive-data">${lowHadir}/${totalGuru} guru</strong> kehadirannya di bawah 80%.</div>
+        <div class="ac-body">Sebanyak <strong class="sensitive-data">${fmt(T.tidak)} siswa (${n2(pKota)}%)</strong> belum mengenal huruf hijaiyah. Selain itu, <strong class="sensitive-data">${lowHadir} dari ${totalGuru} guru</strong> memiliki kehadiran di bawah 80%.</div>
       </div>
       <div class="analysis-card ac-green">
         <div class="ac-eyebrow">Potensi Akselerasi</div>
         <div class="ac-title">Peluang Strategis</div>
-        <div class="ac-body">Fokuskan pendampingan ke <strong class="sensitive-data">${lowC} sekolah merah</strong>. Gunakan <strong>${top10[0] ? top10[0].nama : '-'}</strong> sebagai sekolah percontohan metodologi BTQ.</div>
+        <div class="ac-body">Prioritaskan pendampingan pada <strong class="sensitive-data">${lowC} sekolah</strong> yang masih rendah. Gunakan <strong>${top10[0] ? top10[0].nama : '-'}</strong> sebagai contoh praktik pembelajaran yang baik.</div>
       </div>
     `);
     
     safeSetHTML('exec-banner', `
-      <strong>Konklusi Eksekutif —</strong> Dengan capaian saat ini <strong class="sensitive-data">${n2(pct)}%</strong>, kebijakan seragam tidak lagi cukup. Diperlukan pendekatan asimetris: <strong>penguatan intensif ke sekolah kategori rendah</strong> dan <strong>apresiasi serta peran model rujukan ke sekolah berprestasi</strong>.
+      <strong>Kesimpulan Eksekutif —</strong> Dengan capaian saat ini sebesar <strong class="sensitive-data">${n2(pct)}%</strong>, pendekatan yang sama untuk semua sekolah tidak lagi cukup. Diperlukan perhatian khusus untuk sekolah dengan hasil rendah, serta menjadikan sekolah berprestasi sebagai contoh bagi yang lain.
     `);
 
   } catch (err) {
@@ -5023,13 +5023,13 @@ function renderTrend(cakupan) {
                   let diff = pctAkhir - pctAwal; 
 
                   let status = "Stabil";
-                  if (diff > 0) { status = "Progress Positif"; pPositif++; }
-                  else if (diff < 0) { status = "Perlu Evaluasi"; pEvaluasi++; }
+                  if (diff > 0) { status = "Menunjukkan peningkatan"; pPositif++; }
+                  else if (diff < 0) { status = "Perlu perhatian khusus dan evaluasi lebih lanjut"; pEvaluasi++; }
 
                   dynamicProgress.push({
                       no: eSch.no,
                       nama: eSch.nama,
-                      validation: { changed: changed, note: changed ? "Perubahan Struktur Data" : "Comparable Data Valid" },
+                      validation: { changed: changed, note: changed ? "Data antar periode berbeda, hasil dibandingkan dengan data yang sesuai" : "Data Konsisten" },
                       progress: { total_siswa_latest: eSch.tot, awal_lancar: awalLancar, akhir_lancar: akhirLancar, awal_pct: pctAwal, akhir_pct: pctAkhir, persen: diff, status: status },
                       awal: sSch, akhir: eSch
                   });
@@ -5067,7 +5067,7 @@ function renderTrend(cakupan) {
               if (hasStructuralChange) {
                   valBanner.style.background = 'var(--warning-dim)';
                   valBanner.style.borderLeftColor = 'var(--warning)';
-                  safeSetHTML('trendValidationText', "<strong>Status Data:</strong> Terdapat perubahan struktur data antar periode pada rentang filter terpilih. Analisis menggunakan <em>comparable data</em> untuk menjaga akurasi.");
+                  safeSetHTML('trendValidationText', "<strong>Status Data:</strong> Terdapat perubahan data antar periode yang dipilih. Untuk menjaga keakuratan, analisis hanya menggunakan data yang dapat dibandingkan.");
               } else {
                   valBanner.style.background = 'var(--success-dim)';
                   valBanner.style.borderLeftColor = 'var(--success)';
@@ -5159,7 +5159,7 @@ function renderTrend(cakupan) {
           
           const latestTot = prog.total_siswa_latest || 0;
           const statusText = prog.status || "Stabil";
-          const valNote = val.note || val.label || "Comparable Data Valid";
+          const valNote = val.note || val.label || "Data Konsisten";
           const valChanged = val.changed === true;
           
           let pctAwal = prog.awal_pct;
@@ -5174,18 +5174,19 @@ function renderTrend(cakupan) {
           let reasonHtml = '';
           
           if (!isTop && absoluteDiff <= 0) {
-              let prio = 'C';
-              if (absoluteDiff < -10 || (pctAkhir !== undefined && pctAkhir < 40)) prio = 'A';
-              else if (absoluteDiff < 0 || (pctAkhir !== undefined && pctAkhir < 60)) prio = 'B';
+              let prio = 'c';
+              let prioLabel = 'Prioritas Rendah';
+              if (absoluteDiff < -10 || (pctAkhir !== undefined && pctAkhir < 40)) { prio = 'a'; prioLabel = 'Prioritas Tinggi'; }
+              else if (absoluteDiff < 0 || (pctAkhir !== undefined && pctAkhir < 60)) { prio = 'b'; prioLabel = 'Prioritas Menengah'; }
               
-              prioHtml = `<span class="badge-prio badge-prio-${prio.toLowerCase()}" style="margin-left:8px;">Priority Level ${prio}</span>`;
+              prioHtml = `<span class="badge-prio badge-prio-${prio}" style="margin-left:8px;">${prioLabel}</span>`;
               
               let reason = statusText;
-              if (reason === "Stabil") reason = "Stagnasi capaian kelancaran";
+              if (reason === "Stabil") reason = "Kinerja stabil, tidak ada peningkatan/penurunan";
 
               reasonHtml = `
                 <div style="grid-column: 1 / -1; font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--danger);">
-                  <em>Catatan Dinas: ${reason}</em>
+                  <em>Catatan: ${reason}</em>
                 </div>
               `;
           }
@@ -5215,7 +5216,7 @@ function renderTrend(cakupan) {
                   </div>
                   <div class="pr-validation ${valChanged ? 'warning' : 'success'}" style="${!valChanged && !document.body.classList.contains('dark') ? 'color:var(--success); background:var(--success-dim)' : ''}">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                      Validasi: ${valNote}
+                      ${valChanged ? 'Catatan: ' : 'Validasi: '} ${valNote}
                   </div>
                   ${reasonHtml}
               </div>
@@ -5317,19 +5318,22 @@ function renderTrend(cakupan) {
                     </div>`;
               } else {
                   excludedContainer.innerHTML = `
-                      <div style="font-size:13px; color:var(--text-secondary); margin-bottom: 14px;">Terdapat <strong>${displayExcluded.length} sekolah</strong> yang tidak masuk dalam analisis tren:</div>
+                      <div style="font-size:13px; color:var(--text-secondary); margin-bottom: 14px;">Ada <strong>${displayExcluded.length} sekolah</strong> yang tidak dapat dianalisis:</div>
                       <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:12px;">
-                        ${displayExcluded.map(item => `
+                        ${displayExcluded.map(item => {
+                          let al = item.alasan || "";
+                          if(al === "Data kosong (total siswa = 0)") al = "Tidak ada data siswa (total siswa = 0)";
+                          return `
                           <li style="padding:16px; background:var(--surface); border-radius:var(--r-md); border:1px solid var(--border); box-shadow: var(--shadow-xs); display: flex; flex-direction: column; gap: 6px;">
                             <div style="font-weight:700; color:var(--text-primary); font-size:14.5px;">
                               ${item.nama} <span style="font-weight:500; color:var(--text-tertiary); font-size:12.5px; margin-left:4px;">(Kec. ${item.kecamatan})</span>
                             </div>
                             <div style="font-size:13px; color:var(--danger); display:flex; align-items:start; gap:8px; line-height: 1.5; background: var(--danger-dim); padding: 10px 14px; border-radius: var(--r-sm);">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                              <span><strong>Alasan:</strong> ${item.alasan}</span>
+                              <span><strong>Alasan:</strong> ${al}</span>
                             </div>
                           </li>
-                        `).join("")}
+                        `}).join("")}
                       </ul>
                   `;
               }
@@ -5344,17 +5348,21 @@ function renderTrend(cakupan) {
       const dEnd = pctData[pctData.length-1] || 0;
       const dTot = dEnd - dStart;
       
-      let concHtml = `Berdasarkan filter periode dari <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, performa kumulatif ${cakupan} `;
+      let concHtml = `Pada periode <strong>${validPeriods[0].month} ${validPeriods[0].year}</strong> hingga <strong>${validPeriods[validPeriods.length-1].month} ${validPeriods[validPeriods.length-1].year}</strong>, kinerja BTQ ${cakupan} `;
       
       if(dTot > 0) {
-          concHtml += `menunjukkan tren <strong>peningkatan agregat sebesar +<span class="sensitive-data">${n2(dTot)}</span>%</strong>. `;
+          concHtml += `mengalami <strong>peningkatan sebesar +<span class="sensitive-data">${n2(dTot)}</span>%</strong>. `;
       } else if (dTot < 0) {
-          concHtml += `mengalami kemunduran dengan <strong>penurunan agregat sebesar <span class="sensitive-data">${n2(Math.abs(dTot))}</span>%</strong>. `;
+          concHtml += `mengalami <strong>penurunan sebesar <span class="sensitive-data">${n2(Math.abs(dTot))}</span>%</strong>. `;
       } else {
-          concHtml += `terpantau <strong>stagnan dan stabil</strong> tanpa ada lonjakan berarti. `;
+          concHtml += `terpantau <strong>stabil</strong>. `;
       }
 
-      concHtml += `Secara spesifik, dari total <span class="sensitive-data">${execSum.total_sekolah || 0}</span> sekolah aktif, sebanyak <span class="sensitive-data">${execSum.progress_positif || 0}</span> sekolah berhasil mengukir progres positif. Namun, sistem mendeteksi keberadaan <strong><span class="sensitive-data">${execSum.perlu_pendampingan || 0}</span> sekolah</strong> yang membutuhkan atensi khusus guna mencegah terjadinya penurunan mutu akademis yang lebih luas.`;
+      concHtml += `Dari <span class="sensitive-data">${execSum.total_sekolah || 0}</span> sekolah aktif, sebanyak <span class="sensitive-data">${execSum.progress_positif || 0}</span> sekolah menunjukkan perkembangan positif. `;
+      
+      if (execSum.perlu_pendampingan > 0) {
+          concHtml += `Namun, masih ada <strong><span class="sensitive-data">${execSum.perlu_pendampingan}</span> sekolah</strong> yang perlu perhatian agar kualitas pembelajaran tidak menurun.`;
+      }
 
       safeSetHTML('trendConclusionText', concHtml);
 
