@@ -2345,6 +2345,19 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           </div>
         </div>
 
+        <!-- NEW: Excluded Schools Card -->
+        <div class="chart-card" id="trendExcludedCard" style="display: none; margin-top: 24px; border-left: 4px solid var(--text-tertiary);">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-card-title">Pengecualian Data</div>
+                <div class="chart-card-sub">Sekolah yang tidak diikutsertakan dalam perbandingan tren</div>
+              </div>
+            </div>
+            <div class="chart-card-body" style="padding: 20px 24px; background: var(--surface-2);">
+                <div id="excludedContainer"></div>
+            </div>
+        </div>
+
         <!-- NEW: Executive Conclusion -->
         <div class="chart-card" id="trendConclusionCard" style="display: none; margin-top: 24px; border-left: 4px solid var(--primary);">
             <div class="chart-card-body" style="padding: 24px 28px;">
@@ -4304,6 +4317,54 @@ function renderTrend(cakupan) {
       concHtml += `Secara spesifik, dari total ${execSum.total_sekolah || 0} sekolah aktif, sebanyak ${execSum.progress_positif || 0} sekolah berhasil mengukir progres positif. Namun, sistem mendeteksi keberadaan <strong>${execSum.perlu_pendampingan || 0} sekolah</strong> yang membutuhkan atensi khusus guna mencegah terjadinya penurunan mutu akademis yang lebih luas.`;
 
       safeSetHTML('trendConclusionText', concHtml);
+
+      // --- FITUR BARU: RENDER EXCLUDED SCHOOLS ---
+      const excludedCard = document.getElementById('trendExcludedCard');
+      const excludedContainer = document.getElementById('excludedContainer');
+      
+      if (excludedCard && excludedContainer) {
+          // Ambil dari payload backend secara dinamis, atur default array kosong
+          const excluded = window.MASTER_PAYLOAD?.excluded_schools || [];
+          
+          // Filter data jika user sedang melihat per-kecamatan
+          let displayExcluded = excluded;
+          if (selectedKecamatan !== 'all') {
+              displayExcluded = excluded.filter(s => s.kecamatan === selectedKecamatan);
+          }
+
+          // Hanya tampilkan blok ini jika sedang membandingkan tren (ada rentang data >= 2 bulan)
+          if (validPeriods.length >= 2) {
+              excludedCard.style.display = 'block';
+              
+              if (displayExcluded.length === 0) {
+                  excludedContainer.innerHTML = `
+                    <div style="padding:12px 16px; background: var(--success-dim); border: 1px solid rgba(22,163,74,0.2); border-radius: var(--r-md); color: var(--success); font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                      Semua sekolah valid dan masuk dalam perhitungan perbandingan tren ✔
+                    </div>`;
+              } else {
+                  excludedContainer.innerHTML = `
+                      <div style="font-size:13px; color:var(--text-secondary); margin-bottom: 14px;">Terdapat <strong>${displayExcluded.length} sekolah</strong> yang tidak masuk dalam analisis tren:</div>
+                      <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:12px;">
+                        ${displayExcluded.map(item => `
+                          <li style="padding:16px; background:var(--surface); border-radius:var(--r-md); border:1px solid var(--border); box-shadow: var(--shadow-xs); display: flex; flex-direction: column; gap: 6px;">
+                            <div style="font-weight:700; color:var(--text-primary); font-size:14.5px;">
+                              ${item.nama} <span style="font-weight:500; color:var(--text-tertiary); font-size:12.5px; margin-left:4px;">(Kec. ${item.kecamatan})</span>
+                            </div>
+                            <div style="font-size:13px; color:var(--danger); display:flex; align-items:start; gap:8px; line-height: 1.5; background: var(--danger-dim); padding: 10px 14px; border-radius: var(--r-sm);">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                              <span><strong>Alasan:</strong> ${item.alasan}</span>
+                            </div>
+                          </li>
+                        `).join("")}
+                      </ul>
+                  `;
+              }
+          } else {
+              excludedCard.style.display = 'none'; // Sembunyikan jika bukan mode rentang waktu
+          }
+      }
+      // --- SELESAI FITUR EXCLUDED SCHOOLS ---
 
   } catch(error) {
       console.error("Critical Error during Trend Render:", error);
