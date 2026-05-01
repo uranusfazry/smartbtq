@@ -2018,7 +2018,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
         </button>
 
         <!-- TOMBOL DOWNLOAD PDF -->
-        <button class="btn-print btn-export-pdf" onclick="downloadPDF()" title="Download PDF">
+        <button class="btn-print btn-export-pdf" id="btnExportPDF" onclick="downloadPDF()" title="Download PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
@@ -2029,15 +2029,15 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
           <span class="btn-text">Download PDF</span>
         </button>
 
-        <!-- TOMBOL DOWNLOAD EXCEL -->
-        <button class="btn-print btn-export-excel" onclick="downloadExcel()" title="Download Excel">
+        <!-- TOMBOL DOWNLOAD CSV -->
+        <button class="btn-print btn-export-excel" id="btnExportCSV" onclick="downloadCSV()" title="Download CSV">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="8" y1="13" x2="16" y2="17"></line>
             <line x1="16" y1="13" x2="8" y2="17"></line>
           </svg>
-          <span class="btn-text">Download Excel</span>
+          <span class="btn-text">Download CSV</span>
         </button>
 
         <button class="btn-print" onclick="doLogout()" style="background: var(--danger); color: white; border: none;" title="Keluar">
@@ -2741,16 +2741,100 @@ function getFilterParams() {
   };
 }
 
-function downloadPDF() {
-  const params = new URLSearchParams(getFilterParams());
-  const url = API_URL + "?action=export_pdf&" + params.toString();
-  window.open(url, "_blank");
+async function downloadPDF() {
+  const btn = document.getElementById("btnExportPDF");
+  const originalContent = btn.innerHTML;
+
+  try {
+    // 1. Loading UI pada tombol
+    btn.disabled = true;
+    btn.style.opacity = "0.8";
+    btn.style.cursor = "wait";
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> <span class="btn-text">Menyiapkan PDF...</span>`;
+
+    const params = new URLSearchParams(getFilterParams());
+    const url = `${API_URL}?action=export_pdf&${params.toString()}`;
+    
+    // 2. Fetch file dari backend
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error("Gagal download PDF");
+    }
+
+    // 3. Konversi menjadi Blob
+    const blob = await res.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    // 4. Trigger download secara senyap (tanpa buka tab baru)
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = `Laporan_BTQ_${params.get('fromMonth')}_${params.get('fromYear')}.pdf`;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    // 5. Bersihkan memory URL
+    window.URL.revokeObjectURL(downloadUrl);
+
+  } catch (error) {
+    console.error("Export PDF Error:", error);
+    alert("Gagal mendownload PDF. Cek koneksi atau server.");
+  } finally {
+    // 6. Kembalikan tombol ke keadaan normal
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+    btn.innerHTML = originalContent;
+  }
 }
 
-function downloadExcel() {
-  const params = new URLSearchParams(getFilterParams());
-  const url = API_URL + "?action=export_excel&" + params.toString();
-  window.open(url, "_blank");
+async function downloadCSV() {
+  const btn = document.getElementById("btnExportCSV");
+  const originalContent = btn.innerHTML;
+
+  try {
+    // 1. Loading UI pada tombol
+    btn.disabled = true;
+    btn.style.opacity = "0.8";
+    btn.style.cursor = "wait";
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> <span class="btn-text">Menyiapkan CSV...</span>`;
+
+    const params = new URLSearchParams(getFilterParams());
+    const url = `${API_URL}?action=export_csv&${params.toString()}`;
+    
+    // 2. Fetch file dari backend
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error("Gagal download CSV");
+    }
+
+    // 3. Konversi menjadi Blob
+    const blob = await res.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    // 4. Trigger download secara senyap
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = `Laporan_BTQ_${params.get('fromMonth')}_${params.get('fromYear')}.csv`;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    // 5. Bersihkan memory URL
+    window.URL.revokeObjectURL(downloadUrl);
+
+  } catch (error) {
+    console.error("Export CSV Error:", error);
+    alert("Gagal mendownload CSV. Cek koneksi atau server.");
+  } finally {
+    // 6. Kembalikan tombol ke keadaan normal
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+    btn.innerHTML = originalContent;
+  }
 }
 
 // ────────────────────────────────────────────
