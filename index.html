@@ -1926,6 +1926,15 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
         </button>
 
         <!-- Dark mode toggle is dynamically injected here via JS -->
+        <span id="lastUpdateText" style="font-size: 11.5px; font-weight: 600; color: var(--text-tertiary); display: none;" class="header-brand-sub"></span>
+        <button class="btn-print" onclick="refreshData()" title="Refresh Data" style="background: var(--success);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          <span class="btn-text">Refresh</span>
+        </button>
         <button class="btn-print" onclick="window.print()" title="Cetak PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           <span class="btn-text">Cetak PDF</span>
@@ -2697,6 +2706,49 @@ async function fetchDashboardData(isInit = false) {
     return await res.json();
 }
 
+async function refreshData() {
+    if (isLoading) return;
+    try {
+        showLoading("Memperbarui Data", "Menghapus cache di server...");
+        console.log("Refreshing data...");
+        
+        // 1. Trigger clear_cache ke backend Google Apps Script via POST
+        const res = await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "clear_cache" })
+        });
+        
+        const result = await res.json();
+
+        // 2. Validasi response POST
+        if (!result || result.status !== "success") {
+            alert("Gagal menghapus cache di server.");
+            hideLoading();
+            return;
+        }
+
+        // 3. Wajib: Delay 800ms agar Google Apps Script benar-benar selesai menghapus cache
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // 4. Reload data dashboard menggunakan pipeline GET yang aman
+        await applyMasterFilter();
+
+        // 5. Update indikator waktu
+        const lastUpdateStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const lastUpdateEl = document.getElementById("lastUpdateText");
+        if (lastUpdateEl) {
+            lastUpdateEl.innerText = "Update: " + lastUpdateStr;
+            lastUpdateEl.style.display = "inline-block";
+        }
+        
+        console.log("Data berhasil diperbarui");
+    } catch (error) {
+        console.error("Gagal refresh:", error);
+        hideLoading();
+        alert("Terjadi kesalahan koneksi saat me-refresh data.");
+    }
+}
+
 async function initDashboard() {
   if (isLoading) return;
   try {
@@ -2706,8 +2758,23 @@ async function initDashboard() {
         new Promise(resolve => setTimeout(resolve, 800))
     ]);
     
+    // VALIDASI WAJIB INISIALISASI
+    if (!resData || resData.status !== "success") {
+        console.error("Data Init Error:", resData);
+        throw new Error("Gagal memuat data dari server.");
+    }
+    if (!resData.grouped_data) {
+        console.error("Data kosong! grouped_data missing.");
+        throw new Error("Struktur data tidak valid.");
+    }
+    
     window.MASTER_PAYLOAD = resData; 
-    DATABASE = resData.grouped_data || resData; 
+    DATABASE = resData.grouped_data; // Menggunakan grouped_data yang sudah divalidasi
+
+    // Simpan timeline periode penuh pertama kali untuk dropdown filter
+    // (Tambahkan fallback agar tidak crash jika periode kosong)
+    const periods = getAllPeriods();
+    window.AVAILABLE_PERIODS = periods.length > 0 ? periods : null;
 
     // Setup Filter Dropdowns
     initMasterFilterDropdowns();
@@ -2877,12 +2944,27 @@ async function applyMasterFilter() {
     // Tutup panel Hamburger Menu secara otomatis setelah tombol diklik
     closeSidebar();
 
-    showLoading("Menerapkan Filter Data", "Menyinkronkan data validasi dengan server...");
+    showLoading("Menerapkan Filter Data", "Menyinkronkan data dengan server...");
     
     try {
         const rawData = await fetchDashboardData(false);
+
+        // =====================================================
+        // 🔥 VALIDASI WAJIB (MENCEGAH CRASH & NaN)
+        // =====================================================
+        if (!rawData || rawData.status !== "success") {
+            console.error("Data error:", rawData);
+            alert("Gagal mengambil data dari server");
+            throw new Error("API return status bukan success");
+        }
+        
+        if (!rawData.grouped_data) {
+            console.error("Data kosong! grouped_data missing.");
+            throw new Error("Format data tidak sesuai dari server (grouped_data tidak ada)");
+        }
+
         window.MASTER_PAYLOAD = rawData;
-        DATABASE = rawData.grouped_data || rawData;
+        DATABASE = rawData.grouped_data;
 
         if (DATABASE[currentYear] && DATABASE[currentYear][currentMonth]) {
             renderUI(DATABASE[currentYear][currentMonth]);
