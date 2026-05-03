@@ -1753,8 +1753,8 @@ body.dark .fs-btn-accept {
   tbody tr { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-md); margin: 0 0 16px 0; padding: 16px; box-shadow: var(--shadow-xs); }
   tbody td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-2); text-align: right !important; font-size: 13.5px; }
   tbody td:last-child { border-bottom: none; padding-bottom: 0; padding-top: 12px; }
-  tbody td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; margin-right: 12px; }
-  tbody td[data-label="#"], tbody td[data-label="Kualitas"] { display: none; }
+  .modal-table td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); text-align: left; margin-right: 12px; }
+  tbody td[data-label="#"] { display: none; }
   tbody td[data-label="Sekolah"] { flex-direction: column; align-items: flex-start; text-align: left !important; border-bottom: 2px solid var(--border-2); padding-bottom: 12px; margin-bottom: 4px; }
   tbody td[data-label="Sekolah"]::before { display: none; }
   .td-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
@@ -1762,7 +1762,7 @@ body.dark .fs-btn-accept {
   tfoot tr { display: flex; flex-direction: column; background: var(--primary-dim); border: 1px solid rgba(37,99,235,.2); border-radius: var(--r-md); padding: 16px; margin: 0 0 16px 0; }
   tfoot td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(37,99,235,.2); text-align: right !important; font-size: 14px; background: transparent !important; }
   tfoot td::before { content: attr(data-label); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-secondary); text-align: left; }
-  tfoot td[data-label="#"], tfoot td[data-label="Aksi"], tfoot td[data-label="Kualitas"] { display: none; }
+  tfoot td[data-label="#"], tfoot td[data-label="Aksi"], tfoot td[data-label="Status Data"] { display: none; }
   tfoot td[data-label="Sekolah"] { flex-direction: row; border-bottom: 2px solid rgba(37,99,235,.2); padding-bottom: 12px; margin-bottom: 4px; color: var(--primary); font-size: 14px; justify-content: center; text-align: center !important; }
   tfoot td[data-label="Sekolah"]::before { display: none; }
   
@@ -2523,7 +2523,7 @@ body.dark .preset-btn.active { background: #2563eb; color: #fff; border-color: #
                   <th class="c">% Lancar</th>
                   <th class="c">Belum</th>
                   <th class="c">Tidak</th>
-                  <th class="c">Kualitas</th>
+                  <th class="c">Status Data</th>
                   <th class="c">Aksi</th>
                 </tr>
               </thead>
@@ -4488,9 +4488,9 @@ function renderTable() {
   
   display.forEach((s, i) => {
     const q = dataQuality(s);
-    const qLabel = q === 'valid' ? '<span class="q-dot q-green" title="Data Valid"></span> Valid' :
-                   q === 'partial' ? '<span class="q-dot q-amber" title="Perlu Periksa"></span> Partial' :
-                   '<span class="q-dot q-red" title="Inkonsistensi"></span> Cek';
+    const qLabel = q === 'valid' ? '<span style="color:var(--success); font-weight:700;"><span class="q-dot q-green" style="margin-right:4px;"></span>Valid</span>' :
+                   q === 'partial' ? '<span style="color:var(--warning); font-weight:700;"><span class="q-dot q-amber" style="margin-right:4px;"></span>Partial</span>' :
+                   '<span style="color:var(--danger); font-weight:700;"><span class="q-dot q-red" style="margin-right:4px;"></span>Cek</span>';
     
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -4504,7 +4504,7 @@ function renderTable() {
       <td data-label="% Lancar" class="c sensitive-data">${s.tot>0 ? pctPill(s.pct) : '<span style="color:var(--text-muted)">–</span>'}</td>
       <td data-label="Belum Lancar" class="c sensitive-data" style="color:var(--warning)">${fmt(s.belum)}</td>
       <td data-label="Tidak Bisa" class="c sensitive-data" style="color:var(--danger)">${fmt(s.tidak)}</td>
-      <td data-label="Kualitas" class="c" style="font-size:12px;white-space:nowrap">${qLabel}</td>
+      <td data-label="Status Data" class="c" style="font-size:12.5px;white-space:nowrap">${qLabel}</td>
       <td data-label="Aksi" class="c" style="padding-top:12px;">
         <button class="btn-detail" onclick="openModal(${s.no})">Detail Sekolah</button>
       </td>
@@ -4523,7 +4523,7 @@ function renderTable() {
     <td data-label="% Lancar" class="c sensitive-data">${pctPill(p)}</td>
     <td data-label="Belum Lancar" class="c sensitive-data">${fmt(T.belum)}</td>
     <td data-label="Tidak Bisa" class="c sensitive-data">${fmt(T.tidak)}</td>
-    <td data-label="Kualitas"></td>
+    <td data-label="Status Data"></td>
     <td data-label="Aksi"></td>
   </tr>`;
 }
